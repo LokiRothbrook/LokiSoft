@@ -72,7 +72,7 @@ export function CodeBlock({ code, language }: CodeBlockProps) {
             className={`${className} overflow-x-auto rounded-xl border border-neon-purple/40 p-4 pt-6 text-sm transition-all duration-300 group-hover:border-neon-purple/60 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.15)]`}
             style={{
               ...style,
-              backgroundColor: "oklch(0.1 0.02 270)",
+              backgroundColor: "#12101a",
               margin: 0,
             }}
           >
