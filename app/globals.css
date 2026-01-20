@@ -148,7 +148,13 @@
     color: white;
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar - Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #a855f7 #12101a;
+  }
+
+  /* Custom scrollbar - Chrome/Safari/Edge */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -269,8 +275,11 @@
     );
     background-size: 300% 300%;
     -webkit-background-clip: text;
+    -moz-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+    color: transparent;
   }
 
   .gradient-text-animated {
@@ -283,8 +292,11 @@
     );
     background-size: 400% 400%;
     -webkit-background-clip: text;
+    -moz-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+    color: transparent;
     animation: gradient-shift 8s ease infinite;
   }
 
@@ -430,10 +442,27 @@
 .prose-cyberpunk h4,
 .prose-cyberpunk h5,
 .prose-cyberpunk h6 {
-  background: linear-gradient(135deg, #f0eff2, #22d3ee);
+  /* Gradient text - pink to purple to cyan */
+  background: linear-gradient(135deg, #ec4899 0%, #a855f7 50%, #22d3ee 100%);
   -webkit-background-clip: text;
+  -moz-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  -moz-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Firefox fallback if gradient text doesn't work */
+@supports not (background-clip: text) {
+  .prose-cyberpunk h1,
+  .prose-cyberpunk h2,
+  .prose-cyberpunk h3,
+  .prose-cyberpunk h4,
+  .prose-cyberpunk h5,
+  .prose-cyberpunk h6 {
+    background: none;
+    color: #ec4899;
+  }
 }
 
 .prose-cyberpunk hr {
