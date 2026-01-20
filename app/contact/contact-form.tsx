@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Send, CheckCircle, Loader2 } from "lucide-react";
+import { Send, CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Turnstile } from "@/components/ui/turnstile";
 import { submitContactForm, ContactFormData } from "./actions";
 
 const projectTypes = [
@@ -17,34 +18,77 @@ const projectTypes = [
   { value: "other", label: "Other" },
 ];
 
+// Maximum lengths for form fields (enforced client and server side)
+const MAX_LENGTHS = {
+  name: 100,
+  email: 254,
+  subject: 200,
+  message: 5000,
+};
+
 export function ContactForm() {
-  const [formData, setFormData] = useState<ContactFormData>({
+  const [formData, setFormData] = useState<Omit<ContactFormData, "turnstileToken">>({
     name: "",
     email: "",
     subject: "",
     projectType: "",
     message: "",
   });
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rateLimitedUntil, setRateLimitedUntil] = useState<number | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const maxLength = MAX_LENGTHS[name as keyof typeof MAX_LENGTHS];
+
+    // Enforce max length on client side
+    const trimmedValue = maxLength ? value.slice(0, maxLength) : value;
+
+    setFormData((prev) => ({ ...prev, [name]: trimmedValue }));
     setError(null);
   };
 
+  const handleTurnstileVerify = useCallback((token: string) => {
+    setTurnstileToken(token);
+    setError(null);
+  }, []);
+
+  const handleTurnstileError = useCallback(() => {
+    setError("CAPTCHA verification failed. Please refresh the page and try again.");
+  }, []);
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken("");
+    setError("CAPTCHA expired. Please complete the verification again.");
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if rate limited
+    if (rateLimitedUntil && Date.now() < rateLimitedUntil) {
+      const secondsLeft = Math.ceil((rateLimitedUntil - Date.now()) / 1000);
+      setError(`Please wait ${secondsLeft} seconds before trying again.`);
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
     // Client-side validation
-    if (!formData.name || !formData.email || !formData.message) {
-      setError("Please fill in all required fields.");
+    if (!formData.name || formData.name.trim().length < 2) {
+      setError("Please provide a valid name (at least 2 characters).");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!formData.email) {
+      setError("Please provide your email address.");
       setIsSubmitting(false);
       return;
     }
@@ -56,13 +100,38 @@ export function ContactForm() {
       return;
     }
 
+    if (!formData.message || formData.message.trim().length < 10) {
+      setError("Please provide a message with at least 10 characters.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Check Turnstile token (only if Turnstile is configured)
+    const turnstileConfigured = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    if (turnstileConfigured && !turnstileToken) {
+      setError("Please complete the CAPTCHA verification.");
+      setIsSubmitting(false);
+      return;
+    }
+
     // Submit via server action
-    const result = await submitContactForm(formData);
+    const result = await submitContactForm({
+      ...formData,
+      turnstileToken,
+    });
 
     if (result.success) {
       setIsSubmitted(true);
     } else {
       setError(result.error || "Something went wrong. Please try again.");
+
+      // Handle rate limiting
+      if (result.rateLimited && result.retryAfter) {
+        setRateLimitedUntil(Date.now() + result.retryAfter * 1000);
+      }
+
+      // Reset Turnstile on error so user can try again
+      setTurnstileToken("");
     }
 
     setIsSubmitting(false);
@@ -98,6 +167,7 @@ export function ContactForm() {
               projectType: "",
               message: "",
             });
+            setTurnstileToken("");
           }}
         >
           Send Another Message
@@ -112,9 +182,10 @@ export function ContactForm() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm"
+          className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-start gap-3"
         >
-          {error}
+          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <span>{error}</span>
         </motion.div>
       )}
 
@@ -131,6 +202,8 @@ export function ContactForm() {
             value={formData.name}
             onChange={handleChange}
             required
+            maxLength={MAX_LENGTHS.name}
+            autoComplete="name"
             className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30 transition-all"
             placeholder="Your name"
           />
@@ -148,6 +221,8 @@ export function ContactForm() {
             value={formData.email}
             onChange={handleChange}
             required
+            maxLength={MAX_LENGTHS.email}
+            autoComplete="email"
             className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30 transition-all"
             placeholder="your@email.com"
           />
@@ -166,6 +241,7 @@ export function ContactForm() {
             name="subject"
             value={formData.subject}
             onChange={handleChange}
+            maxLength={MAX_LENGTHS.subject}
             className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30 transition-all"
             placeholder="What's this about?"
           />
@@ -196,6 +272,9 @@ export function ContactForm() {
       <div>
         <label htmlFor="message" className="block text-sm font-medium mb-2">
           Message <span className="text-neon-pink">*</span>
+          <span className="text-muted-foreground text-xs ml-2">
+            ({formData.message.length}/{MAX_LENGTHS.message})
+          </span>
         </label>
         <textarea
           id="message"
@@ -204,8 +283,18 @@ export function ContactForm() {
           onChange={handleChange}
           required
           rows={6}
+          maxLength={MAX_LENGTHS.message}
           className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30 transition-all resize-none"
           placeholder="Tell us about your project, questions, or just say hello..."
+        />
+      </div>
+
+      {/* Turnstile CAPTCHA */}
+      <div className="flex justify-center">
+        <Turnstile
+          onVerify={handleTurnstileVerify}
+          onError={handleTurnstileError}
+          onExpire={handleTurnstileExpire}
         />
       </div>
 
@@ -217,7 +306,7 @@ export function ContactForm() {
         <Button
           type="submit"
           size="lg"
-          disabled={isSubmitting}
+          disabled={isSubmitting || (rateLimitedUntil !== null && Date.now() < rateLimitedUntil)}
           className="bg-neon-pink hover:bg-neon-pink/80 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (

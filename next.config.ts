@@ -64,24 +64,29 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              // Scripts: allow self, inline (for Next.js), and eval (for Next.js dev)
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://giscus.app",
+              // Scripts: allow self, inline (for Next.js), eval (for Next.js dev), Giscus, and Turnstile
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://giscus.app https://challenges.cloudflare.com",
               // Styles: allow self, inline (for styled-jsx and dynamic styles), and KaTeX CDN
               "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-              // Fonts: allow self and KaTeX CDN
+              // Fonts: allow self and data URIs
               "font-src 'self' data:",
-              // Images: allow self, data URIs, and common image sources
-              "img-src 'self' data: blob: https: http:",
-              // Connect: allow self and analytics/API endpoints
-              "connect-src 'self' https://giscus.app",
-              // Frames: allow Giscus for comments
-              "frame-src 'self' https://giscus.app",
-              // Frame ancestors: only self
+              // Images: RESTRICTED to specific trusted domains only
+              // Self, data URIs for inline images, Unsplash for blog images, jsDelivr for icons
+              "img-src 'self' data: blob: https://images.unsplash.com https://cdn.jsdelivr.net https://*.githubusercontent.com",
+              // Connect: allow self, Giscus API, and Turnstile verification
+              "connect-src 'self' https://giscus.app https://challenges.cloudflare.com",
+              // Frames: allow Giscus for comments and Turnstile for CAPTCHA
+              "frame-src 'self' https://giscus.app https://challenges.cloudflare.com",
+              // Frame ancestors: only self (prevents clickjacking)
               "frame-ancestors 'self'",
               // Form actions: only self
               "form-action 'self'",
               // Base URI: only self
               "base-uri 'self'",
+              // Object sources: none (blocks Flash, etc.)
+              "object-src 'none'",
+              // Upgrade insecure requests in production
+              "upgrade-insecure-requests",
             ].join("; "),
           },
         ],
