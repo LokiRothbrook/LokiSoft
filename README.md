@@ -8,7 +8,7 @@ A modern, cyberpunk-themed company website built with Next.js 15, React 19, and 
 
 ## Features
 
-- **Cyberpunk Neon Theme** - Dark theme with vibrant neon colors (pink, purple, blue, cyan) using OKLCH color space
+- **Cyberpunk Neon Theme** - Dark theme with vibrant neon colors (pink, purple, blue, cyan)
 - **Full Blog System** - Markdown-based posts with syntax highlighting, math equations (KaTeX), and interactive components
 - **Responsive Design** - Mobile-first approach with glass morphism effects
 - **Fast Performance** - Built on Next.js App Router with static generation
@@ -83,15 +83,17 @@ Configuration for external services and site-specific settings is managed throug
 
 You can easily change the website's color scheme and appearance.
 
-1.  **Colors:** The primary color variables are defined at the top of `app/globals.css`. The site uses the OKLCH color model for a wide gamut of vibrant colors.
+1.  **Colors:** The primary color variables are defined at the top of `app/globals.css`. The site uses hex color values for maximum browser compatibility.
     ```css
     /* In app/globals.css */
-    --neon-pink: oklch(0.7 0.25 350);
-    --neon-purple: oklch(0.65 0.25 300);
-    --neon-blue: oklch(0.65 0.2 250);
-    --neon-cyan: oklch(0.75 0.15 200);
+    --neon-pink: #ec4899;
+    --neon-purple: #a855f7;
+    --neon-blue: #3b82f6;
+    --neon-cyan: #22d3ee;
     ```
     Simply change these values to whatever you prefer.
+
+    > **Note:** We use hex/rgba colors instead of OKLCH for Firefox compatibility. OKLCH colors can cause rendering issues with backdrop-filter and gradient text in Firefox.
 
 2.  **Logo:** The site logo is an SVG file located at `public/lokisoft-logo.svg`. Replace this file with your own logo.
 
@@ -184,11 +186,20 @@ The site uses a custom cyberpunk theme with CSS variables defined in `app/global
 ### Neon Colors
 
 ```css
---neon-pink: oklch(0.7 0.25 350);
---neon-purple: oklch(0.65 0.25 300);
---neon-blue: oklch(0.65 0.2 250);
---neon-cyan: oklch(0.75 0.15 200);
+--neon-pink: #ec4899;
+--neon-purple: #a855f7;
+--neon-blue: #3b82f6;
+--neon-cyan: #22d3ee;
 ```
+
+### Firefox Compatibility
+
+This project prioritizes cross-browser compatibility. Key considerations:
+
+- **Colors:** Use hex (`#ec4899`) or rgba (`rgba(236, 72, 153, 0.5)`) instead of OKLCH. Firefox has issues with OKLCH colors when combined with `backdrop-filter` and gradient text.
+- **Scrollbars:** Custom scrollbar styling uses both `-webkit-scrollbar` (Chrome/Safari/Edge) and `scrollbar-color` (Firefox).
+- **Gradient Text:** The `-moz-` prefixes are included for gradient text effects, with fallback colors for unsupported browsers.
+- **Glass Effects:** The `.glass` classes include `transform: translateZ(0)` to prevent flickering in Firefox.
 
 ### Utility Classes
 
