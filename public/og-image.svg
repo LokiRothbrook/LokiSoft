@@ -1,0 +1,100 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#12121a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0f;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Neon glow filters -->
+    <filter id="glowPink" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="glowCyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="glowPurple" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Text gradient -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff00ff"/>
+      <stop offset="33%" style="stop-color:#bf00ff"/>
+      <stop offset="66%" style="stop-color:#00d4ff"/>
+      <stop offset="100%" style="stop-color:#00ffff"/>
+    </linearGradient>
+
+    <!-- Grid pattern -->
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(191,0,255,0.1)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Grid overlay -->
+  <rect width="1200" height="630" fill="url(#grid)" opacity="0.5"/>
+
+  <!-- Decorative elements - top left corner glow -->
+  <circle cx="0" cy="0" r="300" fill="rgba(255,0,255,0.05)"/>
+
+  <!-- Decorative elements - bottom right corner glow -->
+  <circle cx="1200" cy="630" r="350" fill="rgba(0,212,255,0.05)"/>
+
+  <!-- Accent lines -->
+  <line x1="100" y1="150" x2="300" y2="150" stroke="#ff00ff" stroke-width="2" opacity="0.6" filter="url(#glowPink)"/>
+  <line x1="900" y1="480" x2="1100" y2="480" stroke="#00ffff" stroke-width="2" opacity="0.6" filter="url(#glowCyan)"/>
+
+  <!-- Corner accents -->
+  <path d="M 50 50 L 50 100 M 50 50 L 100 50" stroke="#ff00ff" stroke-width="3" fill="none" filter="url(#glowPink)"/>
+  <path d="M 1150 50 L 1150 100 M 1150 50 L 1100 50" stroke="#bf00ff" stroke-width="3" fill="none" filter="url(#glowPurple)"/>
+  <path d="M 50 580 L 50 530 M 50 580 L 100 580" stroke="#00d4ff" stroke-width="3" fill="none" filter="url(#glowCyan)"/>
+  <path d="M 1150 580 L 1150 530 M 1150 580 L 1100 580" stroke="#00ffff" stroke-width="3" fill="none" filter="url(#glowCyan)"/>
+
+  <!-- Logo mark - stylized "L" -->
+  <g transform="translate(520, 180)">
+    <!-- Outer glow box -->
+    <rect x="0" y="0" width="160" height="160" rx="20" fill="none" stroke="url(#textGradient)" stroke-width="3" filter="url(#glowPink)"/>
+
+    <!-- Inner L shape -->
+    <path d="M 40 35 L 40 125 L 120 125" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#glowCyan)"/>
+
+    <!-- Accent dot -->
+    <circle cx="120" cy="55" r="8" fill="#00ffff" filter="url(#glowCyan)"/>
+  </g>
+
+  <!-- Main title -->
+  <text x="600" y="400" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="bold" fill="url(#textGradient)" filter="url(#glowPink)">
+    LokiSoft
+  </text>
+
+  <!-- Tagline -->
+  <text x="600" y="470" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="28" fill="#e0e0e0" opacity="0.9">
+    Open Source Software Built on Christian Values
+  </text>
+
+  <!-- Subtle bottom accent -->
+  <rect x="400" y="520" width="400" height="2" fill="url(#textGradient)" opacity="0.5" rx="1"/>
+
+  <!-- URL -->
+  <text x="600" y="570" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="20" fill="#00ffff" opacity="0.7" filter="url(#glowCyan)">
+    lokisoft.xyz
+  </text>
+</svg>

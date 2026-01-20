@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a1a"/>
+      <stop offset="100%" stop-color="#12122a"/>
+    </linearGradient>
+
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="500" fill="url(#bgGrad)"/>
+
+  <!-- Window chrome -->
+  <rect x="50" y="30" width="700" height="440" rx="12" fill="#1a1a2e" stroke="#a855f7" stroke-width="1" opacity="0.9"/>
+
+  <!-- Title bar -->
+  <rect x="50" y="30" width="700" height="40" rx="12" fill="#12122a"/>
+  <rect x="50" y="58" width="700" height="12" fill="#12122a"/>
+
+  <!-- Window buttons -->
+  <circle cx="80" cy="50" r="7" fill="#ff5f56"/>
+  <circle cx="105" cy="50" r="7" fill="#ffbd2e"/>
+  <circle cx="130" cy="50" r="7" fill="#27ca40"/>
+
+  <!-- Tab -->
+  <rect x="160" y="38" width="120" height="28" rx="6" fill="#1a1a2e"/>
+  <text x="180" y="57" font-family="monospace" font-size="11" fill="#00d9ff">code.tsx</text>
+
+  <!-- Line numbers -->
+  <g font-family="monospace" font-size="13" fill="#a855f7" opacity="0.5">
+    <text x="70" y="100">1</text>
+    <text x="70" y="125">2</text>
+    <text x="70" y="150">3</text>
+    <text x="70" y="175">4</text>
+    <text x="70" y="200">5</text>
+    <text x="70" y="225">6</text>
+    <text x="70" y="250">7</text>
+    <text x="70" y="275">8</text>
+    <text x="70" y="300">9</text>
+    <text x="63" y="325">10</text>
+    <text x="63" y="350">11</text>
+    <text x="63" y="375">12</text>
+    <text x="63" y="400">13</text>
+    <text x="63" y="425">14</text>
+  </g>
+
+  <!-- Code content with syntax highlighting -->
+  <g font-family="monospace" font-size="13" filter="url(#glow)">
+    <!-- Line 1: import statement -->
+    <text x="100" y="100" fill="#ff006e">import</text>
+    <text x="165" y="100" fill="#ffffff">{ useState }</text>
+    <text x="280" y="100" fill="#ff006e">from</text>
+    <text x="330" y="100" fill="#00d9ff">'react'</text>
+    <text x="400" y="100" fill="#ffffff">;</text>
+
+    <!-- Line 2: blank -->
+
+    <!-- Line 3: function declaration -->
+    <text x="100" y="150" fill="#ff006e">function</text>
+    <text x="180" y="150" fill="#a855f7">Counter</text>
+    <text x="265" y="150" fill="#ffffff">() {</text>
+
+    <!-- Line 4: const -->
+    <text x="120" y="175" fill="#ff006e">const</text>
+    <text x="175" y="175" fill="#ffffff">[count, setCount] =</text>
+    <text x="360" y="175" fill="#a855f7">useState</text>
+    <text x="435" y="175" fill="#ffffff">(</text>
+    <text x="445" y="175" fill="#00d9ff">0</text>
+    <text x="455" y="175" fill="#ffffff">);</text>
+
+    <!-- Line 5: blank -->
+
+    <!-- Line 6: return -->
+    <text x="120" y="225" fill="#ff006e">return</text>
+    <text x="180" y="225" fill="#ffffff">(</text>
+
+    <!-- Line 7: div -->
+    <text x="140" y="250" fill="#ffffff">&lt;</text>
+    <text x="155" y="250" fill="#00d9ff">div</text>
+    <text x="185" y="250" fill="#a855f7">className</text>
+    <text x="265" y="250" fill="#ffffff">=</text>
+    <text x="280" y="250" fill="#00d9ff">"counter"</text>
+    <text x="365" y="250" fill="#ffffff">&gt;</text>
+
+    <!-- Line 8: h1 -->
+    <text x="160" y="275" fill="#ffffff">&lt;</text>
+    <text x="175" y="275" fill="#00d9ff">h1</text>
+    <text x="195" y="275" fill="#ffffff">&gt;{count}&lt;/</text>
+    <text x="300" y="275" fill="#00d9ff">h1</text>
+    <text x="320" y="275" fill="#ffffff">&gt;</text>
+
+    <!-- Line 9: button -->
+    <text x="160" y="300" fill="#ffffff">&lt;</text>
+    <text x="175" y="300" fill="#00d9ff">button</text>
+    <text x="235" y="300" fill="#a855f7">onClick</text>
+    <text x="305" y="300" fill="#ffffff">={() =&gt;</text>
+    <text x="385" y="300" fill="#a855f7">setCount</text>
+    <text x="460" y="300" fill="#ffffff">(c =&gt; c +</text>
+    <text x="555" y="300" fill="#00d9ff">1</text>
+    <text x="565" y="300" fill="#ffffff">)}&gt;</text>
+
+    <!-- Line 10: button text -->
+    <text x="180" y="325" fill="#ffffff">Increment</text>
+
+    <!-- Line 11: button close -->
+    <text x="160" y="350" fill="#ffffff">&lt;/</text>
+    <text x="180" y="350" fill="#00d9ff">button</text>
+    <text x="235" y="350" fill="#ffffff">&gt;</text>
+
+    <!-- Line 12: div close -->
+    <text x="140" y="375" fill="#ffffff">&lt;/</text>
+    <text x="160" y="375" fill="#00d9ff">div</text>
+    <text x="190" y="375" fill="#ffffff">&gt;</text>
+
+    <!-- Line 13: paren close -->
+    <text x="120" y="400" fill="#ffffff">);</text>
+
+    <!-- Line 14: function close -->
+    <text x="100" y="425" fill="#ffffff">}</text>
+  </g>
+
+  <!-- Cursor -->
+  <rect x="115" y="428" width="8" height="2" fill="#ff006e" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0;0.8" dur="1s" repeatCount="indefinite"/>
+  </rect>
+</svg>

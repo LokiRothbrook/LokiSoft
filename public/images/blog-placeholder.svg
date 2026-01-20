@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <defs>
+    <!-- Gradient backgrounds -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a1a"/>
+      <stop offset="50%" stop-color="#12122a"/>
+      <stop offset="100%" stop-color="#0a0a1a"/>
+    </linearGradient>
+
+    <!-- Neon glow filters -->
+    <filter id="glowPink" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="glowCyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="glowPurple" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Grid pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#a855f7" stroke-width="0.5" opacity="0.15"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="url(#bgGradient)"/>
+
+  <!-- Grid overlay -->
+  <rect width="800" height="400" fill="url(#grid)"/>
+
+  <!-- Decorative circuit lines -->
+  <g stroke="#00d9ff" stroke-width="1" fill="none" opacity="0.3">
+    <path d="M 0 100 L 100 100 L 150 150 L 200 150"/>
+    <path d="M 800 300 L 700 300 L 650 250 L 600 250"/>
+    <path d="M 0 350 L 80 350 L 100 330"/>
+    <path d="M 800 50 L 720 50 L 700 70"/>
+  </g>
+
+  <!-- Central design - code brackets with glow -->
+  <g transform="translate(400, 200)">
+    <!-- Large brackets -->
+    <text x="-120" y="25" font-family="monospace" font-size="100" fill="#ff006e" filter="url(#glowPink)" opacity="0.9">{</text>
+    <text x="70" y="25" font-family="monospace" font-size="100" fill="#ff006e" filter="url(#glowPink)" opacity="0.9">}</text>
+
+    <!-- Code lines inside brackets -->
+    <g filter="url(#glowCyan)">
+      <rect x="-50" y="-30" width="100" height="6" rx="3" fill="#00d9ff" opacity="0.8"/>
+      <rect x="-35" y="-10" width="70" height="6" rx="3" fill="#a855f7" opacity="0.7"/>
+      <rect x="-45" y="10" width="90" height="6" rx="3" fill="#00d9ff" opacity="0.6"/>
+      <rect x="-30" y="30" width="60" height="6" rx="3" fill="#a855f7" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- Corner accents -->
+  <g stroke="#ff006e" stroke-width="2" fill="none" filter="url(#glowPink)" opacity="0.6">
+    <!-- Top left corner -->
+    <path d="M 20 50 L 20 20 L 50 20"/>
+    <!-- Top right corner -->
+    <path d="M 750 20 L 780 20 L 780 50"/>
+    <!-- Bottom left corner -->
+    <path d="M 20 350 L 20 380 L 50 380"/>
+    <!-- Bottom right corner -->
+    <path d="M 750 380 L 780 380 L 780 350"/>
+  </g>
+
+  <!-- Floating particles/dots -->
+  <g fill="#00d9ff" filter="url(#glowCyan)">
+    <circle cx="100" cy="80" r="2" opacity="0.6"/>
+    <circle cx="700" cy="120" r="3" opacity="0.5"/>
+    <circle cx="150" cy="320" r="2" opacity="0.4"/>
+    <circle cx="650" cy="350" r="2" opacity="0.6"/>
+    <circle cx="300" cy="60" r="1.5" opacity="0.5"/>
+    <circle cx="500" cy="340" r="2" opacity="0.4"/>
+  </g>
+
+  <g fill="#a855f7" filter="url(#glowPurple)">
+    <circle cx="200" cy="150" r="1.5" opacity="0.5"/>
+    <circle cx="600" cy="250" r="2" opacity="0.4"/>
+    <circle cx="750" cy="200" r="1.5" opacity="0.6"/>
+    <circle cx="50" cy="200" r="2" opacity="0.5"/>
+  </g>
+
+  <!-- Subtle "LokiSoft" watermark -->
+  <text x="400" y="385" text-anchor="middle" font-family="monospace" font-size="12" fill="#a855f7" opacity="0.4" filter="url(#glowPurple)">LOKISOFT</text>
+</svg>

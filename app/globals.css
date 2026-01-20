@@ -1,0 +1,672 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* FiraCode Nerd Font - Self-hosted */
+@font-face {
+  font-family: 'FiraCode Nerd Font';
+  src: url('/fonts/FiraCodeNerdFont-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FiraCode Nerd Font';
+  src: url('/fonts/FiraCodeNerdFont-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FiraCode Nerd Font';
+  src: url('/fonts/FiraCodeNerdFont-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FiraCode Nerd Font';
+  src: url('/fonts/FiraCodeNerdFont-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FiraCode Nerd Font';
+  src: url('/fonts/FiraCodeNerdFont-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: 'FiraCode Nerd Font', system-ui, sans-serif;
+  --font-mono: 'FiraCode Nerd Font', monospace;
+
+  /* Neon Colors */
+  --color-neon-pink: var(--neon-pink);
+  --color-neon-purple: var(--neon-purple);
+  --color-neon-blue: var(--neon-blue);
+  --color-neon-cyan: var(--neon-cyan);
+
+  /* Core colors */
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+}
+
+:root {
+  /* Dark cyberpunk base */
+  --background: oklch(0.08 0.02 270);
+  --foreground: oklch(0.95 0.01 270);
+
+  /* Neon palette */
+  --neon-pink: oklch(0.7 0.25 350);
+  --neon-purple: oklch(0.6 0.28 300);
+  --neon-blue: oklch(0.65 0.22 250);
+  --neon-cyan: oklch(0.75 0.18 195);
+
+  /* Card with glass effect base */
+  --card: oklch(0.12 0.025 270 / 80%);
+  --card-foreground: oklch(0.95 0.01 270);
+
+  /* Popover */
+  --popover: oklch(0.1 0.03 270 / 95%);
+  --popover-foreground: oklch(0.95 0.01 270);
+
+  /* Primary - neon pink */
+  --primary: oklch(0.7 0.25 350);
+  --primary-foreground: oklch(0.98 0.01 350);
+
+  /* Secondary - neon purple */
+  --secondary: oklch(0.15 0.04 300);
+  --secondary-foreground: oklch(0.9 0.02 300);
+
+  /* Muted */
+  --muted: oklch(0.18 0.02 270);
+  --muted-foreground: oklch(0.65 0.02 270);
+
+  /* Accent - neon cyan */
+  --accent: oklch(0.75 0.18 195);
+  --accent-foreground: oklch(0.1 0.02 195);
+
+  /* Destructive */
+  --destructive: oklch(0.6 0.25 25);
+
+  /* Borders and inputs */
+  --border: oklch(0.3 0.05 300 / 30%);
+  --input: oklch(0.15 0.03 270);
+  --ring: oklch(0.7 0.25 350);
+
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    background:
+      radial-gradient(ellipse at 20% 20%, oklch(0.2 0.1 300 / 20%) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, oklch(0.2 0.1 250 / 20%) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, oklch(0.15 0.08 350 / 15%) 0%, transparent 60%),
+      oklch(0.08 0.02 270);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: oklch(0.7 0.25 350 / 40%);
+    color: white;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: oklch(0.1 0.02 270);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, oklch(0.7 0.25 350), oklch(0.6 0.28 300));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, oklch(0.75 0.25 350), oklch(0.65 0.28 300));
+  }
+}
+
+@layer utilities {
+  /* Neon glow effects */
+  .neon-glow-pink {
+    text-shadow:
+      0 0 5px oklch(0.7 0.25 350),
+      0 0 10px oklch(0.7 0.25 350),
+      0 0 20px oklch(0.7 0.25 350 / 70%),
+      0 0 40px oklch(0.7 0.25 350 / 50%);
+  }
+
+  .neon-glow-purple {
+    text-shadow:
+      0 0 5px oklch(0.6 0.28 300),
+      0 0 10px oklch(0.6 0.28 300),
+      0 0 20px oklch(0.6 0.28 300 / 70%),
+      0 0 40px oklch(0.6 0.28 300 / 50%);
+  }
+
+  .neon-glow-blue {
+    text-shadow:
+      0 0 5px oklch(0.65 0.22 250),
+      0 0 10px oklch(0.65 0.22 250),
+      0 0 20px oklch(0.65 0.22 250 / 70%),
+      0 0 40px oklch(0.65 0.22 250 / 50%);
+  }
+
+  .neon-glow-cyan {
+    text-shadow:
+      0 0 5px oklch(0.75 0.18 195),
+      0 0 10px oklch(0.75 0.18 195),
+      0 0 20px oklch(0.75 0.18 195 / 70%),
+      0 0 40px oklch(0.75 0.18 195 / 50%);
+  }
+
+  /* Box glow effects */
+  .box-glow-pink {
+    box-shadow:
+      0 0 5px oklch(0.7 0.25 350 / 50%),
+      0 0 20px oklch(0.7 0.25 350 / 30%),
+      inset 0 0 20px oklch(0.7 0.25 350 / 10%);
+  }
+
+  .box-glow-purple {
+    box-shadow:
+      0 0 5px oklch(0.6 0.28 300 / 50%),
+      0 0 20px oklch(0.6 0.28 300 / 30%),
+      inset 0 0 20px oklch(0.6 0.28 300 / 10%);
+  }
+
+  .box-glow-blue {
+    box-shadow:
+      0 0 5px oklch(0.65 0.22 250 / 50%),
+      0 0 20px oklch(0.65 0.22 250 / 30%),
+      inset 0 0 20px oklch(0.65 0.22 250 / 10%);
+  }
+
+  .box-glow-cyan {
+    box-shadow:
+      0 0 5px oklch(0.75 0.18 195 / 50%),
+      0 0 20px oklch(0.75 0.18 195 / 30%),
+      inset 0 0 20px oklch(0.75 0.18 195 / 10%);
+  }
+
+  /* Glass morphism */
+  .glass {
+    background: oklch(0.12 0.025 270 / 60%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid oklch(0.4 0.1 300 / 20%);
+  }
+
+  .glass-strong {
+    background: oklch(0.1 0.03 270 / 80%);
+    border: 1px solid oklch(0.5 0.15 300 / 25%);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg,
+      oklch(0.7 0.25 350),
+      oklch(0.6 0.28 300),
+      oklch(0.65 0.22 250),
+      oklch(0.75 0.18 195)
+    );
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .gradient-text-animated {
+    background: linear-gradient(135deg,
+      oklch(0.7 0.25 350),
+      oklch(0.6 0.28 300),
+      oklch(0.65 0.22 250),
+      oklch(0.75 0.18 195),
+      oklch(0.7 0.25 350)
+    );
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  /* Gradient border */
+  .gradient-border {
+    position: relative;
+    background: oklch(0.1 0.02 270);
+    border-radius: var(--radius);
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg,
+      oklch(0.7 0.25 350),
+      oklch(0.6 0.28 300),
+      oklch(0.65 0.22 250),
+      oklch(0.75 0.18 195)
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Animated gradient border */
+  .gradient-border-animated::before {
+    background: linear-gradient(135deg,
+      oklch(0.7 0.25 350),
+      oklch(0.6 0.28 300),
+      oklch(0.65 0.22 250),
+      oklch(0.75 0.18 195),
+      oklch(0.7 0.25 350)
+    );
+    background-size: 400% 400%;
+    animation: gradient-shift 6s ease infinite;
+  }
+
+  /* Neon border glow */
+  .neon-border {
+    border: 1px solid oklch(0.7 0.25 350 / 50%);
+    box-shadow:
+      0 0 5px oklch(0.7 0.25 350 / 30%),
+      inset 0 0 5px oklch(0.7 0.25 350 / 10%);
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Prose styles for blog posts */
+.prose-cyberpunk {
+  --tw-prose-body: oklch(0.85 0.02 270);
+  --tw-prose-headings: oklch(0.95 0.01 270);
+  --tw-prose-links: oklch(0.75 0.18 195);
+  --tw-prose-bold: oklch(0.95 0.01 270);
+  --tw-prose-counters: oklch(0.6 0.28 300);
+  --tw-prose-bullets: oklch(0.7 0.25 350);
+  --tw-prose-hr: oklch(0.3 0.05 300 / 50%);
+  --tw-prose-quotes: oklch(0.7 0.25 350);
+  --tw-prose-quote-borders: oklch(0.7 0.25 350);
+  --tw-prose-captions: oklch(0.65 0.02 270);
+  --tw-prose-code: oklch(0.75 0.18 195);
+  --tw-prose-pre-code: oklch(0.85 0.02 270);
+  --tw-prose-pre-bg: oklch(0.1 0.02 270);
+  --tw-prose-th-borders: oklch(0.3 0.05 300 / 50%);
+  --tw-prose-td-borders: oklch(0.2 0.03 300 / 30%);
+}
+
+.prose-cyberpunk a {
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.prose-cyberpunk a:hover {
+  text-shadow: 0 0 10px oklch(0.75 0.18 195 / 70%);
+}
+
+.prose-cyberpunk code {
+  background: oklch(0.15 0.03 270);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
+
+.prose-cyberpunk pre {
+  border: 1px solid oklch(0.3 0.05 300 / 30%);
+  border-radius: 0.5rem;
+}
+
+.prose-cyberpunk blockquote {
+  border-left: 3px solid oklch(0.7 0.25 350);
+  background: oklch(0.1 0.02 270 / 50%);
+  padding: 1rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  width: 100%;
+}
+
+.prose-cyberpunk h1,
+.prose-cyberpunk h2,
+.prose-cyberpunk h3,
+.prose-cyberpunk h4,
+.prose-cyberpunk h5,
+.prose-cyberpunk h6 {
+  background: linear-gradient(135deg, oklch(0.95 0.01 270), oklch(0.75 0.18 195));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.prose-cyberpunk hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    oklch(0.7 0.25 350 / 50%),
+    oklch(0.6 0.28 300 / 50%),
+    transparent
+  );
+}
+
+/* List styles */
+.prose-cyberpunk ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.prose-cyberpunk ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.prose-cyberpunk li {
+  margin: 0.5rem 0;
+  padding-left: 0.5rem;
+}
+
+.prose-cyberpunk li::marker {
+  color: oklch(0.7 0.25 350);
+}
+
+.prose-cyberpunk ol li::marker {
+  color: oklch(0.6 0.28 300);
+  font-weight: 600;
+}
+
+/* Nested lists */
+.prose-cyberpunk ul ul,
+.prose-cyberpunk ol ul {
+  list-style-type: circle;
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.prose-cyberpunk ul ul ul,
+.prose-cyberpunk ol ul ul {
+  list-style-type: square;
+}
+
+.prose-cyberpunk ol ol,
+.prose-cyberpunk ul ol {
+  list-style-type: lower-alpha;
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+/* Task lists */
+.prose-cyberpunk .contains-task-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.prose-cyberpunk .task-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.prose-cyberpunk .task-list-item input[type="checkbox"] {
+  margin-top: 0.25rem;
+  width: 1rem;
+  height: 1rem;
+  accent-color: oklch(0.7 0.25 350);
+  cursor: pointer;
+}
+
+/* Table styles */
+.prose-cyberpunk table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.5rem 0;
+  border-radius: 0.75rem;
+  border: 2px solid oklch(0.6 0.28 300 / 70%);
+  box-shadow: 0 0 15px oklch(0.6 0.28 300 / 20%);
+}
+
+@media (min-width: 1024px) {
+  .prose-cyberpunk table {
+    width: auto;
+    max-width: 80%;
+  }
+}
+
+.prose-cyberpunk thead {
+  background: oklch(0.18 0.06 300 / 80%);
+}
+
+.prose-cyberpunk tbody {
+  background: oklch(0.08 0.02 270 / 90%);
+}
+
+.prose-cyberpunk th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: oklch(0.95 0.05 300);
+  border-bottom: 2px solid oklch(0.6 0.28 300 / 60%);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Round top corners of first row header cells */
+.prose-cyberpunk thead tr:first-child th:first-child {
+  border-top-left-radius: 0.6rem;
+}
+
+.prose-cyberpunk thead tr:first-child th:last-child {
+  border-top-right-radius: 0.6rem;
+}
+
+.prose-cyberpunk td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid oklch(0.4 0.1 300 / 30%);
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.prose-cyberpunk tr:last-child td {
+  border-bottom: none;
+}
+
+/* Round bottom corners of last row cells */
+.prose-cyberpunk tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 0.6rem;
+}
+
+.prose-cyberpunk tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 0.6rem;
+}
+
+.prose-cyberpunk tr:hover td {
+  background: oklch(0.7 0.25 350 / 8%);
+}
+
+/* Table alignment classes from GFM */
+.prose-cyberpunk th[align="center"],
+.prose-cyberpunk td[align="center"] {
+  text-align: center;
+}
+
+.prose-cyberpunk th[align="right"],
+.prose-cyberpunk td[align="right"] {
+  text-align: right;
+}
+
+/* Image styles */
+.prose-cyberpunk img {
+  cursor: zoom-in;
+  border-radius: 0.75rem;
+  border: 2px solid oklch(0.5 0.15 300 / 40%);
+  max-height: 400px;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+  transition: all 0.3s ease;
+}
+
+.prose-cyberpunk img:hover {
+  border-color: oklch(0.7 0.25 350 / 70%);
+  box-shadow: 0 0 25px oklch(0.7 0.25 350 / 40%);
+  transform: scale(1.02);
+}
+
+/* Linked images - different cursor and hover */
+.prose-cyberpunk a img {
+  cursor: pointer;
+}
+
+.prose-cyberpunk a img:hover {
+  border-color: oklch(0.75 0.18 195 / 70%);
+  box-shadow: 0 0 25px oklch(0.75 0.18 195 / 40%);
+}
+
+/* Headings with proper hierarchy */
+.prose-cyberpunk h1 {
+  font-size: 2.25rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.prose-cyberpunk h2 {
+  font-size: 1.875rem;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.prose-cyberpunk h3 {
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.prose-cyberpunk h4 {
+  font-size: 1.25rem;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.prose-cyberpunk h5 {
+  font-size: 1.125rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.prose-cyberpunk h6 {
+  font-size: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+/* Giscus comments styling */
+.giscus-wrapper {
+  --giscus-bg: oklch(0.1 0.02 270);
+  --giscus-border: oklch(0.3 0.05 300 / 30%);
+}
+
+.giscus-wrapper .giscus,
+.giscus-wrapper .giscus-frame {
+  width: 100%;
+}
+
+.giscus-wrapper iframe.giscus-frame {
+  border-radius: 1rem;
+  border: 1px solid oklch(0.3 0.05 300 / 30%);
+  background: oklch(0.1 0.02 270 / 60%);
+  backdrop-filter: blur(20px);
+}

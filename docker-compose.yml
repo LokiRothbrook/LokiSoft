@@ -1,0 +1,13 @@
+services:
+  lokisoft-website:
+    build: .
+    container_name: lokisoft
+    restart: always
+    environment:
+      - NODE_ENV=production
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
