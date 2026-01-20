@@ -231,11 +231,11 @@
       inset 0 0 20px oklch(0.75 0.18 195 / 10%);
   }
 
-  /* Glass morphism */
+  /* Glass morphism - using rgba() for backdrop-filter compatibility */
+  /* Note: oklch() + backdrop-filter has bugs in Firefox, so we use rgba() universally */
   .glass {
-    /* Fallback for browsers without oklch support (Firefox) */
-    background: rgba(18, 16, 28, 0.6);
-    border: 1px solid rgba(90, 60, 120, 0.2);
+    background: rgba(18, 16, 30, 0.6);
+    border: 1px solid rgba(120, 80, 160, 0.2);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     /* Firefox flicker fix - force GPU compositing layer */
@@ -243,30 +243,14 @@
     backface-visibility: hidden;
   }
 
-  /* Modern browsers with oklch support */
-  @supports (color: oklch(0 0 0)) {
-    .glass {
-      background: oklch(0.12 0.025 270 / 60%);
-      border: 1px solid oklch(0.4 0.1 300 / 20%);
-    }
-  }
-
   .glass-strong {
-    /* Fallback for browsers without oklch support */
-    background: rgba(14, 12, 24, 0.8);
-    border: 1px solid rgba(110, 75, 140, 0.25);
+    background: rgba(14, 12, 26, 0.8);
+    border: 1px solid rgba(130, 90, 170, 0.25);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     /* Firefox flicker fix */
     transform: translateZ(0);
     backface-visibility: hidden;
-  }
-
-  @supports (color: oklch(0 0 0)) {
-    .glass-strong {
-      background: oklch(0.1 0.03 270 / 80%);
-      border: 1px solid oklch(0.5 0.15 300 / 25%);
-    }
   }
 
   /* Gradient text */
