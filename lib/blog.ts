@@ -12,13 +12,14 @@ import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 
 // Custom sanitization schema that extends the default GitHub schema
-// Allows our custom blog components while still protecting against XSS
+// SECURITY: This schema is carefully designed to allow only necessary attributes
+// while protecting against XSS, CSS injection, and other attacks
 // Note: data-* attributes in HTML are converted to camelCase in HAST (e.g., data-info-box -> dataInfoBox)
 const sanitizeSchema: typeof defaultSchema = {
   ...defaultSchema,
   attributes: {
     ...defaultSchema.attributes,
-    // Allow our custom data attributes on divs (both kebab-case and camelCase forms)
+    // Allow ONLY our specific custom data attributes on divs (no style to prevent CSS injection)
     div: [
       ...(defaultSchema.attributes?.div || []),
       // Kebab-case (as written in HTML)
@@ -39,53 +40,57 @@ const sanitizeSchema: typeof defaultSchema = {
       "dataQuizOption",
       "dataCorrect",
       "dataExplanation",
-      "style",
       "className",
     ],
-    // Re-add attributes for custom button HTML, including both raw and parsed (camelCase) forms
-    button: [
-      "class", "className",
-      "data-slot", "dataSlot",
-      "data-variant", "dataVariant",
-      "data-size", "dataSize",
-    ],
-    // Allow class on <a> tags for styling them as buttons
+    // Allow class on <a> tags for styling (href is already allowed by default schema)
     a: [...(defaultSchema.attributes?.a || []), "class", "className"],
-    // Allow style on common elements for custom HTML blocks
-    span: [...(defaultSchema.attributes?.span || []), "style", "className"],
-    p: [...(defaultSchema.attributes?.p || []), "style", "className"],
-    h1: [...(defaultSchema.attributes?.h1 || []), "id", "style", "className"],
-    h2: [...(defaultSchema.attributes?.h2 || []), "id", "style", "className"],
-    h3: [...(defaultSchema.attributes?.h3 || []), "id", "style", "className"],
-    h4: [...(defaultSchema.attributes?.h4 || []), "id", "style", "className"],
-    h5: [...(defaultSchema.attributes?.h5 || []), "id", "style", "className"],
-    h6: [...(defaultSchema.attributes?.h6 || []), "id", "style", "className"],
-    // Allow align on table elements (GFM tables)
-    th: [...(defaultSchema.attributes?.th || []), "align", "style"],
-    td: [...(defaultSchema.attributes?.td || []), "align", "style"],
+    // Allow className on span for inline styling classes only
+    span: [...(defaultSchema.attributes?.span || []), "className"],
+    // Headings: allow id for anchor links, className for styling
+    h1: [...(defaultSchema.attributes?.h1 || []), "id", "className"],
+    h2: [...(defaultSchema.attributes?.h2 || []), "id", "className"],
+    h3: [...(defaultSchema.attributes?.h3 || []), "id", "className"],
+    h4: [...(defaultSchema.attributes?.h4 || []), "id", "className"],
+    h5: [...(defaultSchema.attributes?.h5 || []), "id", "className"],
+    h6: [...(defaultSchema.attributes?.h6 || []), "id", "className"],
+    // Allow align on table elements (GFM tables) - no style
+    th: [...(defaultSchema.attributes?.th || []), "align"],
+    td: [...(defaultSchema.attributes?.td || []), "align"],
     // Allow class on code for syntax highlighting
     code: [...(defaultSchema.attributes?.code || []), "className", "class"],
     pre: [...(defaultSchema.attributes?.pre || []), "className", "class"],
-    // Allow KaTeX-related attributes
+    // Allow KaTeX-related attributes (math rendering)
     math: ["xmlns", "display"],
     annotation: ["encoding"],
-    // Allow data-* pattern on all elements as fallback
+    // Paragraphs and lists - only className, no style
+    p: [...(defaultSchema.attributes?.p || []), "className"],
+    ul: [...(defaultSchema.attributes?.ul || []), "className"],
+    ol: [...(defaultSchema.attributes?.ol || []), "className"],
+    li: [...(defaultSchema.attributes?.li || []), "className"],
+    // Input for task lists (checkboxes)
+    input: ["type", "checked", "disabled"],
+    // SECURITY: Only allow id globally, NO wildcard data-* pattern
+    // This prevents arbitrary data attribute injection
     "*": [
       ...(defaultSchema.attributes?.["*"] || []),
       "id",
-      // Match any data-* attribute using regex pattern
-      ["data*", /^data.*/],
     ],
   },
   tagNames: [
     ...(defaultSchema.tagNames || []),
-    "button", // Re-allow button tag
     "br",     // Allow break tag
-    // KaTeX elements
+    "input",  // Allow for task list checkboxes
+    // KaTeX elements for math rendering
     "math", "semantics", "mrow", "mi", "mo", "mn", "msup", "msub", "mfrac",
     "msqrt", "mroot", "mtable", "mtr", "mtd", "mtext", "mspace", "annotation",
     "mover", "munder", "munderover", "menclose", "mpadded", "mphantom",
   ],
+  // SECURITY: Disallow dangerous protocols in URLs
+  protocols: {
+    ...defaultSchema.protocols,
+    href: ["http", "https", "mailto"],
+    src: ["http", "https"],
+  },
 };
 
 const postsDirectory = path.join(process.cwd(), "posts");
