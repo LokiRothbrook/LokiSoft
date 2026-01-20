@@ -25,6 +25,11 @@ function isAllowedExternalUrl(url: string): boolean {
     const parsed = new URL(url);
     const hostname = parsed.hostname;
 
+    // Only allow HTTPS for external images (security)
+    if (parsed.protocol !== "https:") {
+      return false;
+    }
+
     // Check default allowed domains
     if (DEFAULT_ALLOWED_DOMAINS.includes(hostname)) {
       return true;
@@ -43,8 +48,8 @@ function isAllowedExternalUrl(url: string): boolean {
       }
     }
 
-    // In development, allow all external images
-    if (process.env.NODE_ENV === "development") {
+    // Check GitHub user content (for avatars, etc.)
+    if (hostname.endsWith(".githubusercontent.com")) {
       return true;
     }
 
