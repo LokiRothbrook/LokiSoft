@@ -5,8 +5,7 @@ import { ArrowLeft, Calendar, User, Clock, Star, Tag, Github, MessageSquare, Git
 import { getPostWithHtml, getAllPosts, Post } from "@/lib/blog";
 import { Button } from "@/components/ui/button";
 import { TableOfContents, BlogContent, Comments } from "@/components/blog";
-
-const BASE_URL = "https://lokisoft.xyz";
+import { siteConfig } from "@/lib/data/site";
 
 // Generate Article JSON-LD schema for blog posts
 function generateArticleSchema(post: Post, slug: string) {
@@ -15,7 +14,7 @@ function generateArticleSchema(post: Post, slug: string) {
     "@type": "Article",
     headline: post.title,
     description: post.excerpt,
-    image: post.coverImage ? `${BASE_URL}${post.coverImage}` : `${BASE_URL}/lokisoft-logo.svg`,
+    image: post.coverImage ? `${siteConfig.baseUrl}${post.coverImage}` : `${siteConfig.baseUrl}${siteConfig.branding.logo}`,
     datePublished: post.date,
     dateModified: post.date,
     author: {
@@ -24,15 +23,15 @@ function generateArticleSchema(post: Post, slug: string) {
     },
     publisher: {
       "@type": "Organization",
-      name: "LokiSoft",
+      name: siteConfig.name,
       logo: {
         "@type": "ImageObject",
-        url: `${BASE_URL}/lokisoft-logo.svg`,
+        url: `${siteConfig.baseUrl}${siteConfig.branding.logo}`,
       },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${BASE_URL}/blog/${slug}`,
+      "@id": `${siteConfig.baseUrl}/blog/${slug}`,
     },
     wordCount: post.content.split(/\s+/).length,
     articleSection: post.categories.join(", "),
@@ -50,19 +49,19 @@ function generateBreadcrumbSchema(post: Post, slug: string) {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: BASE_URL,
+        item: siteConfig.baseUrl,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Blog",
-        item: `${BASE_URL}/blog`,
+        item: `${siteConfig.baseUrl}/blog`,
       },
       {
         "@type": "ListItem",
         position: 3,
         name: post.title,
-        item: `${BASE_URL}/blog/${slug}`,
+        item: `${siteConfig.baseUrl}/blog/${slug}`,
       },
     ],
   };
@@ -87,9 +86,9 @@ export async function generateMetadata({
     return { title: "Post Not Found" };
   }
 
-  const postUrl = `${BASE_URL}/blog/${slug}`;
+  const postUrl = `${siteConfig.baseUrl}/blog/${slug}`;
   // TODO: Create /public/og-image.png (1200x630px) for optimal social sharing fallback
-  const ogImage = post.coverImage || "/lokisoft-logo.svg";
+  const ogImage = post.coverImage || siteConfig.branding.logo;
 
   return {
     title: post.title,
@@ -277,7 +276,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                   <a
-                    href="https://github.com/LokiRothbrook/LokiSoft-Blog"
+                    href={siteConfig.blogRepoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -318,7 +317,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <div className="flex items-center gap-4">
                   <span className="text-sm text-muted-foreground">Share this post:</span>
                   <a
-                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://lokisoft.com/blog/${post.slug}`)}`}
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`${siteConfig.baseUrl}/blog/${post.slug}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-neon-pink transition-colors"
