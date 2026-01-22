@@ -65,45 +65,12 @@ export const products: Product[] = [
     color: "cyan",
   },
   {
-    slug: "lokicloud",
-    name: "LokiCloud",
-    tagline: "Your data, your control",
-    shortDescription: "Self-hosted cloud storage and sync solution with end-to-end encryption",
-    description:
-      "LokiCloud gives you the convenience of cloud storage without sacrificing privacy. Host your own cloud infrastructure with our easy-to-deploy solution that syncs across all your devices. With end-to-end encryption and zero-knowledge architecture, your data stays yours.",
-    icon: "Cloud",
-    features: [
-      {
-        title: "End-to-End Encryption",
-        description: "Your files are encrypted before they leave your device. Only you can read them.",
-        icon: "Lock",
-      },
-      {
-        title: "Cross-Platform Sync",
-        description: "Seamlessly sync files across Windows, Mac, Linux, iOS, and Android.",
-        icon: "RefreshCw",
-      },
-      {
-        title: "Easy Self-Hosting",
-        description: "Deploy on your own hardware or VPS with our simple setup wizard.",
-        icon: "Server",
-      },
-      {
-        title: "File Versioning",
-        description: "Never lose work with automatic version history and easy restoration.",
-        icon: "History",
-      },
-    ],
-    status: "coming-soon",
-    color: "purple",
-  },
-  {
-    slug: "lokidocs",
-    name: "LokiDocs",
+    slug: "lokiNotes",
+    name: "LokiNotes",
     tagline: "Documentation that developers love",
     shortDescription: "Beautiful documentation generator for your open source projects",
     description:
-      "Create stunning documentation for your projects with LokiDocs. Write in Markdown, get beautiful, searchable docs that your users will love. With built-in versioning, API reference generation, and full customization, LokiDocs makes documentation a joy instead of a chore.",
+      "Create stunning documentation for your projects with LokiNotes. Write in Markdown, get beautiful, searchable notes that your users will love. With built-in versioning, API reference generation, and full customization, LokiNotes makes documentation a joy instead of a chore.",
     icon: "BookOpen",
     features: [
       {

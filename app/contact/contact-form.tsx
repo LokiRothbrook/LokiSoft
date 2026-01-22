@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Send, CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,30 @@ export function ContactForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rateLimitedUntil, setRateLimitedUntil] = useState<number | null>(null);
+  const [isRateLimited, setIsRateLimited] = useState(false);
+
+  // Update rate limited state based on time - timer callback is intentional
+  useEffect(() => {
+    if (rateLimitedUntil === null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsRateLimited(false);
+      return;
+    }
+
+    const checkRateLimit = () => {
+      const now = Date.now();
+      if (now >= rateLimitedUntil) {
+        setIsRateLimited(false);
+        setRateLimitedUntil(null);
+      } else {
+        setIsRateLimited(true);
+      }
+    };
+
+    checkRateLimit();
+    const interval = setInterval(checkRateLimit, 1000);
+    return () => clearInterval(interval);
+  }, [rateLimitedUntil]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -306,7 +330,7 @@ export function ContactForm() {
         <Button
           type="submit"
           size="lg"
-          disabled={isSubmitting || (rateLimitedUntil !== null && Date.now() < rateLimitedUntil)}
+          disabled={isSubmitting || isRateLimited}
           className="bg-neon-pink hover:bg-neon-pink/80 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (

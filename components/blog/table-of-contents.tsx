@@ -15,7 +15,7 @@ export function TableOfContents() {
   const [activeId, setActiveId] = useState<string>("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // Find headings from the DOM on mount
+  // Find headings from the DOM on mount - DOM measurement pattern
   useEffect(() => {
     const articleElement = document.querySelector("article");
     if (!articleElement) return;
@@ -33,6 +33,7 @@ export function TableOfContents() {
       }
     });
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHeadings(foundHeadings);
   }, []);
 
@@ -101,13 +102,6 @@ export function TableOfContents() {
             )}
             <span className="line-clamp-2">{heading.text}</span>
           </span>
-          {activeId === heading.id && (
-            <motion.div
-              layoutId="activeIndicator"
-              className="absolute left-0 top-0 bottom-0 w-0.5 bg-neon-pink rounded-full"
-              transition={{ type: "spring", stiffness: 380, damping: 30 }}
-            />
-          )}
         </button>
       ))}
     </nav>
@@ -120,7 +114,7 @@ export function TableOfContents() {
         <div className="sticky top-24">
           <div className="glass rounded-xl p-4 max-h-[calc(100vh-8rem)] overflow-y-auto border border-white/5">
             <h3 className="text-sm font-semibold mb-4 flex items-center gap-2 gradient-text">
-              <List className="w-4 h-4 text-neon-cyan" />
+              <List className="w-4 h-4 text-neon-pink" />
               Table of Contents
             </h3>
             <div className="relative">
@@ -164,7 +158,7 @@ export function TableOfContents() {
               >
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold flex items-center gap-2 gradient-text">
-                    <List className="w-5 h-5 text-neon-cyan" />
+                    <List className="w-5 h-5 text-neon-pink" />
                     Table of Contents
                   </h3>
                   <button

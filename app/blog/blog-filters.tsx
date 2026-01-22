@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronDown, X } from "lucide-react";
 import type { Post } from "@/lib/blog";
@@ -58,17 +58,12 @@ export function BlogFilters({ categories, posts, onFilteredPostsChange }: BlogFi
     onFilteredPostsChange(filtered);
   }, [filterType, selectedCategory, searchQuery, filterPosts, onFilteredPostsChange]);
 
-  // Reset category when changing filter type away from category
-  useEffect(() => {
-    if (filterType !== "category") {
-      setSelectedCategory("");
-    }
-  }, [filterType]);
-
   const handleFilterTypeChange = (type: FilterType) => {
     setFilterType(type);
     if (type === "category" && !selectedCategory && categories.length > 0) {
       setSelectedCategory(categories[0].name);
+    } else if (type !== "category") {
+      setSelectedCategory("");
     }
   };
 

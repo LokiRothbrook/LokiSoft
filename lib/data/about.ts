@@ -74,7 +74,7 @@ export const aboutConfig: AboutConfig = {
   hero: {
     title: "Building Software That Matters",
     description:
-      "We're a Christian values company committed to open source and the freedom of knowledge for everyone. Our mission is to create technology that empowers, educates, and serves.",
+      "We're a God fearing company, committed to open source and the freedom of knowledge for everyone! Our mission is to create technology that empowers, educates, and serves Gods people.",
   },
 
   // Our Story Section
@@ -83,7 +83,7 @@ export const aboutConfig: AboutConfig = {
     subtitle: "How LokiSoft came to be",
     paragraphs: [
       "LokiSoft was founded with a simple belief: technology should serve people, not the other way around. Too often, we see companies that prioritize profit over people, surveillance over privacy, and proprietary solutions over shared knowledge.",
-      "We decided to do things differently. Guided by our Christian faith, we set out to build a company that reflects our values—one that treats every client, contributor, and community member with dignity and respect.",
+      "We decided to do things differently. Guided by our Christian faith, we set out to build a company that reflects our values, one that treats every client, contributor, and community member with dignity and respect.",
       "Today, we're building products that help people take control of their digital lives, offering services that empower businesses to succeed, and sharing everything we learn along the way. We believe that when we lift others up, everyone rises together.",
     ],
   },
@@ -118,7 +118,7 @@ export const aboutConfig: AboutConfig = {
         icon: "Users",
         title: "Community Focused",
         description:
-          "We're building more than software—we're building a community of people who share our values and vision.",
+          "We're building more than software, we're building a community of people who share our values and vision.",
         color: "blue",
       },
       {
@@ -174,7 +174,7 @@ export const aboutConfig: AboutConfig = {
   cta: {
     title: "Let's Work Together",
     description:
-      "Whether you need custom software, want to use our products, or just want to be part of our community—we'd love to connect with you.",
+      "Whether you need custom software, want to use our products, or just want to be part of our community, we'd love to connect with you.",
     primaryButton: {
       text: "Get in Touch",
       href: "/contact",

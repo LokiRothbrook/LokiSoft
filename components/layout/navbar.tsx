@@ -12,7 +12,7 @@ import { services } from "@/lib/data/services";
 import { products } from "@/lib/data/products";
 import { demos, portfolio } from "@/lib/data/showcase";
 import { siteConfig } from "@/lib/data/site";
-import { getIcon } from "@/lib/icons";
+import { DynamicIcon } from "@/components/ui/dynamic-icon";
 
 interface NavbarProps {
   posts?: {
@@ -39,6 +39,7 @@ function DropdownItem({
   description,
   color,
   onClick,
+  external = false,
 }: {
   href: string;
   icon: string;
@@ -46,9 +47,8 @@ function DropdownItem({
   description: string;
   color: string;
   onClick?: () => void;
+  external?: boolean;
 }) {
-  const IconComponent = getIcon(icon);
-
   // Colors are always shown, hover only adds glow effect
   const colorClasses = {
     pink: {
@@ -75,20 +75,32 @@ function DropdownItem({
 
   const classes = colorClasses[color as keyof typeof colorClasses];
 
+  const content = (
+    <div className="group flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-all cursor-pointer">
+      <div
+        className={`p-2 rounded-lg bg-muted/50 transition-all ${classes.icon} ${classes.glow}`}
+      >
+        <DynamicIcon name={icon} className="w-5 h-5" />
+      </div>
+      <div className="flex-1">
+        <p className={`font-medium text-sm transition-colors ${classes.text}`}>{name}</p>
+        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{description}</p>
+      </div>
+      <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all mt-1" />
+    </div>
+  );
+
+  if (external) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" onClick={onClick}>
+        {content}
+      </a>
+    );
+  }
+
   return (
     <Link href={href} onClick={onClick}>
-      <div className="group flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-all">
-        <div
-          className={`p-2 rounded-lg bg-muted/50 transition-all ${classes.icon} ${classes.glow}`}
-        >
-          <IconComponent className="w-5 h-5" />
-        </div>
-        <div className="flex-1">
-          <p className={`font-medium text-sm transition-colors ${classes.text}`}>{name}</p>
-          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{description}</p>
-        </div>
-        <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all mt-1" />
-      </div>
+      {content}
     </Link>
   );
 }
@@ -107,9 +119,12 @@ export function Navbar({ posts = [] }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close menu on route change - intentional navigation pattern
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     setIsMobileMenuOpen(false);
     setOpenDropdown(null);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [pathname]);
 
   const handleMouseEnter = (label: string) => {
@@ -129,7 +144,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <nav className="container mx-auto px-4 h-16 flex items-center justify-between whitespace-nowrap">
         {/* Logo */}
         <NeonLogo size="md" />
 
@@ -219,6 +234,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
                               name={demo.name}
                               description={demo.shortDescription}
                               color={demo.color}
+                              external
                             />
                           ))}
                           <div className="h-px bg-border/50 my-2" />
@@ -233,6 +249,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
                               name={item.name}
                               description={item.shortDescription}
                               color={item.color}
+                              external
                             />
                           ))}
                         </>
@@ -246,8 +263,10 @@ export function Navbar({ posts = [] }: NavbarProps) {
         </div>
 
         {/* Right Side */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <SearchBar posts={posts} />
+        <div className="flex-1 lg:flex-initial flex items-center gap-2 sm:gap-3 ml-3 lg:ml-0">
+          <div className="flex-1 lg:flex-initial">
+            <SearchBar posts={posts} />
+          </div>
           <Link href="/contact" className="hidden sm:block">
             <Button variant="default" size="sm" className="bg-neon-pink hover:bg-neon-pink/80">
               Contact Us
@@ -278,7 +297,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-muted/50 transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-muted/50 transition-colors text-neon-purple"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -294,31 +313,38 @@ export function Navbar({ posts = [] }: NavbarProps) {
             exit={{ opacity: 0, height: 0 }}
             className="lg:hidden glass-strong border-t border-border/50 max-h-[calc(100vh-4rem)] overflow-y-auto"
           >
-            <div className="container mx-auto px-4 py-4 space-y-2">
+            <div className="container mx-auto px-4 py-4 space-y-2 text-neon-purple">
               {navLinks.map((link) => (
                 <div key={link.label}>
-                  <Link
-                    href={link.href}
-                    className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                      pathname === link.href
-                        ? "text-neon-pink bg-neon-pink/10"
-                        : "text-foreground hover:bg-muted/50"
-                    }`}
-                    onClick={() => !link.hasDropdown && setIsMobileMenuOpen(false)}
-                  >
-                    {link.label}
-                    {link.hasDropdown && (
+                  {link.hasDropdown ? (
+                    <button
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                        pathname === link.href
+                          ? "text-neon-pink bg-neon-pink/10"
+                          : "text-neon-purple hover:bg-muted/50"
+                      }`}
+                      onClick={() => setOpenDropdown(openDropdown === link.label ? null : link.label)}
+                    >
+                      {link.label}
                       <ChevronUp
                         className={`w-4 h-4 transition-transform ${
                           openDropdown === link.label ? "rotate-180" : ""
                         }`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setOpenDropdown(openDropdown === link.label ? null : link.label);
-                        }}
                       />
-                    )}
-                  </Link>
+                    </button>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                        pathname === link.href
+                          ? "text-neon-pink bg-neon-pink/10"
+                          : "text-neon-purple hover:bg-muted/50"
+                      }`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  )}
 
                   {/* Mobile Dropdown */}
                   <AnimatePresence>
@@ -329,6 +355,21 @@ export function Navbar({ posts = [] }: NavbarProps) {
                         exit={{ opacity: 0, height: 0 }}
                         className="pl-4 overflow-hidden"
                       >
+                        {/* All X Link */}
+                        <Link
+                          href={link.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-pink/10 to-neon-purple/10 hover:from-neon-pink/20 hover:to-neon-purple/20 transition-all mb-2">
+                            <span className="font-medium text-sm text-neon-blue">
+                              All {link.label}
+                            </span>
+                            <ArrowRight className="w-4 h-4 ml-auto text-neon-blue group-hover:translate-x-1 transition-transform" />
+                          </div>
+                        </Link>
+
+                        <div className="h-px bg-border/50 my-2" />
+
                         {link.label === "Services" &&
                           services.map((service) => (
                             <DropdownItem
@@ -369,6 +410,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
                                 description={demo.shortDescription}
                                 color={demo.color}
                                 onClick={() => setIsMobileMenuOpen(false)}
+                                external
                               />
                             ))}
                             <div className="h-px bg-border/50 my-2" />
@@ -384,6 +426,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
                                 description={item.shortDescription}
                                 color={item.color}
                                 onClick={() => setIsMobileMenuOpen(false)}
+                                external
                               />
                             ))}
                           </>
@@ -395,9 +438,9 @@ export function Navbar({ posts = [] }: NavbarProps) {
               ))}
 
               {/* Mobile Contact & Source Buttons */}
-              <div className="pt-2 space-y-2 sm:hidden">
+              <div className="pt-4 sm:hidden">
                 <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="default" className="w-full bg-neon-pink hover:bg-neon-pink/80">
+                  <Button variant="default" className="w-full h-10 bg-neon-pink hover:bg-neon-pink/80">
                     Contact Us
                   </Button>
                 </Link>
@@ -405,7 +448,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
                   href={siteConfig.githubRepoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full px-4 py-2 rounded-lg text-sm font-medium text-foreground/90 bg-zinc-700/80 hover:bg-zinc-600/80 border border-zinc-600/50 transition-all"
+                  className="flex items-center justify-center gap-2 w-full h-10 mt-3 px-4 rounded-lg text-sm font-medium text-foreground/90 bg-zinc-700/80 hover:bg-zinc-600/80 border border-zinc-600/50 transition-all"
                 >
                   <Github className="w-4 h-4" />
                   <span>View Source on GitHub</span>

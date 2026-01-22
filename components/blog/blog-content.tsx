@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback, memo, Suspense } from "react";
+import { useEffect, useRef, useCallback, memo } from "react";
 import dynamic from "next/dynamic";
 import { createRoot, Root } from "react-dom/client";
 import { InfoBox } from "./info-box";

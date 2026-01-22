@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { NeonLogo } from "@/components/ui/neon-logo";
 import { SectionTitle, GlassCard } from "@/components/ui/hero-card";
 import { Button } from "@/components/ui/button";
-import { getIcon } from "@/lib/icons";
+import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { siteConfig } from "@/lib/data/site";
 import { aboutConfig } from "@/lib/data/about";
 
@@ -61,7 +61,6 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {aboutConfig.values.items.map((value) => {
-              const IconComponent = getIcon(value.icon);
               const colorClasses = {
                 pink: "bg-neon-pink/10 text-neon-pink",
                 purple: "bg-neon-purple/10 text-neon-purple",
@@ -72,7 +71,7 @@ export default function AboutPage() {
               return (
                 <GlassCard key={value.title} glow={value.color}>
                   <div className={`p-3 rounded-xl ${colorClasses[value.color]} w-fit mb-4`}>
-                    <IconComponent className="w-6 h-6" />
+                    <DynamicIcon name={value.icon} className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">{value.title}</h3>
                   <p className="text-sm text-muted-foreground">{value.description}</p>
@@ -91,7 +90,6 @@ export default function AboutPage() {
 
           <div className="max-w-4xl mx-auto space-y-6">
             {aboutConfig.principles.items.map((principle, index) => {
-              const IconComponent = getIcon(principle.icon);
               const colors = ["pink", "purple", "cyan"] as const;
               const color = colors[index % colors.length];
               const colorClasses = {
@@ -104,7 +102,7 @@ export default function AboutPage() {
                 <GlassCard key={principle.title} className="border-l-4" glow={color}>
                   <div className="flex items-start gap-4">
                     <div className={`p-3 rounded-xl ${colorClasses[color].split(" ").slice(0, 2).join(" ")}`}>
-                      <IconComponent className="w-6 h-6" />
+                      <DynamicIcon name={principle.icon} className="w-6 h-6" />
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold mb-2">{principle.title}</h3>
@@ -148,8 +146,9 @@ export default function AboutPage() {
                 </Button>
               </Link>
               <Link href={aboutConfig.cta.secondaryButton.href}>
-                <Button size="lg" variant="outline">
+                <Button size="lg" className="bg-neon-purple hover:bg-neon-purple/80 group">
                   {aboutConfig.cta.secondaryButton.text}
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>

@@ -10,7 +10,6 @@ import { CoverImage } from "@/components/ui/cover-image";
 import type { Post } from "@/lib/blog";
 
 interface FeaturedPostsProps {
-  initialPosts: Post[];
   allPosts: Post[];
 }
 
@@ -119,7 +118,7 @@ function BlogCard({ post, index }: { post: Post; index: number }) {
   );
 }
 
-export function FeaturedPosts({ initialPosts, allPosts }: FeaturedPostsProps) {
+export function FeaturedPosts({ allPosts }: FeaturedPostsProps) {
   const [displayCount, setDisplayCount] = useState(6);
   const displayedPosts = allPosts.slice(0, displayCount);
   const hasMore = displayCount < allPosts.length;

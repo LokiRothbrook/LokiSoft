@@ -434,6 +434,7 @@
   padding: 1rem;
   border-radius: 0 0.5rem 0.5rem 0;
   width: 100%;
+  margin-top: 1.5rem;
 }
 
 .prose-cyberpunk h1,
@@ -474,6 +475,7 @@
     rgba(168, 85, 247, 0.5),
     transparent
   );
+  margin-top: 2rem;
 }
 
 /* List styles */

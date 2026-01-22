@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, FileText, Briefcase, Package, Tag, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -88,7 +88,6 @@ function getTypeColor(type: SearchResult["type"]) {
 export function SearchBar({ posts = [] }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [results, setResults] = useState<SearchResult[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -196,11 +195,14 @@ export function SearchBar({ posts = [] }: SearchBarProps) {
     return scored;
   }, [debouncedQuery, allResults]);
 
-  // Update results when search completes
+  // Use searchResults directly as results
+  const results = searchResults;
+
+  // Reset selected index when query changes - intentional derived state reset
   useEffect(() => {
-    setResults(searchResults);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedIndex(0);
-  }, [searchResults]);
+  }, [debouncedQuery]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -231,7 +233,7 @@ export function SearchBar({ posts = [] }: SearchBarProps) {
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative w-full lg:w-auto">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
         <input
@@ -242,7 +244,7 @@ export function SearchBar({ posts = [] }: SearchBarProps) {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          className="w-32 sm:w-48 lg:w-64 h-9 pl-9 pr-8 rounded-lg bg-muted/50 border border-border/50 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30 transition-all"
+          className="w-full lg:w-64 h-9 pl-9 pr-8 rounded-lg bg-muted/50 border border-border/50 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30 transition-all"
           role="combobox"
           aria-expanded={isOpen && results.length > 0}
           aria-haspopup="listbox"

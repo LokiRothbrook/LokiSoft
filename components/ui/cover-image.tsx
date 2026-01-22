@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
 const PLACEHOLDER_IMAGE = "/images/blog-placeholder.svg";
@@ -84,21 +84,13 @@ function normalizeImagePath(path: string | undefined): string {
 
 export function CoverImage({ src, alt, className = "" }: CoverImageProps) {
   const normalizedSrc = normalizeImagePath(src);
-  const [imageSrc, setImageSrc] = useState(normalizedSrc);
-  const [hasError, setHasError] = useState(false);
+  const [errorForSrc, setErrorForSrc] = useState<string | null>(null);
 
-  // Reset state when src prop changes
-  useEffect(() => {
-    const newSrc = normalizeImagePath(src);
-    setImageSrc(newSrc);
-    setHasError(false);
-  }, [src]);
+  // Derive imageSrc based on whether we had an error for the current src
+  const imageSrc = errorForSrc === src ? PLACEHOLDER_IMAGE : normalizedSrc;
 
   const handleError = () => {
-    if (!hasError) {
-      setHasError(true);
-      setImageSrc(PLACEHOLDER_IMAGE);
-    }
+    setErrorForSrc(src ?? null);
   };
 
   return (

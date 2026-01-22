@@ -181,7 +181,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <div className="w-full max-w-full px-4 sm:px-6 md:px-8 lg:pl-24 lg:pr-12 xl:pl-32 xl:pr-16">
           {/* Back Button */}
         <Link href="/blog">
-          <Button variant="ghost" className="mb-8 group">
+          <Button variant="ghost" className="mb-8 text-neon-purple hover:text-neon-purple/80 group">
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to Blog
           </Button>
@@ -276,7 +276,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                   <a
-                    href={siteConfig.blogRepoUrl}
+                    href={siteConfig.githubRepoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
