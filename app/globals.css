@@ -435,6 +435,7 @@
   border-radius: 0 0.5rem 0.5rem 0;
   width: 100%;
   margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .prose-cyberpunk h1,
@@ -476,6 +477,12 @@
     transparent
   );
   margin-top: 2rem;
+}
+
+/* Paragraph styles */
+.prose-cyberpunk p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 /* List styles */
