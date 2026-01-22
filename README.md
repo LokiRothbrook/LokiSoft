@@ -101,11 +101,75 @@ You can easily change the website's color scheme and appearance.
 
 4.  **UI Components:** The site uses `shadcn/ui`. You can modify the existing components in `components/ui/` or add new ones.
 
+### Site Configuration (White-Label Ready)
+
+The site is designed to be easily white-labeled for your own company. All configurable content is centralized in the `lib/data/` directory:
+
+#### Core Site Config (`lib/data/site.ts`)
+
+This is the main configuration file containing:
+
+- **Company Information:** Name, tagline, description, author
+- **URLs:** Base URL, GitHub repo URL, blog repo URL
+- **Contact Information:** Email addresses, Discord, location
+- **Social Media Links:** Twitter, YouTube, GitHub, Discord
+- **SEO & Metadata:** Keywords, OG image, Twitter card type
+- **Branding:** Logo, favicon, theme colors
+- **Legal:** Copyright holder
+
+```typescript
+// Example: Update your company name and contact info
+export const siteConfig: SiteConfig = {
+  name: "YourCompany",
+  tagline: "Your Company Tagline",
+  contact: {
+    email: "hello@yourcompany.com",
+    // ...
+  },
+  social: {
+    twitter: "https://x.com/yourcompany",
+    // ...
+  },
+  // ...
+};
+```
+
+#### About Page Config (`lib/data/about.ts`)
+
+Customize your About page content:
+
+- **Hero Section:** Title and description
+- **Our Story:** Title, subtitle, and paragraph content
+- **Values:** Array of value cards with icons, titles, descriptions, and colors
+- **Principles:** Array of principle items
+- **Scripture/Quote:** Optional inspirational quote (set to `null` to hide)
+- **CTA Section:** Call-to-action content and buttons
+
+#### Homepage Config (`lib/data/homepage.ts`)
+
+Customize homepage sections:
+
+- **Hero:** Tagline and highlighted text
+- **Announcements:** Section title and subtitle
+- **Featured Posts:** Section title and subtitle
+- **About Cards:** Mission, values, and feature cards
+- **Services/Products:** Section titles and subtitles
+- **CTA:** Title and description
+
+#### Other Data Files
+
+| File | Description |
+|------|-------------|
+| `lib/data/services.ts` | Services offered (name, description, features, pricing) |
+| `lib/data/products.ts` | Products catalog (name, tagline, features, status) |
+| `lib/data/showcase.ts` | Demo templates and portfolio items |
+
 ### Content and Data
 
-1.  **Pages:** The main pages of the site are located in the `app/` directory. You can edit the content of these pages directly.
+1.  **Pages:** The main pages of the site are located in the `app/` directory. Page content is driven by the config files above.
 2.  **Blog Posts:** Blog posts are Markdown files in the `posts/` directory. Add, edit, or delete files here to manage your blog.
-3.  **Products and Services:** The data for products and services is stored in `lib/data/products.ts` and `lib/data/services.ts`. Modify these files to change the content of the "Products" and "Services" pages.
+3.  **Products and Services:** Modify `lib/data/products.ts` and `lib/data/services.ts` to change offerings.
+4.  **Showcase:** Modify `lib/data/showcase.ts` to update demo templates and portfolio items.
 
 ## Project Structure
 
@@ -116,6 +180,7 @@ lokisoft/
 │   ├── contact/           # Contact form
 │   ├── products/          # Products showcase
 │   ├── services/          # Services pages
+│   ├── showcase/          # Demo templates and portfolio
 │   └── about/             # About page
 ├── components/
 │   ├── blog/              # Blog-specific components
@@ -124,7 +189,13 @@ lokisoft/
 │   └── ui/                # Reusable UI components
 ├── lib/
 │   ├── blog.ts            # Blog utilities (markdown parsing)
-│   ├── data/              # Services and products data
+│   ├── data/              # Site configuration and content
+│   │   ├── site.ts        # Core site config (company, contact, social)
+│   │   ├── about.ts       # About page content
+│   │   ├── homepage.ts    # Homepage section content
+│   │   ├── services.ts    # Services data
+│   │   ├── products.ts    # Products data
+│   │   └── showcase.ts    # Demo templates and portfolio
 │   ├── icons.ts           # Icon helper
 │   └── utils.ts           # Utility functions
 ├── posts/                  # Markdown blog posts

@@ -4,57 +4,42 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { ParticleBackground } from "@/components/ui/particle-background";
 import { getPostsForSearch } from "@/lib/blog";
-
-const BASE_URL = "https://lokisoft.xyz";
+import { siteConfig, getPageTitle, getFullUrl } from "@/lib/data/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(siteConfig.baseUrl),
   title: {
-    default: "LokiSoft - Open Source Software Built on Christian Values",
-    template: "%s | LokiSoft",
+    default: getPageTitle(),
+    template: `%s | ${siteConfig.name}`,
   },
-  description:
-    "LokiSoft is a Christian values company committed to open source and the freedom of knowledge for everyone. We build modern web applications, mobile apps, and custom software solutions.",
-  keywords: [
-    "LokiSoft",
-    "open source",
-    "Christian values",
-    "web development",
-    "app development",
-    "custom software",
-    "e-commerce",
-    "LokiMoney",
-  ],
-  authors: [{ name: "LokiSoft" }],
-  creator: "LokiSoft",
-  publisher: "LokiSoft",
+  description: siteConfig.description,
+  keywords: siteConfig.seo.keywords,
+  authors: [{ name: siteConfig.author }],
+  creator: siteConfig.author,
+  publisher: siteConfig.author,
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: BASE_URL,
-    siteName: "LokiSoft",
-    title: "LokiSoft - Open Source Software Built on Christian Values",
-    description:
-      "A Christian values company committed to open source and the freedom of knowledge for everyone.",
-    // TODO: Create /public/og-image.png (1200x630px) for optimal social sharing
-    // Currently using logo as fallback - create a proper OG image for best results
+    url: siteConfig.baseUrl,
+    siteName: siteConfig.name,
+    title: getPageTitle(),
+    description: siteConfig.description,
     images: [
       {
-        url: "/lokisoft-logo.svg",
+        url: siteConfig.branding.logo,
         width: 1200,
         height: 630,
-        alt: "LokiSoft - Open Source Software Built on Christian Values",
+        alt: getPageTitle(),
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
-    site: "@lokisoft",
-    creator: "@lokisoft",
-    title: "LokiSoft - Open Source Software Built on Christian Values",
-    description:
-      "A Christian values company committed to open source and the freedom of knowledge for everyone.",
-    images: ["/lokisoft-logo.svg"],
+    card: siteConfig.seo.twitterCard,
+    site: siteConfig.social.twitterHandle,
+    creator: siteConfig.social.twitterHandle,
+    title: getPageTitle(),
+    description: siteConfig.description,
+    images: [siteConfig.branding.logo],
   },
   robots: {
     index: true,
@@ -68,7 +53,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: BASE_URL,
+    canonical: siteConfig.baseUrl,
   },
   verification: {
     // Add your verification codes here when you have them
@@ -81,21 +66,20 @@ export const metadata: Metadata = {
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "LokiSoft",
-  url: BASE_URL,
-  logo: `${BASE_URL}/lokisoft-logo.svg`,
-  description:
-    "A Christian values company committed to open source and the freedom of knowledge for everyone.",
+  name: siteConfig.name,
+  url: siteConfig.baseUrl,
+  logo: getFullUrl(siteConfig.branding.logo),
+  description: siteConfig.description,
   sameAs: [
-    "https://x.com/lokisoft",
-    "https://youtube.com/@lokisoft",
-    "https://github.com/LokiRothbrook/LokiSoft-Blog",
-    "https://discord.gg/lokisoft",
+    siteConfig.social.twitter,
+    siteConfig.social.youtube,
+    siteConfig.social.github,
+    siteConfig.social.discord,
   ],
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "customer service",
-    url: `${BASE_URL}/contact`,
+    url: getFullUrl("/contact"),
   },
 };
 
@@ -103,13 +87,13 @@ const organizationSchema = {
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "LokiSoft",
-  url: BASE_URL,
+  name: siteConfig.name,
+  url: siteConfig.baseUrl,
   potentialAction: {
     "@type": "SearchAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate: `${BASE_URL}/blog?q={search_term_string}`,
+      urlTemplate: getFullUrl("/blog?q={search_term_string}"),
     },
     "query-input": "required name=search_term_string",
   },

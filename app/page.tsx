@@ -1,12 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Sparkles,
-  Heart,
-  Users,
-  BookOpen,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { NeonLogoAnimated } from "@/components/ui/neon-logo";
 import { HeroCard, GlassCard, SectionTitle } from "@/components/ui/hero-card";
 import { Button } from "@/components/ui/button";
@@ -16,9 +10,11 @@ import { getAllPosts, getAnnouncements, getFeaturedPosts } from "@/lib/blog";
 import { services } from "@/lib/data/services";
 import { products } from "@/lib/data/products";
 import { getIcon } from "@/lib/icons";
+import { siteConfig, getPageTitle } from "@/lib/data/site";
+import { homepageConfig } from "@/lib/data/homepage";
 
 export const metadata: Metadata = {
-  title: "LokiSoft - Open Source Software Built on Christian Values",
+  title: getPageTitle(),
 };
 
 export default function HomePage() {
@@ -73,8 +69,8 @@ export default function HomePage() {
       <HeroCard gradient="pink">
         <div className="container mx-auto px-4">
           <SectionTitle
-            title="Announcements"
-            subtitle="Stay up to date with the latest news from LokiSoft"
+            title={homepageConfig.announcements.title}
+            subtitle={`${homepageConfig.announcements.subtitle} from ${siteConfig.name}`}
           />
           <div className="max-w-3xl mx-auto">
             <Announcements announcements={announcements} />
@@ -86,8 +82,8 @@ export default function HomePage() {
       <HeroCard gradient="purple">
         <div className="container mx-auto px-4">
           <SectionTitle
-            title="Featured Posts"
-            subtitle="Explore our latest articles, tutorials, and insights"
+            title={homepageConfig.featuredPosts.title}
+            subtitle={homepageConfig.featuredPosts.subtitle}
           />
           <FeaturedPosts initialPosts={featuredPosts} allPosts={allPosts} />
 
@@ -106,74 +102,34 @@ export default function HomePage() {
       <HeroCard gradient="blue">
         <div className="container mx-auto px-4">
           <SectionTitle
-            title="About LokiSoft"
-            subtitle="Building software that makes a difference"
+            title={`About ${siteConfig.name}`}
+            subtitle={homepageConfig.about.subtitle}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <GlassCard glow="cyan">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-neon-cyan/10">
-                  <Heart className="w-8 h-8 text-neon-cyan" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Our Mission</h3>
-                  <p className="text-muted-foreground">
-                    We&apos;re a Christian values company committed to creating open source
-                    software that empowers individuals and businesses. We believe technology
-                    should be accessible to everyone, and knowledge should be freely shared.
-                  </p>
-                </div>
-              </div>
-            </GlassCard>
+            {homepageConfig.about.cards.map((card) => {
+              const IconComponent = getIcon(card.icon);
+              const colorClasses = {
+                pink: "bg-neon-pink/10 text-neon-pink",
+                purple: "bg-neon-purple/10 text-neon-purple",
+                blue: "bg-neon-blue/10 text-neon-blue",
+                cyan: "bg-neon-cyan/10 text-neon-cyan",
+              };
 
-            <GlassCard glow="pink">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-neon-pink/10">
-                  <Sparkles className="w-8 h-8 text-neon-pink" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Our Values</h3>
-                  <p className="text-muted-foreground">
-                    Integrity, excellence, and service guide everything we do. We build software
-                    with care, treat our clients like family, and always strive to do what&apos;s
-                    right—not just what&apos;s profitable.
-                  </p>
-                </div>
-              </div>
-            </GlassCard>
-
-            <GlassCard glow="purple">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-neon-purple/10">
-                  <BookOpen className="w-8 h-8 text-neon-purple" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Open Source First</h3>
-                  <p className="text-muted-foreground">
-                    We believe in the power of open source. Our tools and libraries are available
-                    for everyone to use, modify, and learn from. Knowledge shared is knowledge
-                    multiplied.
-                  </p>
-                </div>
-              </div>
-            </GlassCard>
-
-            <GlassCard glow="blue">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-neon-blue/10">
-                  <Users className="w-8 h-8 text-neon-blue" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Community Driven</h3>
-                  <p className="text-muted-foreground">
-                    We&apos;re building more than software—we&apos;re building a community. Join us on
-                    Discord, contribute to our projects, or just say hello. Everyone is welcome
-                    here.
-                  </p>
-                </div>
-              </div>
-            </GlassCard>
+              return (
+                <GlassCard key={card.title} glow={card.color}>
+                  <div className="flex items-start gap-4">
+                    <div className={`p-3 rounded-xl ${colorClasses[card.color]}`}>
+                      <IconComponent className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
+                      <p className="text-muted-foreground">{card.description}</p>
+                    </div>
+                  </div>
+                </GlassCard>
+              );
+            })}
           </div>
 
           <div className="mt-8 text-center">
@@ -191,12 +147,12 @@ export default function HomePage() {
       <HeroCard gradient="cyan">
         <div className="container mx-auto px-4">
           <SectionTitle
-            title="Our Services"
-            subtitle="Professional solutions tailored to your needs"
+            title={homepageConfig.services.title}
+            subtitle={homepageConfig.services.subtitle}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {services.map((service, index) => {
+            {services.map((service) => {
               const IconComponent = getIcon(service.icon);
               const colorClasses = {
                 pink: "bg-neon-pink/10 text-neon-pink",
@@ -240,8 +196,8 @@ export default function HomePage() {
       <HeroCard gradient="mixed">
         <div className="container mx-auto px-4">
           <SectionTitle
-            title="Our Products"
-            subtitle="Software solutions designed to make your life easier"
+            title={homepageConfig.products.title}
+            subtitle={homepageConfig.products.subtitle}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -303,11 +259,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold gradient-text-animated mb-6">
-              Ready to Get Started?
+              {homepageConfig.cta.title}
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Whether you need custom software, want to explore our products, or just want to
-              chat about your project—we&apos;re here to help.
+              {homepageConfig.cta.description}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link href="/contact">

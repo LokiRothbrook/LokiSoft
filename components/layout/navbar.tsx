@@ -4,15 +4,15 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Menu, X, ArrowRight, Github } from "lucide-react";
+import { ChevronUp, Menu, X, ArrowRight, Github } from "lucide-react";
 import { NeonLogo } from "@/components/ui/neon-logo";
 import { SearchBar } from "@/components/ui/search-bar";
 import { Button } from "@/components/ui/button";
 import { services } from "@/lib/data/services";
 import { products } from "@/lib/data/products";
+import { demos, portfolio } from "@/lib/data/showcase";
+import { siteConfig } from "@/lib/data/site";
 import { getIcon } from "@/lib/icons";
-
-const GITHUB_REPO_URL = process.env.NEXT_PUBLIC_GITHUB_REPO_URL || "https://github.com/LokiRothbrook/lokisoft";
 
 interface NavbarProps {
   posts?: {
@@ -28,6 +28,7 @@ const navLinks = [
   { label: "Blog", href: "/blog" },
   { label: "Services", href: "/services", hasDropdown: true },
   { label: "Products", href: "/products", hasDropdown: true },
+  { label: "Showcase", href: "/showcase", hasDropdown: true },
   { label: "About", href: "/about" },
 ];
 
@@ -151,7 +152,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
               >
                 {link.label}
                 {link.hasDropdown && (
-                  <ChevronDown
+                  <ChevronUp
                     className={`w-4 h-4 transition-transform ${openDropdown === link.label ? "rotate-180" : ""}`}
                   />
                 )}
@@ -204,6 +205,38 @@ export function Navbar({ posts = [] }: NavbarProps) {
                             color={product.color}
                           />
                         ))}
+
+                      {link.label === "Showcase" && (
+                        <>
+                          <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Demo Templates
+                          </p>
+                          {demos.map((demo) => (
+                            <DropdownItem
+                              key={demo.slug}
+                              href={demo.liveUrl}
+                              icon={demo.icon}
+                              name={demo.name}
+                              description={demo.shortDescription}
+                              color={demo.color}
+                            />
+                          ))}
+                          <div className="h-px bg-border/50 my-2" />
+                          <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Portfolio
+                          </p>
+                          {portfolio.map((item) => (
+                            <DropdownItem
+                              key={item.slug}
+                              href={item.liveUrl}
+                              icon={item.icon}
+                              name={item.name}
+                              description={item.shortDescription}
+                              color={item.color}
+                            />
+                          ))}
+                        </>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -224,7 +257,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
           {/* Source Button with Tooltip */}
           <div className="relative group hidden sm:block">
             <a
-              href={GITHUB_REPO_URL}
+              href={siteConfig.githubRepoUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-foreground/90 hover:text-foreground bg-zinc-700/80 hover:bg-zinc-600/80 border border-zinc-600/50 transition-all"
@@ -275,7 +308,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
                   >
                     {link.label}
                     {link.hasDropdown && (
-                      <ChevronDown
+                      <ChevronUp
                         className={`w-4 h-4 transition-transform ${
                           openDropdown === link.label ? "rotate-180" : ""
                         }`}
@@ -321,6 +354,40 @@ export function Navbar({ posts = [] }: NavbarProps) {
                               onClick={() => setIsMobileMenuOpen(false)}
                             />
                           ))}
+
+                        {link.label === "Showcase" && (
+                          <>
+                            <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Demo Templates
+                            </p>
+                            {demos.map((demo) => (
+                              <DropdownItem
+                                key={demo.slug}
+                                href={demo.liveUrl}
+                                icon={demo.icon}
+                                name={demo.name}
+                                description={demo.shortDescription}
+                                color={demo.color}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              />
+                            ))}
+                            <div className="h-px bg-border/50 my-2" />
+                            <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Portfolio
+                            </p>
+                            {portfolio.map((item) => (
+                              <DropdownItem
+                                key={item.slug}
+                                href={item.liveUrl}
+                                icon={item.icon}
+                                name={item.name}
+                                description={item.shortDescription}
+                                color={item.color}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              />
+                            ))}
+                          </>
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -335,7 +402,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
                   </Button>
                 </Link>
                 <a
-                  href={GITHUB_REPO_URL}
+                  href={siteConfig.githubRepoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full px-4 py-2 rounded-lg text-sm font-medium text-foreground/90 bg-zinc-700/80 hover:bg-zinc-600/80 border border-zinc-600/50 transition-all"
