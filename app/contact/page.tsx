@@ -2,37 +2,38 @@ import { Metadata } from "next";
 import { Mail, MapPin, MessageSquare } from "lucide-react";
 import { SectionTitle, GlassCard } from "@/components/ui/hero-card";
 import { ContactForm } from "./contact-form";
+import { siteConfig } from "@/lib/data/site";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Get in touch with LokiSoft. We'd love to hear from you about your project, questions, or just to say hello.",
+  description: `Get in touch with ${siteConfig.name}. We'd love to hear from you about your project, questions, or just to say hello.`,
 };
 
-const contactInfo = [
-  {
-    icon: Mail,
-    title: "Email Us",
-    description: "Drop us a line anytime",
-    value: "hello@lokisoft.com",
-    color: "pink",
-  },
-  {
-    icon: MessageSquare,
-    title: "Discord",
-    description: "Join our community",
-    value: "discord.gg/lokisoft",
-    color: "purple",
-  },
-  {
-    icon: MapPin,
-    title: "Location",
-    description: "Based remotely",
-    value: "Worldwide",
-    color: "cyan",
-  },
-];
-
 export default function ContactPage() {
+  const contactInfo = [
+    {
+      icon: Mail,
+      title: "Email Us",
+      description: "Drop us a line anytime",
+      value: siteConfig.contact.email,
+      color: "pink",
+    },
+    {
+      icon: MessageSquare,
+      title: "Discord",
+      description: "Join our community",
+      value: siteConfig.contact.discord,
+      color: "purple",
+    },
+    {
+      icon: MapPin,
+      title: "Location",
+      description: "Based remotely",
+      value: siteConfig.contact.location,
+      color: "cyan",
+    },
+  ];
+
   const colorClasses = {
     pink: "bg-neon-pink/10 text-neon-pink",
     purple: "bg-neon-purple/10 text-neon-purple",
@@ -99,15 +100,15 @@ export default function ContactPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
               <div>
                 <p className="text-neon-pink font-medium mb-1">General Inquiries</p>
-                <p className="text-muted-foreground">hello@lokisoft.com</p>
+                <p className="text-muted-foreground">{siteConfig.contact.email}</p>
               </div>
               <div>
                 <p className="text-neon-purple font-medium mb-1">Technical Support</p>
-                <p className="text-muted-foreground">support@lokisoft.com</p>
+                <p className="text-muted-foreground">{siteConfig.contact.supportEmail}</p>
               </div>
               <div>
                 <p className="text-neon-cyan font-medium mb-1">Partnerships</p>
-                <p className="text-muted-foreground">partners@lokisoft.com</p>
+                <p className="text-muted-foreground">{siteConfig.contact.partnershipsEmail}</p>
               </div>
             </div>
           </GlassCard>

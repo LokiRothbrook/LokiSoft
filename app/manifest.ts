@@ -1,23 +1,23 @@
 import { MetadataRoute } from "next";
+import { siteConfig, getPageTitle } from "@/lib/data/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "LokiSoft - Open Source Software Built on Christian Values",
-    short_name: "LokiSoft",
-    description:
-      "A Christian values company committed to open source and the freedom of knowledge for everyone.",
+    name: getPageTitle(),
+    short_name: siteConfig.shortName,
+    description: siteConfig.description,
     start_url: "/",
     display: "standalone",
-    background_color: "#0a0a0f",
-    theme_color: "#ff00ff",
+    background_color: siteConfig.branding.backgroundColor,
+    theme_color: siteConfig.branding.themeColor,
     icons: [
       {
-        src: "/favicon.ico",
+        src: siteConfig.branding.favicon,
         sizes: "any",
         type: "image/x-icon",
       },
       {
-        src: "/lokisoft-logo.svg",
+        src: siteConfig.branding.logo,
         sizes: "any",
         type: "image/svg+xml",
       },

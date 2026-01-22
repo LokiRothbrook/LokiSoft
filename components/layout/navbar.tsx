@@ -11,9 +11,8 @@ import { Button } from "@/components/ui/button";
 import { services } from "@/lib/data/services";
 import { products } from "@/lib/data/products";
 import { demos, portfolio } from "@/lib/data/showcase";
+import { siteConfig } from "@/lib/data/site";
 import { getIcon } from "@/lib/icons";
-
-const GITHUB_REPO_URL = process.env.NEXT_PUBLIC_GITHUB_REPO_URL || "https://github.com/LokiRothbrook/lokisoft";
 
 interface NavbarProps {
   posts?: {
@@ -258,7 +257,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
           {/* Source Button with Tooltip */}
           <div className="relative group hidden sm:block">
             <a
-              href={GITHUB_REPO_URL}
+              href={siteConfig.githubRepoUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-foreground/90 hover:text-foreground bg-zinc-700/80 hover:bg-zinc-600/80 border border-zinc-600/50 transition-all"
@@ -403,7 +402,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
                   </Button>
                 </Link>
                 <a
-                  href={GITHUB_REPO_URL}
+                  href={siteConfig.githubRepoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full px-4 py-2 rounded-lg text-sm font-medium text-foreground/90 bg-zinc-700/80 hover:bg-zinc-600/80 border border-zinc-600/50 transition-all"

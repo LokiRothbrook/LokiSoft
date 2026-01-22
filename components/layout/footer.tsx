@@ -5,6 +5,7 @@ import Link from "next/link";
 import { NeonLogo } from "@/components/ui/neon-logo";
 import { services } from "@/lib/data/services";
 import { products } from "@/lib/data/products";
+import { siteConfig } from "@/lib/data/site";
 
 // Custom X (Twitter) icon
 function XIcon({ className }: { className?: string }) {
@@ -40,10 +41,10 @@ function DiscordIcon({ className }: { className?: string }) {
 }
 
 const socialLinks = [
-  { name: "X", href: "https://x.com/lokisoft", icon: XIcon },
-  { name: "YouTube", href: "https://youtube.com/@lokisoft", icon: YouTubeIcon },
-  { name: "GitHub", href: "https://github.com/LokiRothbrook/LokiSoft-Blog", icon: GitHubIcon },
-  { name: "Discord", href: "https://discord.gg/lokisoft", icon: DiscordIcon },
+  { name: "X", href: siteConfig.social.twitter, icon: XIcon },
+  { name: "YouTube", href: siteConfig.social.youtube, icon: YouTubeIcon },
+  { name: "GitHub", href: siteConfig.social.github, icon: GitHubIcon },
+  { name: "Discord", href: siteConfig.social.discord, icon: DiscordIcon },
 ];
 
 const footerLinks = {
@@ -70,8 +71,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <NeonLogo size="lg" href="/" />
             <p className="mt-4 text-muted-foreground text-sm max-w-sm">
-              A Christian values company committed to open source and the freedom of knowledge for
-              everyone. Building software that makes a difference.
+              {siteConfig.description}
             </p>
 
             {/* Social Links */}
@@ -171,7 +171,7 @@ export function Footer() {
         <div className="mt-12 pt-6 border-t border-border/30">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} LokiSoft. All rights reserved.
+              &copy; {new Date().getFullYear()} {siteConfig.legal.copyrightHolder}. All rights reserved.
             </p>
             <p className="text-xs text-muted-foreground">
               Built with faith, passion, and{" "}
