@@ -1,17 +1,20 @@
 "use client";
 
-import { useState, ReactNode } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight } from "lucide-react";
+import { useHydrate } from "./use-hydrate";
 
 interface ToggleBoxProps {
   title: string;
   defaultOpen?: boolean;
-  children: ReactNode;
+  contentHtml: string;
 }
 
-export function ToggleBox({ title, defaultOpen = false, children }: ToggleBoxProps) {
+export function ToggleBox({ title, defaultOpen = false, contentHtml }: ToggleBoxProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const contentRef = useRef<HTMLDivElement>(null);
+  useHydrate(contentRef, contentHtml);
 
   return (
     <div className="my-6 rounded-xl border border-neon-purple/30 bg-neon-purple/5 overflow-hidden w-full">
@@ -38,9 +41,10 @@ export function ToggleBox({ title, defaultOpen = false, children }: ToggleBoxPro
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
             <div className="px-4 pb-4 pt-0 border-t border-neon-purple/20">
-              <div className="pt-4 prose-p:my-2 prose-p:first:mt-0 prose-p:last:mb-0">
-                {children}
-              </div>
+              <div
+                ref={contentRef}
+                className="pt-4 prose-p:my-2 prose-p:first:mt-0 prose-p:last:mb-0"
+              />
             </div>
           </motion.div>
         )}

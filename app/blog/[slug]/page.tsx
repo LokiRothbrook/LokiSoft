@@ -2,10 +2,14 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, User, Clock, Star, Tag, Github, MessageSquare, GitPullRequest } from "lucide-react";
-import { getPostWithHtml, getAllPosts, Post } from "@/lib/blog";
+import { getPostWithHtml, getAllPosts, getRelatedPosts, Post } from "@/lib/blog";
 import { Button } from "@/components/ui/button";
-import { TableOfContents, BlogContent, Comments } from "@/components/blog";
+import { SupportButton } from "@/components/ui/support-button";
+import { TableOfContents, BlogContent, Comments, RelatedPosts } from "@/components/blog";
 import { siteConfig } from "@/lib/data/site";
+
+// ISR: Revalidate every hour
+export const revalidate = 3600;
 
 // Generate Article JSON-LD schema for blog posts
 function generateArticleSchema(post: Post, slug: string) {
@@ -161,6 +165,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const categoryColors = ["neon-pink", "neon-purple", "neon-blue", "neon-cyan"];
   const articleSchema = generateArticleSchema(post, slug);
   const breadcrumbSchema = generateBreadcrumbSchema(post, slug);
+  const relatedPosts = getRelatedPosts(slug, 4);
 
   return (
     <>
@@ -258,6 +263,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               <BlogContent contentHtml={post.contentHtml || ""} />
             </div>
 
+            {/* Support CTA */}
+            <SupportButton className="mt-12" />
+
             {/* Contribution CTA */}
             <div className="mt-12 rounded-2xl border border-neon-cyan/30 bg-gradient-to-br from-neon-cyan/5 to-neon-purple/5 p-6 md:p-8">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -303,6 +311,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             {/* Comments */}
             <Comments />
+
+            {/* Related Posts */}
+            <RelatedPosts posts={relatedPosts} />
 
             {/* Footer */}
             <footer className="mt-12 pt-8 border-t border-border/30">

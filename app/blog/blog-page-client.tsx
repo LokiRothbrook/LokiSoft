@@ -1,16 +1,24 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { Calendar, User, Clock, Star, ArrowRight, Tag } from "lucide-react";
 import { GlassCard } from "@/components/ui/hero-card";
 import { CoverImage } from "@/components/ui/cover-image";
+import { PaginationControls } from "@/components/blog";
 import { BlogFilters } from "./blog-filters";
-import type { Post } from "@/lib/blog";
+import type { Post, PaginationInfo, PostFilterType, SortOption } from "@/lib/blog";
 
 interface BlogPageClientProps {
-  posts: Post[];
+  initialPosts: Post[];
+  pagination: PaginationInfo;
   categories: { name: string; count: number }[];
+  initialFilters: {
+    filterType: PostFilterType;
+    category: string | null;
+    difficulty: number | null;
+    sort: SortOption;
+  };
 }
 
 function DifficultyStars({ difficulty }: { difficulty: number }) {
@@ -33,12 +41,69 @@ function DifficultyStars({ difficulty }: { difficulty: number }) {
   );
 }
 
-export function BlogPageClient({ posts, categories }: BlogPageClientProps) {
-  const [filteredPosts, setFilteredPosts] = useState<Post[]>(posts);
+// Highlight matching search terms in text
+function HighlightedText({ text, searchQuery }: { text: string; searchQuery: string }) {
+  if (!searchQuery.trim()) {
+    return <>{text}</>;
+  }
 
-  const handleFilteredPostsChange = useCallback((newPosts: Post[]) => {
-    setFilteredPosts(newPosts);
-  }, []);
+  const terms = searchQuery.toLowerCase().trim().split(/\s+/).filter(t => t.length > 0);
+  if (terms.length === 0) {
+    return <>{text}</>;
+  }
+
+  // Create regex pattern for all terms
+  const pattern = new RegExp(`(${terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi');
+  const parts = text.split(pattern);
+
+  return (
+    <>
+      {parts.map((part, i) => {
+        const isMatch = terms.some(term => part.toLowerCase() === term);
+        return isMatch ? (
+          <mark key={i} className="bg-neon-pink/30 text-foreground rounded px-0.5">
+            {part}
+          </mark>
+        ) : (
+          <span key={i}>{part}</span>
+        );
+      })}
+    </>
+  );
+}
+
+export function BlogPageClient({
+  initialPosts,
+  pagination,
+  categories,
+  initialFilters,
+}: BlogPageClientProps) {
+  // Posts to display - can be overridden by search results
+  const [displayPosts, setDisplayPosts] = useState<Post[]>(initialPosts);
+  const [displayPagination, setDisplayPagination] = useState<PaginationInfo>(pagination);
+  const [isSearchMode, setIsSearchMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Reset display when initial posts change (page navigation)
+  useEffect(() => {
+    if (!isSearchMode) {
+      setDisplayPosts(initialPosts);
+      setDisplayPagination(pagination);
+    }
+  }, [initialPosts, pagination, isSearchMode]);
+
+  // Handle search results from BlogFilters
+  const handleSearchResults = useCallback((posts: Post[], paginationInfo: PaginationInfo | null, searching: boolean, query?: string) => {
+    setIsSearchMode(searching);
+    setSearchQuery(query || "");
+    if (searching && paginationInfo) {
+      setDisplayPosts(posts);
+      setDisplayPagination(paginationInfo);
+    } else {
+      setDisplayPosts(initialPosts);
+      setDisplayPagination(pagination);
+    }
+  }, [initialPosts, pagination]);
 
   const categoryColors = ["neon-pink", "neon-purple", "neon-blue", "neon-cyan"];
 
@@ -48,14 +113,14 @@ export function BlogPageClient({ posts, categories }: BlogPageClientProps) {
       <div className="mb-8">
         <BlogFilters
           categories={categories}
-          posts={posts}
-          onFilteredPostsChange={handleFilteredPostsChange}
+          initialFilters={initialFilters}
+          onSearchResults={handleSearchResults}
         />
       </div>
 
       {/* Posts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredPosts.map((post) => (
+        {displayPosts.map((post) => (
           <Link key={post.slug} href={`/blog/${post.slug}`}>
             <GlassCard className="h-full group cursor-pointer" glow="purple">
               {/* Cover Image */}
@@ -96,12 +161,12 @@ export function BlogPageClient({ posts, categories }: BlogPageClientProps) {
 
               {/* Title */}
               <h2 className="text-lg font-semibold mb-2 group-hover:text-neon-pink transition-colors line-clamp-2">
-                {post.title}
+                <HighlightedText text={post.title} searchQuery={searchQuery} />
               </h2>
 
               {/* Excerpt */}
               <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                {post.excerpt}
+                <HighlightedText text={post.excerpt} searchQuery={searchQuery} />
               </p>
 
               {/* Meta */}
@@ -133,12 +198,26 @@ export function BlogPageClient({ posts, categories }: BlogPageClientProps) {
         ))}
       </div>
 
-      {filteredPosts.length === 0 && (
+      {displayPosts.length === 0 && (
         <div className="text-center py-12">
           <Tag className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold mb-2">No posts found</h3>
           <p className="text-muted-foreground">
             Try adjusting your filters or search query.
+          </p>
+        </div>
+      )}
+
+      {/* Pagination - only show when not in search mode */}
+      {!isSearchMode && displayPosts.length > 0 && (
+        <PaginationControls pagination={displayPagination} />
+      )}
+
+      {/* Search results pagination */}
+      {isSearchMode && displayPosts.length > 0 && displayPagination.totalPages > 1 && (
+        <div className="flex flex-col items-center gap-4 mt-8">
+          <p className="text-sm text-muted-foreground">
+            Found {displayPagination.total} results (showing page {displayPagination.page} of {displayPagination.totalPages})
           </p>
         </div>
       )}

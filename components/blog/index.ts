@@ -8,3 +8,5 @@ export { ImageLightbox, useLightbox } from "./image-lightbox";
 export { BlogContent } from "./blog-content";
 export { Comments } from "./comments";
 export { InteractiveChecklist } from "./interactive-checklist";
+export { PaginationControls } from "./pagination-controls";
+export { RelatedPosts } from "./related-posts";
