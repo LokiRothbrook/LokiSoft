@@ -139,7 +139,7 @@ export function SearchBar({ posts = [] }: SearchBarProps) {
             type: "category",
             title: cat,
             description: `View all posts in ${cat}`,
-            url: `/blog?category=${encodeURIComponent(cat)}`,
+            url: `/blog?categories=${encodeURIComponent(cat)}`,
           });
         }
       });

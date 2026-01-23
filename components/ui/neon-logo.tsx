@@ -23,6 +23,12 @@ export function NeonLogo({ size = "md", animated = true, href = "/" }: NeonLogoP
   const logoContent = (
     <motion.div
       className="relative select-none"
+      style={{
+        // GPU acceleration to prevent flickering on Chrome Android
+        transform: "translateZ(0)",
+        backfaceVisibility: "hidden",
+        WebkitBackfaceVisibility: "hidden",
+      }}
       initial={animated ? { opacity: 0 } : undefined}
       animate={animated ? { opacity: 1 } : undefined}
       transition={{ duration: 0.5 }}
@@ -38,6 +44,9 @@ export function NeonLogo({ size = "md", animated = true, href = "/" }: NeonLogoP
               0 0 20px rgba(236, 72, 153, 0.4),
               0 0 40px rgba(236, 72, 153, 0.2)
             `,
+            // GPU acceleration for smooth animation
+            transform: "translateZ(0)",
+            willChange: "text-shadow",
           }}
           animate={
             animated
@@ -67,6 +76,9 @@ export function NeonLogo({ size = "md", animated = true, href = "/" }: NeonLogoP
               0 0 20px rgba(34, 211, 238, 0.4),
               0 0 40px rgba(34, 211, 238, 0.2)
             `,
+            // GPU acceleration for smooth animation
+            transform: "translateZ(0)",
+            willChange: "text-shadow",
           }}
           animate={
             animated

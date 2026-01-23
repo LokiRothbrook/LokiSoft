@@ -140,9 +140,17 @@ export function Navbar({ posts = [] }: NavbarProps) {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? "glass-strong shadow-lg backdrop-blur-md" : "backdrop-blur-md"
       }`}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
+      style={{
+        // Ensure fixed positioning is stable on mobile browsers
+        position: "fixed",
+        top: 0,
+        transform: "translateZ(0)",
+        WebkitBackfaceVisibility: "hidden",
+        backfaceVisibility: "hidden",
+      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
     >
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between whitespace-nowrap">
         {/* Logo */}

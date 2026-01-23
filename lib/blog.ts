@@ -351,10 +351,15 @@ export interface PaginatedResult<T> {
 
 export type PostFilterType = "all" | "featured" | "announcements" | "category";
 export type SortOption = "newest" | "oldest" | "reading_time_asc" | "reading_time_desc";
+export type CategoryMatchMode = "and" | "or";
 
 export interface PostFilters {
   filterType?: PostFilterType;
-  category?: string;
+  category?: string; // Legacy single category support
+  categories?: string[]; // New multi-category support
+  categoryMatchMode?: CategoryMatchMode; // AND or OR logic for multi-category
+  featured?: boolean; // Filter to include only featured posts
+  announcement?: boolean; // Filter to include only announcement posts
   query?: string;
   difficulty?: number | null; // 1-5 or null for any
   sort?: SortOption;
@@ -370,15 +375,42 @@ export function getPaginatedPosts(
 ): PaginatedResult<Post> {
   let posts = getAllPosts();
 
-  // Apply filter type
-  if (filters.filterType === "featured") {
+  // Apply featured filter (new approach - can be combined with other filters)
+  if (filters.featured === true) {
     posts = posts.filter((post) => post.featured);
-  } else if (filters.filterType === "announcements") {
+  }
+
+  // Apply announcement filter (new approach - can be combined with other filters)
+  if (filters.announcement === true) {
     posts = posts.filter((post) => post.announcement);
   }
 
-  // Apply category filter
-  if (filters.category) {
+  // Legacy filterType support (for backwards compatibility)
+  if (filters.filterType === "featured" && filters.featured !== true) {
+    posts = posts.filter((post) => post.featured);
+  } else if (filters.filterType === "announcements" && filters.announcement !== true) {
+    posts = posts.filter((post) => post.announcement);
+  }
+
+  // Apply category filter with AND/OR logic
+  if (filters.categories && filters.categories.length > 0) {
+    const categorySet = new Set(filters.categories.map(c => c.toLowerCase()));
+    const matchMode = filters.categoryMatchMode || "or";
+
+    if (matchMode === "and") {
+      // AND logic: post must have ALL selected categories
+      posts = posts.filter((post) => {
+        const postCategoriesLower = post.categories.map(c => c.toLowerCase());
+        return Array.from(categorySet).every(cat => postCategoriesLower.includes(cat));
+      });
+    } else {
+      // OR logic: post must have at least ONE of the selected categories
+      posts = posts.filter((post) =>
+        post.categories.some((c) => categorySet.has(c.toLowerCase()))
+      );
+    }
+  } else if (filters.category) {
+    // Legacy single category filter
     const categoryLower = filters.category.toLowerCase();
     posts = posts.filter((post) =>
       post.categories.some((c) => c.toLowerCase() === categoryLower)

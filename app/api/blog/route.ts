@@ -9,6 +9,8 @@ export async function GET(request: NextRequest) {
   const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
   const filterType = (searchParams.get("filter") || "all") as PostFilterType;
   const category = searchParams.get("category") || undefined;
+  const categoriesParam = searchParams.get("categories");
+  const selectedCategories = categoriesParam ? categoriesParam.split(",").filter(c => c.trim()) : undefined;
   const difficultyParam = searchParams.get("difficulty");
   const sortParam = searchParams.get("sort") as SortOption | null;
 
@@ -28,6 +30,7 @@ export async function GET(request: NextRequest) {
   const result = getPaginatedPosts(page, limit, {
     filterType: safeFilterType,
     category,
+    categories: selectedCategories,
     difficulty: safeDifficulty,
     sort: safeSort,
   });
