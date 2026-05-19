@@ -2,11 +2,11 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Calendar, User, Clock, Star, ArrowRight, Tag, Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Calendar, User, Clock, ArrowRight, Tag, Loader2 } from "lucide-react";
 import { GlassCard } from "@/components/ui/hero-card";
 import { CoverImage } from "@/components/ui/cover-image";
-import { PaginationControls } from "@/components/blog";
+import { PaginationControls, DifficultyStars, categoryColors } from "@/components/blog";
 import { BlogFilters } from "./blog-filters";
 import type { Post, PaginationInfo, SortOption, CategoryMatchMode } from "@/lib/blog";
 
@@ -22,22 +22,6 @@ interface BlogPageClientProps {
     announcement?: boolean;
     categoryMatchMode?: CategoryMatchMode;
   };
-}
-
-function DifficultyStars({ difficulty }: { difficulty: number }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-xs text-muted-foreground">Difficulty</span>
-      <div className="flex items-center gap-0.5">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star
-            key={i}
-            className={`w-3 h-3 ${i < difficulty ? "fill-neon-cyan text-neon-cyan" : "fill-transparent text-muted-foreground/30"}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
 }
 
 // Highlight matching search terms in text
@@ -77,7 +61,6 @@ export function BlogPageClient({
   categories,
   initialFilters,
 }: BlogPageClientProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   // Search results state (only used when actively searching)
@@ -100,15 +83,10 @@ export function BlogPageClient({
     if (searching && paginationInfo) {
       setSearchResults({ posts, pagination: paginationInfo });
     } else {
-      // If not searching, or search is cleared, clear search results
+      // Clear search overlay — show the server-rendered filter results (initialPosts)
       setSearchResults(null);
-      if (!searching) {
-        router.push('/blog');
-      }
     }
-  }, [router]);
-
-  const categoryColors = ["neon-pink", "neon-purple", "neon-blue", "neon-cyan"]; // Still needed for post card rendering
+  }, []);
 
   return (
     <>
@@ -203,7 +181,7 @@ export function BlogPageClient({
 
                 {/* Footer */}
                 <div className="flex items-center justify-between">
-                  <DifficultyStars difficulty={post.difficulty} />
+                  <DifficultyStars difficulty={post.difficulty} showLabel />
                   <span className="text-xs text-muted-foreground flex items-center gap-1 group-hover:text-neon-pink transition-colors">
                     Read more
                     <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />

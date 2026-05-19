@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, User, Clock, Star, Tag, Github, MessageSquare, GitPullRequest } from "lucide-react";
+import { ArrowLeft, Calendar, User, Clock, Tag, Github, MessageSquare, GitPullRequest } from "lucide-react";
 import { getPostWithHtml, getAllPosts, getRelatedPosts, Post } from "@/lib/blog";
 import { Button } from "@/components/ui/button";
 import { SupportButton } from "@/components/ui/support-button";
-import { TableOfContents, BlogContent, Comments, RelatedPosts } from "@/components/blog";
+import { TableOfContents, BlogContent, Comments, RelatedPosts, DifficultyStars, categoryColors } from "@/components/blog";
 import { siteConfig } from "@/lib/data/site";
 
 // ISR: Revalidate every hour
@@ -130,30 +130,6 @@ export async function generateMetadata({
   };
 }
 
-function DifficultyStars({ difficulty }: { difficulty: number }) {
-  return (
-    <div className="flex items-center gap-1">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={`w-4 h-4 ${
-            i < difficulty
-              ? "fill-neon-cyan text-neon-cyan"
-              : "fill-transparent text-muted-foreground/30"
-          }`}
-        />
-      ))}
-      <span className="text-sm text-muted-foreground ml-2">
-        {difficulty === 1 && "Beginner"}
-        {difficulty === 2 && "Easy"}
-        {difficulty === 3 && "Intermediate"}
-        {difficulty === 4 && "Advanced"}
-        {difficulty === 5 && "Expert"}
-      </span>
-    </div>
-  );
-}
-
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
   const post = await getPostWithHtml(slug);
@@ -162,7 +138,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  const categoryColors = ["neon-pink", "neon-purple", "neon-blue", "neon-cyan"];
   const articleSchema = generateArticleSchema(post, slug);
   const breadcrumbSchema = generateBreadcrumbSchema(post, slug);
   const relatedPosts = getRelatedPosts(slug, 4);
@@ -244,7 +219,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 {post.categories.map((category, i) => (
                   <Link
                     key={category}
-                    href={`/blog?category=${encodeURIComponent(category)}`}
+                    href={`/blog?categories=${encodeURIComponent(category)}`}
                     className={`text-sm px-3 py-1 rounded-full bg-${categoryColors[i % categoryColors.length]}/10 text-${categoryColors[i % categoryColors.length]} hover:bg-${categoryColors[i % categoryColors.length]}/20 transition-colors`}
                   >
                     {category}
@@ -254,7 +229,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
               {/* Difficulty */}
               <div className="flex justify-center">
-                <DifficultyStars difficulty={post.difficulty} />
+                <DifficultyStars difficulty={post.difficulty} size="md" showName />
               </div>
             </header>
 

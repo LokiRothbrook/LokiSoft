@@ -303,17 +303,22 @@ export function getPostsByCategory(category: string): Post[] {
 
 export function getAllCategories(): { name: string; count: number }[] {
   const posts = getAllPosts();
-  const categoryMap = new Map<string, number>();
+  const categoryMap = new Map<string, { count: number; displayName: string }>();
 
   posts.forEach((post) => {
     post.categories.forEach((category) => {
       const normalized = category.toLowerCase();
-      categoryMap.set(normalized, (categoryMap.get(normalized) || 0) + 1);
+      const existing = categoryMap.get(normalized);
+      if (existing) {
+        existing.count++;
+      } else {
+        categoryMap.set(normalized, { count: 1, displayName: category });
+      }
     });
   });
 
-  return Array.from(categoryMap.entries())
-    .map(([name, count]) => ({ name, count }))
+  return Array.from(categoryMap.values())
+    .map(({ displayName, count }) => ({ name: displayName, count }))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -395,7 +400,7 @@ export function getPaginatedPosts(
   // Apply category filter with AND/OR logic
   if (filters.categories && filters.categories.length > 0) {
     const categorySet = new Set(filters.categories.map(c => c.toLowerCase()));
-    const matchMode = filters.categoryMatchMode || "or";
+    const matchMode = filters.categoryMatchMode || "and";
 
     if (matchMode === "and") {
       // AND logic: post must have ALL selected categories

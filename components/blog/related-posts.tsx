@@ -1,34 +1,17 @@
 import Link from "next/link";
-import { Calendar, Clock, Star } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import { GlassCard } from "@/components/ui/hero-card";
 import { CoverImage } from "@/components/ui/cover-image";
+import { DifficultyStars } from "./difficulty-stars";
+import { categoryColors } from "./category-colors";
 import type { Post } from "@/lib/blog";
 
 interface RelatedPostsProps {
   posts: Post[];
 }
 
-function DifficultyStars({ difficulty }: { difficulty: number }) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={`w-3 h-3 ${
-            i < difficulty
-              ? "fill-neon-cyan text-neon-cyan"
-              : "fill-transparent text-muted-foreground/30"
-          }`}
-        />
-      ))}
-    </div>
-  );
-}
-
 export function RelatedPosts({ posts }: RelatedPostsProps) {
   if (posts.length === 0) return null;
-
-  const categoryColors = ["neon-pink", "neon-purple", "neon-blue", "neon-cyan"];
 
   return (
     <section className="mt-16">

@@ -10,3 +10,5 @@ export { Comments } from "./comments";
 export { InteractiveChecklist } from "./interactive-checklist";
 export { PaginationControls } from "./pagination-controls";
 export { RelatedPosts } from "./related-posts";
+export { DifficultyStars } from "./difficulty-stars";
+export { categoryColors } from "./category-colors";
