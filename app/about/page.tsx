@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Github, GitFork } from "lucide-react";
 import { NeonLogo } from "@/components/ui/neon-logo";
 import { SectionTitle, GlassCard } from "@/components/ui/hero-card";
 import { Button } from "@/components/ui/button";
@@ -128,6 +128,39 @@ export default function AboutPage() {
             </div>
           </section>
         )}
+
+        {/* Open Source */}
+        <section className="mb-20">
+          <div className="glass rounded-2xl border border-neon-purple/20 p-8 md:p-10 max-w-3xl mx-auto">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+              <div className="p-4 rounded-2xl bg-neon-purple/10 shrink-0">
+                <GitFork className="w-8 h-8 text-neon-purple" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-foreground mb-2">Built in Public</h2>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  This website is open source. Browse the code, fork it, learn from it, or submit a
+                  pull request. We believe in transparency and giving back to the community that
+                  taught us.
+                </p>
+              </div>
+              <a
+                href={siteConfig.githubRepoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0"
+              >
+                <Button
+                  variant="outline"
+                  className="bg-zinc-700/80 hover:bg-zinc-600/80 border-zinc-600 text-foreground whitespace-nowrap"
+                >
+                  <Github className="w-4 h-4 mr-2" />
+                  View Source on GitHub
+                </Button>
+              </a>
+            </div>
+          </div>
+        </section>
 
         {/* CTA */}
         <section>

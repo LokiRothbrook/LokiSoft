@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronUp, Menu, X, ArrowRight, Github } from "lucide-react";
+import { ChevronUp, Menu, X, ArrowRight } from "lucide-react";
 import { NeonLogo } from "@/components/ui/neon-logo";
 import { SearchBar } from "@/components/ui/search-bar";
 import { Button } from "@/components/ui/button";
@@ -21,14 +21,21 @@ interface NavbarProps {
     excerpt?: string;
     categories?: string[];
   }[];
+  courses?: {
+    slug: string;
+    title: string;
+    description: string;
+    icon: string;
+    color: string;
+    lessons?: { slug: string; title: string; excerpt: string; isQuiz: boolean }[];
+  }[];
 }
 
 const navLinks = [
-  { label: "Home", href: "/" },
   { label: "Blog", href: "/blog" },
+  { label: "Courses", href: "/courses", hasDropdown: true },
   { label: "Services", href: "/services", hasDropdown: true },
   { label: "Products", href: "/products", hasDropdown: true },
-  { label: "Showcase", href: "/showcase", hasDropdown: true },
   { label: "About", href: "/about" },
 ];
 
@@ -105,7 +112,7 @@ function DropdownItem({
   );
 }
 
-export function Navbar({ posts = [] }: NavbarProps) {
+export function Navbar({ posts = [], courses = [] }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -189,7 +196,7 @@ export function Navbar({ posts = [] }: NavbarProps) {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 glass-strong rounded-xl shadow-xl overflow-hidden"
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-96 glass-strong rounded-xl shadow-xl overflow-hidden"
                   >
                     <div className="p-2 text-neon-blue backdrop-blur-sm">
                       {/* All Services/Products Link */}
@@ -205,32 +212,40 @@ export function Navbar({ posts = [] }: NavbarProps) {
                       <div className="h-px bg-border/50 my-2" />
 
                       {/* Items */}
-                      {link.label === "Services" &&
-                        services.map((service) => (
-                          <DropdownItem
-                            key={service.slug}
-                            href={`/services/${service.slug}`}
-                            icon={service.icon}
-                            name={service.name}
-                            description={service.shortDescription}
-                            color={service.color}
-                          />
+                      {link.label === "Courses" &&
+                        (courses.length === 0 ? (
+                          <p className="px-3 py-4 text-sm text-muted-foreground text-center">
+                            Courses coming soon
+                          </p>
+                        ) : (
+                          courses.map((course) => (
+                            <DropdownItem
+                              key={course.slug}
+                              href={`/courses/${course.slug}`}
+                              icon={course.icon}
+                              name={course.title}
+                              description={course.description}
+                              color={course.color}
+                            />
+                          ))
                         ))}
 
-                      {link.label === "Products" &&
-                        products.map((product) => (
-                          <DropdownItem
-                            key={product.slug}
-                            href={`/products/${product.slug}`}
-                            icon={product.icon}
-                            name={product.name}
-                            description={product.shortDescription}
-                            color={product.color}
-                          />
-                        ))}
-
-                      {link.label === "Showcase" && (
+                      {link.label === "Services" && (
                         <>
+                          <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Services
+                          </p>
+                          {services.map((service) => (
+                            <DropdownItem
+                              key={service.slug}
+                              href={`/services/${service.slug}`}
+                              icon={service.icon}
+                              name={service.name}
+                              description={service.shortDescription}
+                              color={service.color}
+                            />
+                          ))}
+                          <div className="h-px bg-border/50 my-2" />
                           <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                             Demo Templates
                           </p>
@@ -262,6 +277,19 @@ export function Navbar({ posts = [] }: NavbarProps) {
                           ))}
                         </>
                       )}
+
+                      {link.label === "Products" &&
+                        products.map((product) => (
+                          <DropdownItem
+                            key={product.slug}
+                            href={`/products/${product.slug}`}
+                            icon={product.icon}
+                            name={product.name}
+                            description={product.shortDescription}
+                            color={product.color}
+                          />
+                        ))}
+
                     </div>
                   </motion.div>
                 )}
@@ -273,34 +301,13 @@ export function Navbar({ posts = [] }: NavbarProps) {
         {/* Right Side */}
         <div className="flex-1 lg:flex-initial flex items-center gap-2 sm:gap-3 ml-3 lg:ml-0">
           <div className="flex-1 lg:flex-initial">
-            <SearchBar posts={posts} />
+            <SearchBar posts={posts} courses={courses} />
           </div>
           <Link href="/contact" className="hidden sm:block">
             <Button variant="default" size="sm" className="bg-neon-pink hover:bg-neon-pink/80">
               Contact Us
             </Button>
           </Link>
-
-          {/* Source Button with Tooltip */}
-          <div className="relative group hidden sm:block">
-            <a
-              href={siteConfig.githubRepoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-foreground/90 hover:text-foreground bg-zinc-700/80 hover:bg-zinc-600/80 border border-zinc-600/50 transition-all"
-            >
-              <Github className="w-4 h-4" />
-              <span>Source</span>
-            </a>
-            {/* Tooltip */}
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-50">
-              <div className="glass-strong px-3 py-2 rounded-lg text-xs text-foreground whitespace-nowrap shadow-lg border border-neon-purple/30">
-                <span className="text-neon-cyan">View this website&apos;s source code on GitHub</span>
-              </div>
-              {/* Tooltip arrow */}
-              <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 glass-strong border-l border-t border-neon-purple/30" />
-            </div>
-          </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -322,6 +329,19 @@ export function Navbar({ posts = [] }: NavbarProps) {
             className="lg:hidden glass-strong border-t border-border/50 max-h-[calc(100vh-4rem)] overflow-y-auto"
           >
             <div className="container mx-auto px-4 py-4 space-y-2 text-neon-purple">
+              {/* Home — mobile only (logo covers this on desktop) */}
+              <Link
+                href="/"
+                className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                  pathname === "/"
+                    ? "text-neon-pink bg-neon-pink/10"
+                    : "text-neon-purple hover:bg-muted/50"
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Home
+              </Link>
+
               {navLinks.map((link) => (
                 <div key={link.label}>
                   {link.hasDropdown ? (
@@ -378,34 +398,42 @@ export function Navbar({ posts = [] }: NavbarProps) {
 
                         <div className="h-px bg-border/50 my-2" />
 
-                        {link.label === "Services" &&
-                          services.map((service) => (
-                            <DropdownItem
-                              key={service.slug}
-                              href={`/services/${service.slug}`}
-                              icon={service.icon}
-                              name={service.name}
-                              description={service.shortDescription}
-                              color={service.color}
-                              onClick={() => setIsMobileMenuOpen(false)}
-                            />
+                        {link.label === "Courses" &&
+                          (courses.length === 0 ? (
+                            <p className="px-3 py-4 text-sm text-muted-foreground text-center">
+                              Courses coming soon
+                            </p>
+                          ) : (
+                            courses.map((course) => (
+                              <DropdownItem
+                                key={course.slug}
+                                href={`/courses/${course.slug}`}
+                                icon={course.icon}
+                                name={course.title}
+                                description={course.description}
+                                color={course.color}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              />
+                            ))
                           ))}
 
-                        {link.label === "Products" &&
-                          products.map((product) => (
-                            <DropdownItem
-                              key={product.slug}
-                              href={`/products/${product.slug}`}
-                              icon={product.icon}
-                              name={product.name}
-                              description={product.shortDescription}
-                              color={product.color}
-                              onClick={() => setIsMobileMenuOpen(false)}
-                            />
-                          ))}
-
-                        {link.label === "Showcase" && (
+                        {link.label === "Services" && (
                           <>
+                            <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Services
+                            </p>
+                            {services.map((service) => (
+                              <DropdownItem
+                                key={service.slug}
+                                href={`/services/${service.slug}`}
+                                icon={service.icon}
+                                name={service.name}
+                                description={service.shortDescription}
+                                color={service.color}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              />
+                            ))}
+                            <div className="h-px bg-border/50 my-2" />
                             <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                               Demo Templates
                             </p>
@@ -439,28 +467,33 @@ export function Navbar({ posts = [] }: NavbarProps) {
                             ))}
                           </>
                         )}
+
+                        {link.label === "Products" &&
+                          products.map((product) => (
+                            <DropdownItem
+                              key={product.slug}
+                              href={`/products/${product.slug}`}
+                              icon={product.icon}
+                              name={product.name}
+                              description={product.shortDescription}
+                              color={product.color}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            />
+                          ))}
+
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
               ))}
 
-              {/* Mobile Contact & Source Buttons */}
+              {/* Mobile Contact Button */}
               <div className="pt-4 sm:hidden">
                 <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="default" className="w-full h-10 bg-neon-pink hover:bg-neon-pink/80">
                     Contact Us
                   </Button>
                 </Link>
-                <a
-                  href={siteConfig.githubRepoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full h-10 mt-3 px-4 rounded-lg text-sm font-medium text-foreground/90 bg-zinc-700/80 hover:bg-zinc-600/80 border border-zinc-600/50 transition-all"
-                >
-                  <Github className="w-4 h-4" />
-                  <span>View Source on GitHub</span>
-                </a>
               </div>
             </div>
           </motion.div>
