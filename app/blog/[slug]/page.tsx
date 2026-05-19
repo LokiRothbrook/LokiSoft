@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, User, Clock, Tag, Github, MessageSquare, GitPullRequest } from "lucide-react";
+import { ArrowLeft, Calendar, User, Clock, Tag, GithubIcon, MessageSquare, GitPullRequest } from "lucide-react";
 import { getPostWithHtml, getAllPosts, getRelatedPosts, Post } from "@/lib/blog";
 import { Button } from "@/components/ui/button";
 import { SupportButton } from "@/components/ui/support-button";
@@ -267,7 +267,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                       variant="outline"
                       className="w-full sm:w-auto bg-zinc-700/80 hover:bg-zinc-600/80 border-zinc-600 text-foreground"
                     >
-                      <Github className="w-4 h-4 mr-2" />
+                      <GithubIcon className="w-4 h-4 mr-2" />
                       GitHub
                     </Button>
                   </a>

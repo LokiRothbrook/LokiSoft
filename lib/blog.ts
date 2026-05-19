@@ -1,3 +1,4 @@
+import { cache } from "react";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
@@ -191,12 +192,14 @@ function extractHeadings(content: string): TocHeading[] {
   return headings;
 }
 
-export function getAllPosts(): Post[] {
+// cache() deduplicates filesystem reads within a single server render —
+// getPaginatedPosts() and getAllCategories() both call this, so it runs once per request.
+export const getAllPosts = cache((): Post[] => {
   ensurePostsDirectory();
 
   const fileNames = fs.readdirSync(postsDirectory).filter((name) => name.endsWith(".md"));
 
-  const posts = fileNames
+  return fileNames
     .map((fileName) => {
       const slug = fileName.replace(/\.md$/, "");
       const fullPath = path.join(postsDirectory, fileName);
@@ -208,10 +211,8 @@ export function getAllPosts(): Post[] {
         ...parseFrontmatter(data, content),
       };
     })
-    .sort((a, b) => (new Date(b.date).getTime() - new Date(a.date).getTime()));
-
-  return posts;
-}
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+});
 
 export function getPostBySlug(slug: string): Post | null {
   ensurePostsDirectory();
