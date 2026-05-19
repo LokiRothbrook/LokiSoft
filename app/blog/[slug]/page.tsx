@@ -43,6 +43,15 @@ function generateArticleSchema(post: Post, slug: string) {
   };
 }
 
+// Safely serialize JSON-LD: encodes < > & so a title like "foo</script><script>…"
+// cannot break out of the script tag regardless of what's in the frontmatter.
+function safeJsonLd(schema: object): string {
+  return JSON.stringify(schema)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
+}
+
 // Generate BreadcrumbList JSON-LD schema
 function generateBreadcrumbSchema(post: Post, slug: string) {
   return {
@@ -148,13 +157,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(articleSchema),
+          __html: safeJsonLd(articleSchema),
         }}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbSchema),
+          __html: safeJsonLd(breadcrumbSchema),
         }}
       />
       <div className="min-h-screen py-12">
