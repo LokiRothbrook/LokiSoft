@@ -1,12 +1,13 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, GraduationCap } from "lucide-react";
 import { NeonLogoAnimated } from "@/components/ui/neon-logo";
 import { HeroCard, GlassCard, SectionTitle } from "@/components/ui/hero-card";
 import { Button } from "@/components/ui/button";
 import { FeaturedPosts } from "@/components/home/featured-posts";
 import { Announcements } from "@/components/home/announcements";
 import { getAllPosts, getAnnouncements } from "@/lib/blog";
+import { getAllCourses } from "@/lib/courses";
 import { services } from "@/lib/data/services";
 import { products } from "@/lib/data/products";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   const allPosts = getAllPosts();
   const announcements = getAnnouncements(3);
+  const courses = getAllCourses();
 
   return (
     <div className="relative">
@@ -34,21 +36,29 @@ export default function HomePage() {
             <span className="text-neon-cyan">freedom of knowledge</span> for everyone.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <Link href="/services">
-              <Button size="lg" className="bg-neon-pink hover:bg-neon-pink/80 group">
-                Explore Services
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
+          <div className="mt-8 grid grid-cols-2 gap-4 max-w-lg mx-auto">
+            {/* Top row — larger primary actions */}
             <Link href="/blog">
-              <Button size="lg" className="bg-neon-purple hover:bg-neon-purple/80 group py-6 text-lg">
+              <Button size="lg" className="w-full bg-neon-purple hover:bg-neon-purple/80 group py-6 text-lg">
                 Explore Blog
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
+            <Link href="/courses">
+              <Button size="lg" className="w-full bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group py-6 text-lg">
+                View Courses
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            {/* Bottom row — smaller secondary actions */}
+            <Link href="/services">
+              <Button className="w-full bg-neon-pink hover:bg-neon-pink/80 group">
+                Explore Services
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
             <Link href="/products">
-              <Button size="lg" className="bg-neon-blue hover:bg-neon-blue/80 group">
+              <Button className="w-full bg-neon-blue hover:bg-neon-blue/80 group">
                 View Products
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -77,7 +87,7 @@ export default function HomePage() {
         </div>
       </HeroCard>
 
-      {/* Featured Posts Section */}
+{/* Featured Posts Section */}
       <HeroCard gradient="purple">
         <div className="container mx-auto px-4">
           <SectionTitle
@@ -90,6 +100,71 @@ export default function HomePage() {
             <Link href="/blog">
               <Button size="lg" className="bg-neon-pink hover:bg-neon-pink/80 group">
                 View All Posts
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </HeroCard>
+      {/* Courses Section */}
+      <HeroCard gradient="cyan">
+        <div className="container mx-auto px-4">
+          <SectionTitle
+            title="LokiSoft Academy"
+            subtitle="Free, structured courses to level up your web development skills — no account required, no paywalls, ever."
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {courses.map((course) => {
+              const colorClasses = {
+                pink: { icon: "bg-neon-pink/10 text-neon-pink", glow: "pink" as const },
+                purple: { icon: "bg-neon-purple/10 text-neon-purple", glow: "purple" as const },
+                blue: { icon: "bg-neon-blue/10 text-neon-blue", glow: "blue" as const },
+                cyan: { icon: "bg-neon-cyan/10 text-neon-cyan", glow: "cyan" as const },
+              };
+              const c = colorClasses[course.color as keyof typeof colorClasses] ?? colorClasses.cyan;
+
+              return (
+                <Link key={course.slug} href={`/courses/${course.slug}`}>
+                  <GlassCard className="h-full group cursor-pointer" glow={c.glow}>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={`p-3 rounded-xl ${c.icon}`}>
+                        <DynamicIcon name={course.icon} className="w-6 h-6" />
+                      </div>
+                      <span className="text-xs px-2 py-1 rounded-full bg-neon-cyan/15 text-neon-cyan font-medium">
+                        Free
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-neon-cyan transition-colors">
+                      {course.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{course.description}</p>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span>{course.lessons.length} lessons</span>
+                      {course.estimatedHours > 0 && <span>~{course.estimatedHours}h</span>}
+                    </div>
+                    <div className="mt-4 flex items-center text-sm text-muted-foreground group-hover:text-neon-cyan transition-colors">
+                      Start learning
+                      <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </GlassCard>
+                </Link>
+              );
+            })}
+
+            {/* "More coming soon" card */}
+            <GlassCard className="h-full flex flex-col items-center justify-center text-center gap-3 border-dashed opacity-60">
+              <div className="p-3 rounded-xl bg-neon-purple/10 text-neon-purple">
+                <GraduationCap className="w-6 h-6" />
+              </div>
+              <p className="text-sm font-medium text-muted-foreground">More courses coming soon</p>
+            </GlassCard>
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link href="/courses">
+              <Button size="lg" className="bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group">
+                View All Courses
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>

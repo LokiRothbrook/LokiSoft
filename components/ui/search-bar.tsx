@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, FileText, Briefcase, Package, Tag, ArrowRight } from "lucide-react";
+import { Search, X, FileText, Briefcase, Package, Tag, ArrowRight, GraduationCap, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { services } from "@/lib/data/services";
@@ -26,7 +26,7 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 export interface SearchResult {
-  type: "page" | "blog" | "service" | "product" | "category";
+  type: "page" | "blog" | "service" | "product" | "category" | "course" | "lesson";
   title: string;
   description?: string;
   url: string;
@@ -40,11 +40,18 @@ interface SearchBarProps {
     excerpt?: string;
     categories?: string[];
   }[];
+  courses?: {
+    slug: string;
+    title: string;
+    description: string;
+    lessons?: { slug: string; title: string; excerpt: string; isQuiz: boolean }[];
+  }[];
 }
 
 const staticPages: SearchResult[] = [
   { type: "page", title: "Home", url: "/", description: "Return to the homepage" },
   { type: "page", title: "Blog", url: "/blog", description: "Read our latest articles" },
+  { type: "page", title: "Courses", url: "/courses", description: "Free web development courses" },
   { type: "page", title: "Services", url: "/services", description: "Explore our services" },
   { type: "page", title: "Products", url: "/products", description: "Discover our products" },
   { type: "page", title: "About", url: "/about", description: "Learn about LokiSoft" },
@@ -53,39 +60,31 @@ const staticPages: SearchResult[] = [
 
 function getTypeIcon(type: SearchResult["type"]) {
   switch (type) {
-    case "page":
-      return <FileText className="w-4 h-4" />;
-    case "blog":
-      return <FileText className="w-4 h-4" />;
-    case "service":
-      return <Briefcase className="w-4 h-4" />;
-    case "product":
-      return <Package className="w-4 h-4" />;
-    case "category":
-      return <Tag className="w-4 h-4" />;
-    default:
-      return <FileText className="w-4 h-4" />;
+    case "page":     return <FileText className="w-4 h-4" />;
+    case "blog":     return <FileText className="w-4 h-4" />;
+    case "service":  return <Briefcase className="w-4 h-4" />;
+    case "product":  return <Package className="w-4 h-4" />;
+    case "category": return <Tag className="w-4 h-4" />;
+    case "course":   return <GraduationCap className="w-4 h-4" />;
+    case "lesson":   return <BookOpen className="w-4 h-4" />;
+    default:         return <FileText className="w-4 h-4" />;
   }
 }
 
 function getTypeColor(type: SearchResult["type"]) {
   switch (type) {
-    case "page":
-      return "text-neon-cyan";
-    case "blog":
-      return "text-neon-pink";
-    case "service":
-      return "text-neon-purple";
-    case "product":
-      return "text-neon-blue";
-    case "category":
-      return "text-neon-cyan";
-    default:
-      return "text-muted-foreground";
+    case "page":     return "text-neon-cyan";
+    case "blog":     return "text-neon-pink";
+    case "service":  return "text-neon-purple";
+    case "product":  return "text-neon-blue";
+    case "category": return "text-neon-cyan";
+    case "course":   return "text-neon-cyan";
+    case "lesson":   return "text-neon-purple";
+    default:         return "text-muted-foreground";
   }
 }
 
-export function SearchBar({ posts = [] }: SearchBarProps) {
+export function SearchBar({ posts = [], courses = [] }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -96,7 +95,7 @@ export function SearchBar({ posts = [] }: SearchBarProps) {
   // Debounce search query for better performance
   const debouncedQuery = useDebounce(query, 150);
 
-  // Memoize all searchable results - only recompute when posts change
+  // Memoize all searchable results - only recompute when posts/courses change
   const allResults = useMemo((): SearchResult[] => {
     const results: SearchResult[] = [...staticPages];
 
@@ -117,6 +116,25 @@ export function SearchBar({ posts = [] }: SearchBarProps) {
         title: product.name,
         description: product.shortDescription,
         url: `/products/${product.slug}`,
+      });
+    });
+
+    // Add courses and their lessons
+    courses.forEach((course) => {
+      results.push({
+        type: "course",
+        title: course.title,
+        description: course.description,
+        url: `/courses/${course.slug}`,
+      });
+      course.lessons?.forEach((lesson) => {
+        results.push({
+          type: "lesson",
+          title: lesson.title,
+          description: lesson.excerpt,
+          url: `/courses/${course.slug}/lessons/${lesson.slug}`,
+          category: lesson.isQuiz ? "Quiz" : course.title,
+        });
       });
     });
 
@@ -146,7 +164,7 @@ export function SearchBar({ posts = [] }: SearchBarProps) {
     });
 
     return results;
-  }, [posts]);
+  }, [posts, courses]);
 
   // Memoized search function
   const searchResults = useMemo(() => {

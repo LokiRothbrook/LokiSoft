@@ -10,7 +10,11 @@ interface Heading {
   level: number;
 }
 
-export function TableOfContents() {
+interface TableOfContentsProps {
+  embedded?: boolean;
+}
+
+export function TableOfContents({ embedded = false }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState<string>("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -142,7 +146,9 @@ export function TableOfContents() {
   }, []);
 
   if (headings.length === 0) {
-    return null;
+    return embedded ? (
+      <p className="text-xs text-muted-foreground px-3 py-4 text-center">No headings found.</p>
+    ) : null;
   }
 
   const renderItems = () =>
@@ -172,6 +178,18 @@ export function TableOfContents() {
         </span>
       </button>
     ));
+
+  // Embedded mode: just the scrollable list, no wrapper or mobile button
+  if (embedded) {
+    return (
+      <div
+        ref={tocScrollRef}
+        className="h-full overflow-y-auto"
+      >
+        <nav className="space-y-0.5 p-2">{renderItems()}</nav>
+      </div>
+    );
+  }
 
   return (
     <>
