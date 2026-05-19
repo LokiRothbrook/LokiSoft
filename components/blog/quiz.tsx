@@ -41,14 +41,16 @@ export function QuizGroup({ children, title }: QuizGroupProps) {
   const allAnswered = answeredQuestions === totalQuestions && totalQuestions > 0;
   const scorePercentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
 
-  // Notify lesson pages so they can persist the score
+  // Report this group's raw score to the lesson so it can aggregate across all groups
   useEffect(() => {
     if (allAnswered) {
       document.dispatchEvent(
-        new CustomEvent("lesson-quiz-complete", { detail: { score: scorePercentage } })
+        new CustomEvent("quiz-group-result", {
+          detail: { correct: correctAnswers, total: totalQuestions },
+        })
       );
     }
-  }, [allAnswered, scorePercentage]);
+  }, [allAnswered, correctAnswers, totalQuestions]);
 
   return (
     <QuizContext.Provider value={{ totalQuestions, answeredQuestions, correctAnswers, registerQuestion, recordAnswer }}>
