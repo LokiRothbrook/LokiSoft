@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { products, getProductBySlug } from "@/lib/data/products";
 import { GlassCard } from "@/components/ui/hero-card";
 import { Button } from "@/components/ui/button";
-import { getIcon } from "@/lib/icons";
+import { DynamicIcon } from "@/components/ui/dynamic-icon";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -39,7 +39,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  const IconComponent = getIcon(product.icon);
   const colorClasses = {
     pink: {
       bg: "bg-neon-pink/10",
@@ -82,7 +81,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Back Button */}
         <Link href="/products">
-          <Button variant="ghost" className="mb-8 group">
+          <Button variant="ghost" className="mb-8 text-neon-purple hover:text-neon-purple group">
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to Products
           </Button>
@@ -91,7 +90,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         {/* Hero */}
         <header className="text-center mb-16">
           <div className={`inline-flex p-6 rounded-3xl ${colors.bg} ${colors.glow} mb-6`}>
-            <IconComponent className={`w-16 h-16 ${colors.text}`} />
+            <DynamicIcon name={product.icon} className={`w-16 h-16 ${colors.text}`} />
           </div>
 
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -125,7 +124,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <h2 className="text-2xl font-bold mb-8 text-center gradient-text">Key Features</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {product.features.map((feature, index) => {
-              const FeatureIcon = getIcon(feature.icon);
               const featureColors = ["pink", "purple", "blue", "cyan"] as const;
               const featureColor = featureColors[index % featureColors.length];
               const fColors = colorClasses[featureColor];
@@ -134,7 +132,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <GlassCard key={feature.title} glow={featureColor}>
                   <div className="flex items-start gap-4">
                     <div className={`p-3 rounded-xl ${fColors.bg}`}>
-                      <FeatureIcon className={`w-6 h-6 ${fColors.text}`} />
+                      <DynamicIcon name={feature.icon} className={`w-6 h-6 ${fColors.text}`} />
                     </div>
                     <div>
                       <h3 className="font-semibold mb-2">{feature.title}</h3>
@@ -175,8 +173,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     </Button>
                   </Link>
                   <Link href="/blog">
-                    <Button size="lg" variant="outline">
+                    <Button size="lg" className="bg-neon-purple hover:bg-neon-purple/80 group">
                       Read Our Blog
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
                 </div>
@@ -204,7 +203,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <h2 className="text-2xl font-bold mb-6">Other Products</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {relatedProducts.map((related) => {
-                const RelatedIcon = getIcon(related.icon);
                 const relatedColors = colorClasses[related.color];
 
                 return (
@@ -212,7 +210,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     <GlassCard className="h-full group cursor-pointer" glow={related.color}>
                       <div className="flex items-start gap-4">
                         <div className={`p-3 rounded-xl ${relatedColors.bg}`}>
-                          <RelatedIcon className={`w-6 h-6 ${relatedColors.text}`} />
+                          <DynamicIcon name={related.icon} className={`w-6 h-6 ${relatedColors.text}`} />
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold mb-1 group-hover:text-neon-pink transition-colors">

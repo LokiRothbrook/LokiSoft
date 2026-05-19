@@ -17,7 +17,6 @@ export interface SiteConfig {
   // URLs
   baseUrl: string;
   githubRepoUrl: string;
-  blogRepoUrl: string;
 
   // Contact Information
   contact: {
@@ -67,14 +66,13 @@ export const siteConfig: SiteConfig = {
   description:
     "We build open source software guided by Christian values and a commitment to the freedom of knowledge for everyone.",
   author: "LokiSoft",
-  foundedYear: 2024,
+  foundedYear: 2026,
 
   // URLs
   baseUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://lokisoft.xyz",
   githubRepoUrl:
     process.env.NEXT_PUBLIC_GITHUB_REPO_URL ||
     "https://github.com/LokiRothbrook/lokisoft",
-  blogRepoUrl: "https://github.com/LokiRothbrook/LokiSoft-Blog",
 
   // Contact Information
   contact: {
@@ -91,7 +89,7 @@ export const siteConfig: SiteConfig = {
     twitter: "https://x.com/lokisoft",
     twitterHandle: "@lokisoft",
     youtube: "https://youtube.com/@lokisoft",
-    github: "https://github.com/LokiRothbrook/LokiSoft-Blog",
+    github: "https://github.com/LokiRothbrook/LokiSoft",
     discord: "https://discord.gg/lokisoft",
   },
 
@@ -106,6 +104,10 @@ export const siteConfig: SiteConfig = {
       "mobile apps",
       "e-commerce",
       "custom software",
+      "home-lab",
+      "tech",
+      "programing",
+      "web design"
     ],
     ogImage: "/og-image.svg",
     twitterCard: "summary_large_image",

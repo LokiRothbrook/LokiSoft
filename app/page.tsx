@@ -6,10 +6,10 @@ import { HeroCard, GlassCard, SectionTitle } from "@/components/ui/hero-card";
 import { Button } from "@/components/ui/button";
 import { FeaturedPosts } from "@/components/home/featured-posts";
 import { Announcements } from "@/components/home/announcements";
-import { getAllPosts, getAnnouncements, getFeaturedPosts } from "@/lib/blog";
+import { getAllPosts, getAnnouncements } from "@/lib/blog";
 import { services } from "@/lib/data/services";
 import { products } from "@/lib/data/products";
-import { getIcon } from "@/lib/icons";
+import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { siteConfig, getPageTitle } from "@/lib/data/site";
 import { homepageConfig } from "@/lib/data/homepage";
 
@@ -20,7 +20,6 @@ export const metadata: Metadata = {
 export default function HomePage() {
   const allPosts = getAllPosts();
   const announcements = getAnnouncements(3);
-  const featuredPosts = getFeaturedPosts(6);
 
   return (
     <div className="relative">
@@ -85,11 +84,11 @@ export default function HomePage() {
             title={homepageConfig.featuredPosts.title}
             subtitle={homepageConfig.featuredPosts.subtitle}
           />
-          <FeaturedPosts initialPosts={featuredPosts} allPosts={allPosts} />
+          <FeaturedPosts allPosts={allPosts} />
 
           <div className="mt-8 text-center">
             <Link href="/blog">
-              <Button variant="outline" size="lg" className="group">
+              <Button size="lg" className="bg-neon-pink hover:bg-neon-pink/80 group">
                 View All Posts
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -108,7 +107,6 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {homepageConfig.about.cards.map((card) => {
-              const IconComponent = getIcon(card.icon);
               const colorClasses = {
                 pink: "bg-neon-pink/10 text-neon-pink",
                 purple: "bg-neon-purple/10 text-neon-purple",
@@ -120,7 +118,7 @@ export default function HomePage() {
                 <GlassCard key={card.title} glow={card.color}>
                   <div className="flex items-start gap-4">
                     <div className={`p-3 rounded-xl ${colorClasses[card.color]}`}>
-                      <IconComponent className="w-8 h-8" />
+                      <DynamicIcon name={card.icon} className="w-8 h-8" />
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
@@ -134,7 +132,7 @@ export default function HomePage() {
 
           <div className="mt-8 text-center">
             <Link href="/about">
-              <Button variant="outline" size="lg" className="group">
+              <Button size="lg" className="bg-neon-pink hover:bg-neon-pink/80 group">
                 Learn More About Us
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -153,7 +151,6 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {services.map((service) => {
-              const IconComponent = getIcon(service.icon);
               const colorClasses = {
                 pink: "bg-neon-pink/10 text-neon-pink",
                 purple: "bg-neon-purple/10 text-neon-purple",
@@ -165,7 +162,7 @@ export default function HomePage() {
                 <Link key={service.slug} href={`/services/${service.slug}`}>
                   <GlassCard className="h-full group cursor-pointer" glow={service.color}>
                     <div className={`p-3 rounded-xl ${colorClasses[service.color]} w-fit mb-4`}>
-                      <IconComponent className="w-6 h-6" />
+                      <DynamicIcon name={service.icon} className="w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-semibold mb-2 group-hover:text-neon-pink transition-colors">
                       {service.name}
@@ -183,7 +180,7 @@ export default function HomePage() {
 
           <div className="mt-8 text-center">
             <Link href="/services">
-              <Button variant="outline" size="lg" className="group">
+              <Button size="lg" className="bg-neon-pink hover:bg-neon-pink/80 group">
                 View All Services
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -202,7 +199,6 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {products.map((product) => {
-              const IconComponent = getIcon(product.icon);
               const colorClasses = {
                 pink: "bg-neon-pink/10 text-neon-pink",
                 purple: "bg-neon-purple/10 text-neon-purple",
@@ -220,7 +216,7 @@ export default function HomePage() {
                   <GlassCard className="h-full group cursor-pointer" glow={product.color}>
                     <div className="flex items-center justify-between mb-4">
                       <div className={`p-3 rounded-xl ${colorClasses[product.color]}`}>
-                        <IconComponent className="w-6 h-6" />
+                        <DynamicIcon name={product.icon} className="w-6 h-6" />
                       </div>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${statusClasses[product.status]}`}
@@ -245,7 +241,7 @@ export default function HomePage() {
 
           <div className="mt-8 text-center">
             <Link href="/products">
-              <Button variant="outline" size="lg" className="group">
+              <Button size="lg" className="bg-neon-pink hover:bg-neon-pink/80 group">
                 View All Products
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -272,7 +268,7 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link href="/services">
-                <Button size="lg" variant="outline" className="group">
+                <Button size="lg" className="bg-neon-purple hover:bg-neon-purple/80 group">
                   Explore Services
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>

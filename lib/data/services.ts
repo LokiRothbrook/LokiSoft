@@ -18,7 +18,7 @@ export const services: Service[] = [
     name: "Basic Business Portal",
     shortDescription: "Simple, professional websites for small businesses just getting started",
     description:
-      "Get your business online quickly and affordably. Perfect for startups and small businesses that need a professional web presence without the complexity. We use proven templates to deliver a polished site fast, so you can focus on what matters—running your business.",
+      "Get your business online quickly and affordably. Perfect for startups and small businesses that need a professional web presence without the complexity. We use proven templates to deliver a polished site fast, so you can focus on what matters, running your business.",
     icon: "Rocket",
     features: [
       "Professional template-based design",

@@ -65,10 +65,10 @@ export interface HomepageConfig {
 export const homepageConfig: HomepageConfig = {
   // Hero Section
   hero: {
-    tagline: "Open source software built on Christian values and the freedom of knowledge for everyone.",
+    tagline: "Open source software built on Christian Values and the Freedom of Knowledge for everyone!",
     highlights: [
-      { text: "Christian values", className: "text-neon-pink" },
-      { text: "freedom of knowledge", className: "text-neon-cyan" },
+      { text: "Christian Values", className: "text-neon-pink" },
+      { text: "Freedom of Knowledgde", className: "text-neon-cyan" },
     ],
   },
 
@@ -93,14 +93,14 @@ export const homepageConfig: HomepageConfig = {
         icon: "Heart",
         title: "Our Mission",
         description:
-          "We're a Christian values company committed to creating open source software that empowers individuals and businesses. We believe technology should be accessible to everyone, and knowledge should be freely shared.",
+          "Here at LokiSoft, We believe in the freedom of knowledge and a shared love for God. We're committed to creating open source software that empowers individuals and businesses. We believe technology should be accessible to everyone, and knowledge should be freely shared. For everything else, In God we Trust!",
         color: "cyan",
       },
       {
         icon: "Sparkles",
         title: "Our Values",
         description:
-          "Integrity, excellence, and service guide everything we do. We build software with care, treat our clients like family, and always strive to do what's right—not just what's profitable.",
+          "Integrity, excellence, and God guide everything we do. We build software with care, treat our clients like family, and always strive to do what's right, not just what's profitable.",
         color: "pink",
       },
       {
@@ -114,7 +114,7 @@ export const homepageConfig: HomepageConfig = {
         icon: "Users",
         title: "Community Driven",
         description:
-          "We're building more than software—we're building a community. Join us on Discord, contribute to our projects, or just say hello. Everyone is welcome here.",
+          "We're building more than software, we're building a community. Join us on Discord, contribute to our projects, or just say hello. Everyone is welcome here.",
         color: "blue",
       },
     ],
@@ -136,6 +136,6 @@ export const homepageConfig: HomepageConfig = {
   cta: {
     title: "Ready to Get Started?",
     description:
-      "Whether you need custom software, want to explore our products, or just want to chat about your project—we're here to help.",
+      "Whether you need custom software, want to explore our products, or just want to chat about your project, we're here to help.",
   },
 };

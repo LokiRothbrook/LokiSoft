@@ -1,10 +1,10 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CheckCircle, DollarSign } from "lucide-react";
+import { ArrowRight, CheckCircle } from "lucide-react";
 import { services } from "@/lib/data/services";
 import { SectionTitle, GlassCard } from "@/components/ui/hero-card";
 import { Button } from "@/components/ui/button";
-import { getIcon } from "@/lib/icons";
+import { DynamicIcon } from "@/components/ui/dynamic-icon";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -23,8 +23,7 @@ export default function ServicesPage() {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
-          {services.map((service, index) => {
-            const IconComponent = getIcon(service.icon);
+          {services.map((service) => {
             const colorClasses = {
               pink: {
                 bg: "bg-neon-pink/10",
@@ -50,49 +49,48 @@ export default function ServicesPage() {
             const colors = colorClasses[service.color];
 
             return (
-              <GlassCard key={service.slug} className="group" glow={service.color}>
-                <div className="flex items-start gap-4 mb-4">
-                  <div className={`p-4 rounded-xl ${colors.bg}`}>
-                    <IconComponent className={`w-8 h-8 ${colors.text}`} />
-                  </div>
-                  <div className="flex-1">
-                    <h2 className="text-2xl font-bold mb-2 group-hover:text-neon-pink transition-colors">
-                      {service.name}
-                    </h2>
-                    <p className="text-muted-foreground">{service.shortDescription}</p>
-                  </div>
-                </div>
-
-                {/* Price Range */}
-                <div className={`flex items-center gap-2 mb-4 px-3 py-2 rounded-lg ${colors.bg} w-fit`}>
-                  <DollarSign className={`w-4 h-4 ${colors.text}`} />
-                  <span className="text-sm font-medium">
-                    {service.priceRange.low} – {service.priceRange.high}
-                  </span>
-                </div>
-
-                {/* Features Preview */}
-                <div className="space-y-2 mb-6">
-                  {service.features.slice(0, 3).map((feature) => (
-                    <div key={feature} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className={`w-4 h-4 ${colors.text} shrink-0`} />
-                      <span className="text-muted-foreground">{feature}</span>
+              <Link key={service.slug} href={`/services/${service.slug}`} className="block cursor-pointer">
+                <GlassCard className="group h-full" glow={service.color}>
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className={`p-4 rounded-xl ${colors.bg}`}>
+                      <DynamicIcon name={service.icon} className={`w-8 h-8 ${colors.text}`} />
                     </div>
-                  ))}
-                  {service.features.length > 3 && (
-                    <p className="text-sm text-muted-foreground pl-6">
-                      +{service.features.length - 3} more features
-                    </p>
-                  )}
-                </div>
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold mb-2 group-hover:text-neon-pink transition-colors">
+                        {service.name}
+                      </h2>
+                      <p className="text-muted-foreground">{service.shortDescription}</p>
+                    </div>
+                  </div>
 
-                <Link href={`/services/${service.slug}`}>
-                  <Button variant="outline" className="w-full group/btn">
+                  {/* Price Range */}
+                  <div className={`flex items-center gap-2 mb-4 px-3 py-2 rounded-lg ${colors.bg} w-fit`}>
+                    <span className="text-sm font-medium">
+                      {service.priceRange.low} – {service.priceRange.high}
+                    </span>
+                  </div>
+
+                  {/* Features Preview */}
+                  <div className="space-y-2 mb-6">
+                    {service.features.slice(0, 3).map((feature) => (
+                      <div key={feature} className="flex items-center gap-2 text-sm">
+                        <CheckCircle className={`w-4 h-4 ${colors.text} shrink-0`} />
+                        <span className="text-muted-foreground">{feature}</span>
+                      </div>
+                    ))}
+                    {service.features.length > 3 && (
+                      <p className="text-sm text-muted-foreground pl-6">
+                        +{service.features.length - 3} more features
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-neon-pink group-hover:bg-neon-pink/80 text-white font-medium transition-colors">
                     Learn More
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-              </GlassCard>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </GlassCard>
+              </Link>
             );
           })}
         </div>
@@ -114,8 +112,9 @@ export default function ServicesPage() {
               </Button>
             </Link>
             <Link href="/about">
-              <Button size="lg" variant="outline">
+              <Button size="lg" className="bg-neon-purple hover:bg-neon-purple/80 group">
                 Learn About Us
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
           </div>

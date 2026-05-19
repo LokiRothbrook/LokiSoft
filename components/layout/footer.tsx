@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { NeonLogo } from "@/components/ui/neon-logo";
+import { SupportButton } from "@/components/ui/support-button";
 import { services } from "@/lib/data/services";
 import { products } from "@/lib/data/products";
 import { siteConfig } from "@/lib/data/site";
@@ -173,10 +174,13 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} {siteConfig.legal.copyrightHolder}. All rights reserved.
             </p>
-            <p className="text-xs text-muted-foreground">
-              Built with faith, passion, and{" "}
-              <span className="text-neon-pink">&hearts;</span> for open source
-            </p>
+            <div className="flex items-center gap-6">
+              <SupportButton variant="footer" />
+              <p className="text-xs text-muted-foreground">
+                Built with faith, passion, and{" "}
+                <span className="text-neon-pink">&hearts;</span> for open source
+              </p>
+            </div>
           </div>
         </div>
       </div>
