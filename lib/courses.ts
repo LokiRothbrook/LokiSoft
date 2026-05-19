@@ -1,4 +1,3 @@
-import { cache } from "react";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
@@ -158,20 +157,29 @@ function getLessonsForCourse(courseSlug: string): LessonMeta[] {
     .sort((a, b) => a.lessonNumber - b.lessonNumber);
 }
 
-export const getAllCourses = cache((): Course[] => {
-  if (!fs.existsSync(coursesDirectory)) return [];
+let _coursesCache: Course[] | undefined;
+
+export function getAllCourses(): Course[] {
+  if (_coursesCache) return _coursesCache;
+
+  if (!fs.existsSync(coursesDirectory)) {
+    _coursesCache = [];
+    return _coursesCache;
+  }
 
   const entries = fs.readdirSync(coursesDirectory, { withFileTypes: true });
   const courseDirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
 
-  return courseDirs
+  _coursesCache = courseDirs
     .map((slug) => {
       const meta = parseCourseInfo(slug);
       if (!meta) return null;
       return { ...meta, lessons: getLessonsForCourse(slug) };
     })
     .filter((c): c is Course => c !== null);
-});
+
+  return _coursesCache;
+}
 
 export function getCourseBySlug(slug: string): Course | null {
   const meta = parseCourseInfo(slug);

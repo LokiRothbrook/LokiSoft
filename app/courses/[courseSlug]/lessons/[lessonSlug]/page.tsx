@@ -5,6 +5,8 @@ import { siteConfig } from "@/lib/data/site";
 import { SkillTreeSidebar } from "@/components/courses/skill-tree-sidebar";
 import { LessonContent } from "@/components/courses/lesson-content";
 
+export const dynamicParams = true;
+
 interface LessonPageProps {
   params: Promise<{ courseSlug: string; lessonSlug: string }>;
 }
