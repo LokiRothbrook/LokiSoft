@@ -130,11 +130,11 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="font-sans antialiased min-h-screen flex flex-col overflow-x-hidden"
+        className="font-sans antialiased min-h-screen flex flex-col"
       >
         <ParticleBackground />
         <Navbar posts={posts} />
-        <main className="flex-1 pt-16">{children}</main>
+        <main className="flex-1 pt-16 overflow-x-hidden">{children}</main>
         <Footer />
       </body>
     </html>
