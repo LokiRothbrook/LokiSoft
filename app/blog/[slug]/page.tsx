@@ -1,11 +1,15 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, User, Clock, Star, Tag, Github, MessageSquare, GitPullRequest } from "lucide-react";
-import { getPostWithHtml, getAllPosts, Post } from "@/lib/blog";
+import { ArrowLeft, Calendar, User, Clock, Tag, GithubIcon, MessageSquare, GitPullRequest } from "lucide-react";
+import { getPostWithHtml, getAllPosts, getRelatedPosts, Post } from "@/lib/blog";
 import { Button } from "@/components/ui/button";
-import { TableOfContents, BlogContent, Comments } from "@/components/blog";
+import { SupportButton } from "@/components/ui/support-button";
+import { TableOfContents, BlogContent, Comments, RelatedPosts, DifficultyStars, categoryColors } from "@/components/blog";
 import { siteConfig } from "@/lib/data/site";
+
+// ISR: Revalidate every hour
+export const revalidate = 3600;
 
 // Generate Article JSON-LD schema for blog posts
 function generateArticleSchema(post: Post, slug: string) {
@@ -37,6 +41,15 @@ function generateArticleSchema(post: Post, slug: string) {
     articleSection: post.categories.join(", "),
     keywords: post.categories.join(", "),
   };
+}
+
+// Safely serialize JSON-LD: encodes < > & so a title like "foo</script><script>…"
+// cannot break out of the script tag regardless of what's in the frontmatter.
+function safeJsonLd(schema: object): string {
+  return JSON.stringify(schema)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
 }
 
 // Generate BreadcrumbList JSON-LD schema
@@ -126,30 +139,6 @@ export async function generateMetadata({
   };
 }
 
-function DifficultyStars({ difficulty }: { difficulty: number }) {
-  return (
-    <div className="flex items-center gap-1">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={`w-4 h-4 ${
-            i < difficulty
-              ? "fill-neon-cyan text-neon-cyan"
-              : "fill-transparent text-muted-foreground/30"
-          }`}
-        />
-      ))}
-      <span className="text-sm text-muted-foreground ml-2">
-        {difficulty === 1 && "Beginner"}
-        {difficulty === 2 && "Easy"}
-        {difficulty === 3 && "Intermediate"}
-        {difficulty === 4 && "Advanced"}
-        {difficulty === 5 && "Expert"}
-      </span>
-    </div>
-  );
-}
-
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
   const post = await getPostWithHtml(slug);
@@ -158,9 +147,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  const categoryColors = ["neon-pink", "neon-purple", "neon-blue", "neon-cyan"];
   const articleSchema = generateArticleSchema(post, slug);
   const breadcrumbSchema = generateBreadcrumbSchema(post, slug);
+  const relatedPosts = getRelatedPosts(slug, 4);
 
   return (
     <>
@@ -168,20 +157,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(articleSchema),
+          __html: safeJsonLd(articleSchema),
         }}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbSchema),
+          __html: safeJsonLd(breadcrumbSchema),
         }}
       />
       <div className="min-h-screen py-12">
         <div className="w-full max-w-full px-4 sm:px-6 md:px-8 lg:pl-24 lg:pr-12 xl:pl-32 xl:pr-16">
           {/* Back Button */}
         <Link href="/blog">
-          <Button variant="ghost" className="mb-8 group">
+          <Button variant="ghost" className="mb-8 text-neon-purple hover:text-neon-purple/80 group">
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to Blog
           </Button>
@@ -239,7 +228,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 {post.categories.map((category, i) => (
                   <Link
                     key={category}
-                    href={`/blog?category=${encodeURIComponent(category)}`}
+                    href={`/blog?categories=${encodeURIComponent(category)}`}
                     className={`text-sm px-3 py-1 rounded-full bg-${categoryColors[i % categoryColors.length]}/10 text-${categoryColors[i % categoryColors.length]} hover:bg-${categoryColors[i % categoryColors.length]}/20 transition-colors`}
                   >
                     {category}
@@ -249,7 +238,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
               {/* Difficulty */}
               <div className="flex justify-center">
-                <DifficultyStars difficulty={post.difficulty} />
+                <DifficultyStars difficulty={post.difficulty} size="md" showName />
               </div>
             </header>
 
@@ -257,6 +246,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="glass rounded-2xl p-4 sm:p-6 md:p-8 lg:p-12 overflow-x-auto">
               <BlogContent contentHtml={post.contentHtml || ""} />
             </div>
+
+            {/* Support CTA */}
+            <SupportButton className="mt-12" />
 
             {/* Contribution CTA */}
             <div className="mt-12 rounded-2xl border border-neon-cyan/30 bg-gradient-to-br from-neon-cyan/5 to-neon-purple/5 p-6 md:p-8">
@@ -276,7 +268,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                   <a
-                    href={siteConfig.blogRepoUrl}
+                    href={siteConfig.githubRepoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -284,7 +276,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                       variant="outline"
                       className="w-full sm:w-auto bg-zinc-700/80 hover:bg-zinc-600/80 border-zinc-600 text-foreground"
                     >
-                      <Github className="w-4 h-4 mr-2" />
+                      <GithubIcon className="w-4 h-4 mr-2" />
                       GitHub
                     </Button>
                   </a>
@@ -303,6 +295,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             {/* Comments */}
             <Comments />
+
+            {/* Related Posts */}
+            <RelatedPosts posts={relatedPosts} />
 
             {/* Footer */}
             <footer className="mt-12 pt-8 border-t border-border/30">

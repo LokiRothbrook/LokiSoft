@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 interface Particle {
@@ -12,6 +12,7 @@ interface Particle {
   duration: number;
   delay: number;
   type: "circle" | "square" | "triangle" | "line";
+  xOffset: number;
 }
 
 interface FloatingShape {
@@ -50,6 +51,7 @@ function generateParticles(count: number): Particle[] {
     duration: Math.random() * 20 + 15,
     delay: Math.random() * 5,
     type: (["circle", "square", "triangle", "line"] as const)[Math.floor(Math.random() * 4)],
+    xOffset: Math.random() * 20 - 10,
   }));
 }
 
@@ -87,7 +89,7 @@ function ParticleElement({ particle }: { particle: Particle }) {
         }}
         animate={{
           y: [0, -30, 0],
-          x: [0, Math.random() * 20 - 10, 0],
+          x: [0, particle.xOffset, 0],
           opacity: [0.3, 1, 0.3],
           scale: [1, 1.2, 1],
         }}
@@ -250,16 +252,21 @@ function ShapeElement({ shape }: { shape: FloatingShape }) {
 }
 
 export function ParticleBackground() {
+  const [mounted, setMounted] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [shapes, setShapes] = useState<FloatingShape[]>([]);
-  const [mounted, setMounted] = useState(false);
 
+  // Generate particles only on client after mount - hydration-safe pattern
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setParticles(generateParticles(30));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShapes(generateShapes(6));
   }, []);
 
+  // Don't render until mounted on client
   if (!mounted) return null;
 
   return (

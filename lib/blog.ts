@@ -1,3 +1,4 @@
+import { cache } from "react";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
@@ -191,12 +192,14 @@ function extractHeadings(content: string): TocHeading[] {
   return headings;
 }
 
-export function getAllPosts(): Post[] {
+// cache() deduplicates filesystem reads within a single server render —
+// getPaginatedPosts() and getAllCategories() both call this, so it runs once per request.
+export const getAllPosts = cache((): Post[] => {
   ensurePostsDirectory();
 
   const fileNames = fs.readdirSync(postsDirectory).filter((name) => name.endsWith(".md"));
 
-  const posts = fileNames
+  return fileNames
     .map((fileName) => {
       const slug = fileName.replace(/\.md$/, "");
       const fullPath = path.join(postsDirectory, fileName);
@@ -208,10 +211,8 @@ export function getAllPosts(): Post[] {
         ...parseFrontmatter(data, content),
       };
     })
-    .sort((a, b) => (new Date(b.date).getTime() - new Date(a.date).getTime()));
-
-  return posts;
-}
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+});
 
 export function getPostBySlug(slug: string): Post | null {
   ensurePostsDirectory();
@@ -303,17 +304,22 @@ export function getPostsByCategory(category: string): Post[] {
 
 export function getAllCategories(): { name: string; count: number }[] {
   const posts = getAllPosts();
-  const categoryMap = new Map<string, number>();
+  const categoryMap = new Map<string, { count: number; displayName: string }>();
 
   posts.forEach((post) => {
     post.categories.forEach((category) => {
       const normalized = category.toLowerCase();
-      categoryMap.set(normalized, (categoryMap.get(normalized) || 0) + 1);
+      const existing = categoryMap.get(normalized);
+      if (existing) {
+        existing.count++;
+      } else {
+        categoryMap.set(normalized, { count: 1, displayName: category });
+      }
     });
   });
 
-  return Array.from(categoryMap.entries())
-    .map(([name, count]) => ({ name, count }))
+  return Array.from(categoryMap.values())
+    .map(({ displayName, count }) => ({ name: displayName, count }))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -329,4 +335,281 @@ export function getPostsForSearch(): {
     excerpt: post.excerpt,
     categories: post.categories,
   }));
+}
+
+// ============================================
+// Pagination Types and Helpers
+// ============================================
+
+export interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  pagination: PaginationInfo;
+}
+
+export type PostFilterType = "all" | "featured" | "announcements" | "category";
+export type SortOption = "newest" | "oldest" | "reading_time_asc" | "reading_time_desc";
+export type CategoryMatchMode = "and" | "or";
+
+export interface PostFilters {
+  filterType?: PostFilterType;
+  category?: string; // Legacy single category support
+  categories?: string[]; // New multi-category support
+  categoryMatchMode?: CategoryMatchMode; // AND or OR logic for multi-category
+  featured?: boolean; // Filter to include only featured posts
+  announcement?: boolean; // Filter to include only announcement posts
+  query?: string;
+  difficulty?: number | null; // 1-5 or null for any
+  sort?: SortOption;
+}
+
+/**
+ * Get paginated posts with optional filtering
+ */
+export function getPaginatedPosts(
+  page: number = 1,
+  limit: number = 20,
+  filters: PostFilters = {}
+): PaginatedResult<Post> {
+  let posts = getAllPosts();
+
+  // Apply featured filter (new approach - can be combined with other filters)
+  if (filters.featured === true) {
+    posts = posts.filter((post) => post.featured);
+  }
+
+  // Apply announcement filter (new approach - can be combined with other filters)
+  if (filters.announcement === true) {
+    posts = posts.filter((post) => post.announcement);
+  }
+
+  // Legacy filterType support (for backwards compatibility)
+  if (filters.filterType === "featured" && filters.featured !== true) {
+    posts = posts.filter((post) => post.featured);
+  } else if (filters.filterType === "announcements" && filters.announcement !== true) {
+    posts = posts.filter((post) => post.announcement);
+  }
+
+  // Apply category filter with AND/OR logic
+  if (filters.categories && filters.categories.length > 0) {
+    const categorySet = new Set(filters.categories.map(c => c.toLowerCase()));
+    const matchMode = filters.categoryMatchMode || "and";
+
+    if (matchMode === "and") {
+      // AND logic: post must have ALL selected categories
+      posts = posts.filter((post) => {
+        const postCategoriesLower = post.categories.map(c => c.toLowerCase());
+        return Array.from(categorySet).every(cat => postCategoriesLower.includes(cat));
+      });
+    } else {
+      // OR logic: post must have at least ONE of the selected categories
+      posts = posts.filter((post) =>
+        post.categories.some((c) => categorySet.has(c.toLowerCase()))
+      );
+    }
+  } else if (filters.category) {
+    // Legacy single category filter
+    const categoryLower = filters.category.toLowerCase();
+    posts = posts.filter((post) =>
+      post.categories.some((c) => c.toLowerCase() === categoryLower)
+    );
+  }
+
+  // Apply difficulty filter
+  if (filters.difficulty && filters.difficulty >= 1 && filters.difficulty <= 5) {
+    posts = posts.filter((post) => post.difficulty === filters.difficulty);
+  }
+
+  // Apply search query (basic text search on title and excerpt)
+  if (filters.query) {
+    const searchTerms = filters.query.toLowerCase().trim().split(/\s+/);
+    posts = posts.filter((post) => {
+      const searchableText = `${post.title} ${post.excerpt}`.toLowerCase();
+      return searchTerms.every((term) => searchableText.includes(term));
+    });
+  }
+
+  // Apply sorting
+  const sortOption = filters.sort || "newest";
+  switch (sortOption) {
+    case "oldest":
+      posts = posts.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      break;
+    case "reading_time_asc":
+      posts = posts.sort((a, b) => a.readingTime - b.readingTime);
+      break;
+    case "reading_time_desc":
+      posts = posts.sort((a, b) => b.readingTime - a.readingTime);
+      break;
+    case "newest":
+    default:
+      // Already sorted by newest in getAllPosts()
+      break;
+  }
+
+  // Calculate pagination
+  const total = posts.length;
+  const totalPages = Math.ceil(total / limit);
+  const safePage = Math.max(1, Math.min(page, totalPages || 1));
+  const startIndex = (safePage - 1) * limit;
+  const paginatedPosts = posts.slice(startIndex, startIndex + limit);
+
+  return {
+    data: paginatedPosts,
+    pagination: {
+      page: safePage,
+      limit,
+      total,
+      totalPages,
+      hasNext: safePage < totalPages,
+      hasPrev: safePage > 1,
+    },
+  };
+}
+
+/**
+ * Search posts with pagination - searches title, excerpt, and content
+ */
+export function searchPosts(
+  query: string,
+  page: number = 1,
+  limit: number = 20
+): PaginatedResult<Post> {
+  if (!query.trim()) {
+    return getPaginatedPosts(page, limit);
+  }
+
+  const searchTerms = query.toLowerCase().trim().split(/\s+/);
+  const allPosts = getAllPosts();
+
+  // Score posts by relevance (title matches weighted higher)
+  const scoredPosts = allPosts
+    .map((post) => {
+      const titleLower = post.title.toLowerCase();
+      const excerptLower = post.excerpt.toLowerCase();
+      const contentLower = post.content.toLowerCase();
+
+      let score = 0;
+      let allTermsMatch = true;
+
+      for (const term of searchTerms) {
+        const titleMatch = titleLower.includes(term);
+        const excerptMatch = excerptLower.includes(term);
+        const contentMatch = contentLower.includes(term);
+
+        if (!titleMatch && !excerptMatch && !contentMatch) {
+          allTermsMatch = false;
+          break;
+        }
+
+        // Weight: title > excerpt > content
+        if (titleMatch) score += 10;
+        if (excerptMatch) score += 5;
+        if (contentMatch) score += 1;
+      }
+
+      return { post, score, matches: allTermsMatch };
+    })
+    .filter((item) => item.matches)
+    .sort((a, b) => b.score - a.score)
+    .map((item) => item.post);
+
+  // Calculate pagination
+  const total = scoredPosts.length;
+  const totalPages = Math.ceil(total / limit);
+  const safePage = Math.max(1, Math.min(page, totalPages || 1));
+  const startIndex = (safePage - 1) * limit;
+  const paginatedPosts = scoredPosts.slice(startIndex, startIndex + limit);
+
+  return {
+    data: paginatedPosts,
+    pagination: {
+      page: safePage,
+      limit,
+      total,
+      totalPages,
+      hasNext: safePage < totalPages,
+      hasPrev: safePage > 1,
+    },
+  };
+}
+
+// ============================================
+// Related Posts
+// ============================================
+
+/**
+ * Calculate word overlap similarity between two strings (0-1)
+ */
+function calculateTitleSimilarity(title1: string, title2: string): number {
+  const words1 = new Set(
+    title1.toLowerCase().split(/\s+/).filter(w => w.length > 3)
+  );
+  const words2 = new Set(
+    title2.toLowerCase().split(/\s+/).filter(w => w.length > 3)
+  );
+
+  if (words1.size === 0 || words2.size === 0) return 0;
+
+  let overlap = 0;
+  words1.forEach(word => {
+    if (words2.has(word)) overlap++;
+  });
+
+  return overlap / Math.max(words1.size, words2.size);
+}
+
+/**
+ * Calculate relevance score between two posts
+ */
+function calculateRelevanceScore(current: Post, candidate: Post): number {
+  // Category overlap (10 points per shared category)
+  const currentCategories = current.categories.map(c => c.toLowerCase());
+  const candidateCategories = candidate.categories.map(c => c.toLowerCase());
+  const sharedCategories = currentCategories.filter(c =>
+    candidateCategories.includes(c)
+  ).length;
+  const categoryScore = sharedCategories * 10;
+
+  // Title similarity (0-5 points)
+  const titleScore = calculateTitleSimilarity(current.title, candidate.title) * 5;
+
+  // Recency bonus (posts closer in date get bonus)
+  const currentDate = new Date(current.date).getTime();
+  const candidateDate = new Date(candidate.date).getTime();
+  const daysDiff = Math.abs(currentDate - candidateDate) / (1000 * 60 * 60 * 24);
+  const recencyScore = daysDiff < 30 ? 3 : daysDiff < 90 ? 1 : 0;
+
+  // Same difficulty level bonus
+  const difficultyScore = current.difficulty === candidate.difficulty ? 2 : 0;
+
+  return categoryScore + titleScore + recencyScore + difficultyScore;
+}
+
+/**
+ * Get related posts for a given post
+ */
+export function getRelatedPosts(currentSlug: string, limit: number = 4): Post[] {
+  const allPosts = getAllPosts();
+  const currentPost = allPosts.find(p => p.slug === currentSlug);
+
+  if (!currentPost) return [];
+
+  return allPosts
+    .filter(post => post.slug !== currentSlug)
+    .map(post => ({
+      post,
+      score: calculateRelevanceScore(currentPost, post),
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map(item => item.post);
 }

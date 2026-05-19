@@ -18,8 +18,9 @@ export function InteractiveChecklist({ items: initialItems, storageKey }: Intera
   const [items, setItems] = useState<ChecklistItem[]>(initialItems);
   const [mounted, setMounted] = useState(false);
 
-  // Load saved state from localStorage on mount
+  // Load saved state from localStorage on mount - client-side hydration pattern
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     if (storageKey) {
       const saved = localStorage.getItem(storageKey);

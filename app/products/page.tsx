@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { products } from "@/lib/data/products";
 import { SectionTitle, GlassCard } from "@/components/ui/hero-card";
 import { Button } from "@/components/ui/button";
-import { getIcon } from "@/lib/icons";
+import { DynamicIcon } from "@/components/ui/dynamic-icon";
 
 export const metadata: Metadata = {
   title: "Products",
@@ -48,8 +48,7 @@ export default function ProductsPage() {
 
         {/* Products List */}
         <div className="space-y-8 max-w-4xl mx-auto mb-16">
-          {products.map((product, index) => {
-            const IconComponent = getIcon(product.icon);
+          {products.map((product) => {
             const colors = colorClasses[product.color];
 
             return (
@@ -58,7 +57,7 @@ export default function ProductsPage() {
                   <div className="flex flex-col md:flex-row md:items-start gap-6">
                     {/* Icon */}
                     <div className={`p-4 rounded-2xl ${colors.bg} shrink-0 w-fit`}>
-                      <IconComponent className={`w-10 h-10 ${colors.text}`} />
+                      <DynamicIcon name={product.icon} className={`w-10 h-10 ${colors.text}`} />
                     </div>
 
                     {/* Content */}
@@ -122,8 +121,9 @@ export default function ProductsPage() {
               </Button>
             </Link>
             <Link href="/services">
-              <Button size="lg" variant="outline">
+              <Button size="lg" className="bg-neon-purple hover:bg-neon-purple/80 group">
                 View Our Services
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
           </div>

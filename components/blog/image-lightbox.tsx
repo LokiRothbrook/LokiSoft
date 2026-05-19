@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import {
   Dialog,
-  DialogContent,
   DialogPortal,
   DialogOverlay,
 } from "@/components/ui/dialog";
@@ -28,12 +27,14 @@ export function ImageLightbox({ images, initialIndex, open, onOpenChange }: Imag
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0, posX: 0, posY: 0 });
 
-  // Reset state when dialog opens or initialIndex changes
+  // Reset state when dialog opens or initialIndex changes - intentional prop sync
   useEffect(() => {
     if (open) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setCurrentIndex(initialIndex);
       setZoom(1);
       setPosition({ x: 0, y: 0 });
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [open, initialIndex]);
 

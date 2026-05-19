@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { List, X, ChevronRight } from "lucide-react";
 
@@ -15,7 +15,15 @@ export function TableOfContents() {
   const [activeId, setActiveId] = useState<string>("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // Find headings from the DOM on mount
+  const tocScrollRef = useRef<HTMLDivElement>(null);
+  // Suppresses TOC auto-scroll while the user is manually scrolling the sidebar
+  const isUserScrollingTocRef = useRef(false);
+  const userScrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Suppresses TOC auto-scroll while the page is animating after a TOC link click
+  const isClickScrollingRef = useRef(false);
+  const clickScrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Find headings from the DOM on mount - DOM measurement pattern
   useEffect(() => {
     const articleElement = document.querySelector("article");
     if (!articleElement) return;
@@ -33,6 +41,7 @@ export function TableOfContents() {
       }
     });
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHeadings(foundHeadings);
   }, []);
 
@@ -64,11 +73,69 @@ export function TableOfContents() {
     return () => observer.disconnect();
   }, [headings]);
 
+  // Auto-scroll the active TOC item into view (desktop sidebar only).
+  // Skipped while the user is manually scrolling the sidebar.
+  useEffect(() => {
+    if (!activeId || isUserScrollingTocRef.current || isClickScrollingRef.current) return;
+    const container = tocScrollRef.current;
+    if (!container) return;
+
+    const activeItem = container.querySelector(
+      `[data-heading-id="${activeId}"]`
+    ) as HTMLElement | null;
+    if (!activeItem) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const itemRect = activeItem.getBoundingClientRect();
+    const relTop = itemRect.top - containerRect.top;
+    const relBottom = itemRect.bottom - containerRect.top;
+
+    if (relTop < 0) {
+      container.scrollBy({ top: relTop - 8, behavior: "smooth" });
+    } else if (relBottom > container.clientHeight) {
+      container.scrollBy({ top: relBottom - container.clientHeight + 8, behavior: "smooth" });
+    }
+  }, [activeId]);
+
+  // Detect the user manually scrolling the TOC sidebar via wheel or touch.
+  // We pause auto-scroll for 1.5 s after their last interaction so they can
+  // freely browse the TOC without it snapping back immediately.
+  useEffect(() => {
+    const container = tocScrollRef.current;
+    if (!container) return;
+
+    const handleUserInteraction = () => {
+      isUserScrollingTocRef.current = true;
+      if (userScrollTimeoutRef.current) clearTimeout(userScrollTimeoutRef.current);
+      userScrollTimeoutRef.current = setTimeout(() => {
+        isUserScrollingTocRef.current = false;
+      }, 1500);
+    };
+
+    container.addEventListener("wheel", handleUserInteraction, { passive: true });
+    container.addEventListener("touchstart", handleUserInteraction, { passive: true });
+
+    return () => {
+      container.removeEventListener("wheel", handleUserInteraction);
+      container.removeEventListener("touchstart", handleUserInteraction);
+      if (userScrollTimeoutRef.current) clearTimeout(userScrollTimeoutRef.current);
+      if (clickScrollTimeoutRef.current) clearTimeout(clickScrollTimeoutRef.current);
+    };
+  }, []);
+
   const handleClick = useCallback((id: string) => {
     const element = document.getElementById(id);
     if (element) {
       const yOffset = -100;
       const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+
+      // Block TOC auto-scroll for the duration of the smooth page animation
+      isClickScrollingRef.current = true;
+      if (clickScrollTimeoutRef.current) clearTimeout(clickScrollTimeoutRef.current);
+      clickScrollTimeoutRef.current = setTimeout(() => {
+        isClickScrollingRef.current = false;
+      }, 1000);
+
       window.scrollTo({ top: y, behavior: "smooth" });
     }
     setIsDrawerOpen(false);
@@ -78,54 +145,48 @@ export function TableOfContents() {
     return null;
   }
 
-  const tocContent = (
-    <nav className="space-y-0.5">
-      {headings.map((heading) => (
-        <button
-          key={heading.id}
-          onClick={() => handleClick(heading.id)}
-          className={`group block w-full text-left text-sm py-2 px-3 rounded-lg transition-all duration-300 ${
-            activeId === heading.id
-              ? "bg-neon-pink/15 text-neon-pink"
-              : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-          }`}
-          style={{ paddingLeft: `${(heading.level - 2) * 14 + 12}px` }}
-        >
-          <span className="flex items-center gap-2">
-            {heading.level > 2 && (
-              <ChevronRight
-                className={`w-3 h-3 transition-colors ${
-                  activeId === heading.id ? "text-neon-pink" : "text-muted-foreground/50"
-                }`}
-              />
-            )}
-            <span className="line-clamp-2">{heading.text}</span>
-          </span>
-          {activeId === heading.id && (
-            <motion.div
-              layoutId="activeIndicator"
-              className="absolute left-0 top-0 bottom-0 w-0.5 bg-neon-pink rounded-full"
-              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+  const renderItems = () =>
+    headings.map((heading) => (
+      <button
+        key={heading.id}
+        data-heading-id={heading.id}
+        onClick={() => handleClick(heading.id)}
+        className={`group block w-full text-left text-sm py-2 px-3 rounded-lg transition-all duration-300 ${
+          activeId === heading.id
+            ? "bg-neon-pink/15 text-neon-pink"
+            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+        }`}
+        style={{ paddingLeft: `${(heading.level - 2) * 14 + 12}px` }}
+      >
+        <span className="flex items-center gap-2">
+          {heading.level > 2 && (
+            <ChevronRight
+              className={`w-3 h-3 transition-colors ${
+                activeId === heading.id
+                  ? "text-neon-pink"
+                  : "text-muted-foreground/50"
+              }`}
             />
           )}
-        </button>
-      ))}
-    </nav>
-  );
+          <span className="line-clamp-2">{heading.text}</span>
+        </span>
+      </button>
+    ));
 
   return (
     <>
       {/* Desktop TOC - Sticky sidebar */}
       <aside className="hidden lg:block w-64 shrink-0 self-stretch">
         <div className="sticky top-24">
-          <div className="glass rounded-xl p-4 max-h-[calc(100vh-8rem)] overflow-y-auto border border-white/5">
+          <div
+            ref={tocScrollRef}
+            className="glass rounded-xl p-4 max-h-[calc(100vh-8rem)] overflow-y-auto border border-white/5"
+          >
             <h3 className="text-sm font-semibold mb-4 flex items-center gap-2 gradient-text">
-              <List className="w-4 h-4 text-neon-cyan" />
+              <List className="w-4 h-4 text-neon-pink" />
               Table of Contents
             </h3>
-            <div className="relative">
-              {tocContent}
-            </div>
+            <nav className="space-y-0.5">{renderItems()}</nav>
           </div>
         </div>
       </aside>
@@ -164,7 +225,7 @@ export function TableOfContents() {
               >
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold flex items-center gap-2 gradient-text">
-                    <List className="w-5 h-5 text-neon-cyan" />
+                    <List className="w-5 h-5 text-neon-pink" />
                     Table of Contents
                   </h3>
                   <button
@@ -175,9 +236,7 @@ export function TableOfContents() {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="relative">
-                  {tocContent}
-                </div>
+                <nav className="space-y-0.5 relative">{renderItems()}</nav>
               </motion.div>
             </>
           )}

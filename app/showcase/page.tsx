@@ -5,7 +5,7 @@ import { ArrowRight, ExternalLink, Github, CheckCircle } from "lucide-react";
 import { demos, portfolio } from "@/lib/data/showcase";
 import { SectionTitle, GlassCard } from "@/components/ui/hero-card";
 import { Button } from "@/components/ui/button";
-import { getIcon } from "@/lib/icons";
+import { DynamicIcon } from "@/components/ui/dynamic-icon";
 
 export const metadata: Metadata = {
   title: "Showcase",
@@ -58,7 +58,6 @@ export default function ShowcasePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {demos.map((demo) => {
-              const IconComponent = getIcon(demo.icon);
               const colors = colorClasses[demo.color];
 
               return (
@@ -75,14 +74,14 @@ export default function ShowcasePage() {
                     {/* Fallback overlay for missing images */}
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted/50 to-muted/80">
                       <div className={`p-4 rounded-xl ${colors.bg}`}>
-                        <IconComponent className={`w-12 h-12 ${colors.text}`} />
+                        <DynamicIcon name={demo.icon} className={`w-12 h-12 ${colors.text}`} />
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4 mb-4">
                     <div className={`p-3 rounded-xl ${colors.bg}`}>
-                      <IconComponent className={`w-6 h-6 ${colors.text}`} />
+                      <DynamicIcon name={demo.icon} className={`w-6 h-6 ${colors.text}`} />
                     </div>
                     <div className="flex-1">
                       <h4 className="text-xl font-bold mb-1 group-hover:text-neon-pink transition-colors">
@@ -131,7 +130,7 @@ export default function ShowcasePage() {
                       rel="noopener noreferrer"
                       className="flex-1"
                     >
-                      <Button variant="outline" className="w-full group/btn">
+                      <Button  className="w-full group/btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-foreground/90 hover:text-foreground bg-zinc-700/80 hover:bg-zinc-600/80 border border-zinc-600/50 transition-all">
                         <Github className="w-4 h-4 mr-2" />
                         Source
                       </Button>
@@ -155,7 +154,6 @@ export default function ShowcasePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {portfolio.map((item) => {
-              const IconComponent = getIcon(item.icon);
               const colors = colorClasses[item.color];
 
               return (
@@ -172,14 +170,14 @@ export default function ShowcasePage() {
                     {/* Fallback overlay for missing images */}
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted/50 to-muted/80">
                       <div className={`p-3 rounded-xl ${colors.bg}`}>
-                        <IconComponent className={`w-8 h-8 ${colors.text}`} />
+                        <DynamicIcon name={item.icon} className={`w-8 h-8 ${colors.text}`} />
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3 mb-3">
                     <div className={`p-2 rounded-lg ${colors.bg}`}>
-                      <IconComponent className={`w-5 h-5 ${colors.text}`} />
+                      <DynamicIcon name={item.icon} className={`w-5 h-5 ${colors.text}`} />
                     </div>
                     <div className="flex-1">
                       <h4 className="text-lg font-bold group-hover:text-neon-pink transition-colors">
@@ -196,7 +194,7 @@ export default function ShowcasePage() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Button variant="outline" className="w-full group/btn">
+                    <Button className="w-full bg-neon-pink hover:bg-neon-pink/80 group">
                       Visit Site
                       <ExternalLink className="w-4 h-4 ml-2" />
                     </Button>
@@ -227,8 +225,9 @@ export default function ShowcasePage() {
               </Button>
             </Link>
             <Link href="/services">
-              <Button size="lg" variant="outline">
+              <Button size="lg" className="bg-neon-purple hover:bg-neon-purple/80 group">
                 View Services
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
           </div>
