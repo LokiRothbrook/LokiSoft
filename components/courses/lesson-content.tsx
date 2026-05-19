@@ -105,7 +105,7 @@ export function LessonContent({ lesson, courseSlug, courseTitle, prev, next }: L
   };
 
   return (
-    <article className="flex-1 min-w-0 max-w-4xl">
+    <article className="w-full">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8 flex-wrap">
         <Link href="/courses" className="hover:text-neon-cyan transition-colors">Courses</Link>
