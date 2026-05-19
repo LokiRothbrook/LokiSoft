@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -16,6 +16,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCourseProgress } from "@/hooks/use-course-progress";
+import {
+  exportAllProgress,
+  parseImportFile,
+  saveStore,
+  PROGRESS_IMPORTED_EVENT,
+} from "@/lib/course-progress-io";
 import type { LessonMeta } from "@/lib/courses";
 
 interface CourseProgressSectionProps {
@@ -24,24 +30,29 @@ interface CourseProgressSectionProps {
 }
 
 // ─── Export / Import buttons ─────────────────────────────────────────────────
+// Operates on the full progress store (all courses) — no courseSlug needed.
 
-export function CourseProgressActions({ courseSlug }: { courseSlug: string }) {
-  const { exportProgress, importProgress } = useCourseProgress(courseSlug);
+export function CourseProgressActions() {
   const importRef = useRef<HTMLInputElement>(null);
   const [importError, setImportError] = useState<string | null>(null);
 
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImportError(null);
-    try {
-      await importProgress(file);
-    } catch (err) {
-      setImportError(err instanceof Error ? err.message : "Import failed.");
-    } finally {
-      if (importRef.current) importRef.current.value = "";
-    }
-  };
+  const handleImport = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setImportError(null);
+      try {
+        const parsed = await parseImportFile(file);
+        saveStore(parsed);
+        window.dispatchEvent(new CustomEvent(PROGRESS_IMPORTED_EVENT));
+      } catch (err) {
+        setImportError(err instanceof Error ? err.message : "Import failed.");
+      } finally {
+        if (importRef.current) importRef.current.value = "";
+      }
+    },
+    []
+  );
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -49,7 +60,7 @@ export function CourseProgressActions({ courseSlug }: { courseSlug: string }) {
         <Button
           variant="outline"
           size="sm"
-          onClick={exportProgress}
+          onClick={exportAllProgress}
           className="border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10 hover:border-neon-cyan/60"
         >
           <Download className="w-3.5 h-3.5 mr-1.5" />

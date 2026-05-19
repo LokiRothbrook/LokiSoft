@@ -260,9 +260,7 @@ export function ParticleBackground() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setParticles(generateParticles(30));
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShapes(generateShapes(6));
   }, []);
 

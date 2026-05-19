@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -11,7 +11,6 @@ import {
   HelpCircle,
   Trophy,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { BlogContent } from "@/components/blog/blog-content";
 import { useCourseProgress } from "@/hooks/use-course-progress";
 import type { Lesson, LessonMeta } from "@/lib/courses";

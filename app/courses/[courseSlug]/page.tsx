@@ -92,7 +92,7 @@ export default async function CourseOverviewPage({ params }: CoursePageProps) {
 
               <div className="flex flex-wrap items-center gap-3">
                 <CourseCtaButton courseSlug={courseSlug} lessons={course.lessons} />
-                <CourseProgressActions courseSlug={courseSlug} />
+                <CourseProgressActions />
               </div>
             </div>
           </div>

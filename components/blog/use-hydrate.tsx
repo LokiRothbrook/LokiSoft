@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { createRoot, Root } from "react-dom/client";
 import dynamic from "next/dynamic";
 
@@ -85,7 +85,7 @@ export function useHydrate(contentRef: React.RefObject<HTMLDivElement | null>, c
             handler: (el: Element) => {
                 const title = el.getAttribute("data-title") || undefined;
                 const questionElements = el.querySelectorAll("[data-quiz-question]");
-                const questions: any[] = [];
+                const questions: { question: string; options: string[]; correctIndex: number; explanation?: string }[] = [];
                 questionElements.forEach((qEl) => {
                     const question = qEl.getAttribute("data-quiz-question") || "";
                     const correctIndex = parseInt(qEl.getAttribute("data-correct") || "0", 10);
@@ -136,7 +136,7 @@ export function useHydrate(contentRef: React.RefObject<HTMLDivElement | null>, c
 
         const root = createRoot(container);
         newRoots.push(root);
-        const AnyComponent = Component as any;
+        const AnyComponent = Component as unknown as React.ComponentType<Record<string, unknown>>;
         root.render(<AnyComponent {...props} />);
         
         // Mark the original element and its children as processed

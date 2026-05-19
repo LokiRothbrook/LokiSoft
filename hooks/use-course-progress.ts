@@ -1,63 +1,29 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import {
+  defaultStore,
+  defaultCourseData,
+  loadStore,
+  saveStore,
+  exportAllProgress,
+  parseImportFile,
+  PROGRESS_IMPORTED_EVENT,
+} from "@/lib/course-progress-io";
+import type { QuizAttempt, CourseProgressData, ProgressStore } from "@/lib/course-progress-io";
 
-const STORAGE_KEY = "lokisoft-course-progress";
-const SCHEMA_VERSION = 1;
-
-export interface QuizAttempt {
-  bestScore: number;   // 0–100 percentage
-  attempts: number;
-  lastAttempt: string; // ISO date string
-}
-
-interface CourseProgressData {
-  completedLessons: string[];
-  quizScores: Record<string, QuizAttempt>;
-  lastVisited: string | null;
-}
-
-interface ProgressStore {
-  version: typeof SCHEMA_VERSION;
-  courses: Record<string, CourseProgressData>;
-}
-
-function defaultStore(): ProgressStore {
-  return { version: SCHEMA_VERSION, courses: {} };
-}
-
-function defaultCourseData(): CourseProgressData {
-  return { completedLessons: [], quizScores: {}, lastVisited: null };
-}
-
-function loadStore(): ProgressStore {
-  if (typeof window === "undefined") return defaultStore();
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultStore();
-    const parsed = JSON.parse(raw) as ProgressStore;
-    if (parsed.version !== SCHEMA_VERSION) return defaultStore();
-    return parsed;
-  } catch {
-    return defaultStore();
-  }
-}
-
-function saveStore(store: ProgressStore): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
-  } catch {
-    // quota exceeded or private browsing — silently ignore
-  }
-}
+export type { QuizAttempt };
 
 export function useCourseProgress(courseSlug: string) {
   const [store, setStore] = useState<ProgressStore>(defaultStore);
 
-  // Load from localStorage on mount
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStore(loadStore());
+    // Re-sync when another hook instance on the same page completes an import
+    const handleImport = () => setStore(loadStore());
+    window.addEventListener(PROGRESS_IMPORTED_EVENT, handleImport);
+    return () => window.removeEventListener(PROGRESS_IMPORTED_EVENT, handleImport);
   }, []);
 
   const getCourseData = useCallback(
@@ -147,42 +113,15 @@ export function useCourseProgress(courseSlug: string) {
   const completedLessons = getCourseData(store).completedLessons;
   const completionCount = completedLessons.length;
 
-  const exportProgress = useCallback(() => {
-    const data = loadStore();
-    const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `lokisoft-progress-${new Date().toISOString().split("T")[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, []);
+  const exportProgress = useCallback(() => exportAllProgress(), []);
 
-  const importProgress = useCallback(
-    (file: File): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            const parsed = JSON.parse(e.target?.result as string) as ProgressStore;
-            if (parsed.version !== SCHEMA_VERSION) {
-              reject(new Error("Incompatible progress file version."));
-              return;
-            }
-            saveStore(parsed);
-            setStore(parsed);
-            resolve();
-          } catch {
-            reject(new Error("Invalid progress file."));
-          }
-        };
-        reader.onerror = () => reject(new Error("Failed to read file."));
-        reader.readAsText(file);
-      });
-    },
-    []
-  );
+  const importProgress = useCallback(async (file: File): Promise<void> => {
+    const parsed = await parseImportFile(file);
+    saveStore(parsed);
+    setStore(parsed);
+    // Notify all other useCourseProgress instances on this page to re-sync
+    window.dispatchEvent(new CustomEvent(PROGRESS_IMPORTED_EVENT));
+  }, []);
 
   return {
     isCompleted,

@@ -24,7 +24,6 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
   const lesson = await getLessonWithHtml(courseSlug, lessonSlug);
   if (!lesson) return { title: "Lesson Not Found" };
 
-  const course = getCourseBySlug(courseSlug);
   const url = `${siteConfig.baseUrl}/courses/${courseSlug}/lessons/${lessonSlug}`;
 
   return {

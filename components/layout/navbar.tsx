@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { services } from "@/lib/data/services";
 import { products } from "@/lib/data/products";
 import { demos, portfolio } from "@/lib/data/showcase";
-import { siteConfig } from "@/lib/data/site";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
 
 interface NavbarProps {
