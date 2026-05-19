@@ -198,7 +198,7 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
                     transition={{ duration: 0.15 }}
                     className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-96 glass-strong rounded-xl shadow-xl overflow-hidden"
                   >
-                    <div className="p-2 text-neon-blue backdrop-blur-sm">
+                    <div className="max-h-[75vh] overflow-y-auto p-2 text-neon-blue backdrop-blur-sm">
                       {/* All Services/Products Link */}
                       <Link href={link.href}>
                         <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-pink/10 to-neon-purple/10 hover:from-neon-pink/20 hover:to-neon-purple/20 transition-all mb-2">
@@ -246,6 +246,12 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
                             />
                           ))}
                           <div className="h-px bg-border/50 my-2" />
+                          <Link href="/showcase">
+                            <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-cyan/10 to-neon-blue/10 hover:from-neon-cyan/20 hover:to-neon-blue/20 transition-all mb-1">
+                              <span className="font-medium text-sm">All Showcase</span>
+                              <ArrowRight className="w-4 h-4 ml-auto group-hover:translate-x-1 transition-transform" />
+                            </div>
+                          </Link>
                           <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                             Demo Templates
                           </p>
@@ -434,6 +440,12 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
                               />
                             ))}
                             <div className="h-px bg-border/50 my-2" />
+                            <Link href="/showcase" onClick={() => setIsMobileMenuOpen(false)}>
+                              <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-cyan/10 to-neon-blue/10 hover:from-neon-cyan/20 hover:to-neon-blue/20 transition-all mb-1">
+                                <span className="font-medium text-sm text-neon-blue">All Showcase</span>
+                                <ArrowRight className="w-4 h-4 ml-auto text-neon-blue group-hover:translate-x-1 transition-transform" />
+                              </div>
+                            </Link>
                             <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                               Demo Templates
                             </p>
