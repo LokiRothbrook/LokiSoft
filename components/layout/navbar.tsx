@@ -22,6 +22,7 @@ interface NavbarProps {
   }[];
   courses?: {
     slug: string;
+    categorySlug: string;
     title: string;
     description: string;
     icon: string;
@@ -220,7 +221,7 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
                           courses.map((course) => (
                             <DropdownItem
                               key={course.slug}
-                              href={`/courses/${course.slug}`}
+                              href={`/courses/${course.categorySlug}/${course.slug}`}
                               icon={course.icon}
                               name={course.title}
                               description={course.description}
@@ -412,7 +413,7 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
                             courses.map((course) => (
                               <DropdownItem
                                 key={course.slug}
-                                href={`/courses/${course.slug}`}
+                                href={`/courses/${course.categorySlug}/${course.slug}`}
                                 icon={course.icon}
                                 name={course.title}
                                 description={course.description}

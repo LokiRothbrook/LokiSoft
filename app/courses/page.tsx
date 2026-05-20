@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { GraduationCap, Sparkles } from "lucide-react";
-import { getAllCourses } from "@/lib/courses";
-import { CourseCard } from "@/components/courses/course-card";
+import { getAllCategories } from "@/lib/courses";
+import { CategoryCard } from "@/components/courses/category-card";
 import { siteConfig } from "@/lib/data/site";
 
 export const metadata: Metadata = {
@@ -11,7 +11,8 @@ export const metadata: Metadata = {
 };
 
 export default function CoursesPage() {
-  const courses = getAllCourses();
+  const categories = getAllCategories();
+  const totalCourses = categories.reduce((sum, cat) => sum + cat.courses.length, 0);
 
   return (
     <div className="min-h-screen py-12">
@@ -31,18 +32,24 @@ export default function CoursesPage() {
           </p>
         </div>
 
-        {/* Courses grid */}
-        {courses.length === 0 ? (
+        {/* Categories */}
+        {categories.length === 0 ? (
           <div className="text-center py-24">
             <GraduationCap className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
             <p className="text-muted-foreground">Courses coming soon — check back shortly.</p>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3 max-w-6xl mx-auto">
-            {courses.map((course, i) => (
-              <CourseCard key={course.slug} course={course} index={i} />
+          <div className="space-y-16 max-w-6xl mx-auto">
+            {categories.map((category) => (
+              <CategoryCard key={category.slug} category={category} />
             ))}
           </div>
+        )}
+
+        {totalCourses > 0 && (
+          <p className="text-center text-xs text-muted-foreground/50 mt-16">
+            {totalCourses} {totalCourses === 1 ? "course" : "courses"} across {categories.length} {categories.length === 1 ? "track" : "tracks"} — all free, forever.
+          </p>
         )}
       </div>
     </div>

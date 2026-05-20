@@ -1,49 +1,54 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock, BookOpen, Layers } from "lucide-react";
-import { getAllCourses, getCourseBySlug } from "@/lib/courses";
+import { ArrowLeft, Clock, BookOpen } from "lucide-react";
+import { getAllCategories, getCourseBySlug, resolvePrerequisites } from "@/lib/courses";
 import { DifficultyStars } from "@/components/blog/difficulty-stars";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { Button } from "@/components/ui/button";
 import { CourseCtaButton, CourseCurriculum, CourseProgressActions } from "@/components/courses/course-progress-section";
+import { Prerequisites } from "@/components/courses/prerequisites";
 import { siteConfig } from "@/lib/data/site";
 
 interface CoursePageProps {
-  params: Promise<{ courseSlug: string }>;
+  params: Promise<{ categorySlug: string; courseSlug: string }>;
 }
 
 export async function generateStaticParams() {
-  const courses = getAllCourses();
-  return courses.map((c) => ({ courseSlug: c.slug }));
+  return getAllCategories().flatMap((cat) =>
+    cat.courses.map((course) => ({
+      categorySlug: cat.slug,
+      courseSlug: course.slug,
+    }))
+  );
 }
 
 export async function generateMetadata({ params }: CoursePageProps): Promise<Metadata> {
-  const { courseSlug } = await params;
-  const course = getCourseBySlug(courseSlug);
+  const { categorySlug, courseSlug } = await params;
+  const course = getCourseBySlug(categorySlug, courseSlug);
   if (!course) return { title: "Course Not Found" };
 
   return {
     title: course.title,
     description: course.description,
-    alternates: { canonical: `${siteConfig.baseUrl}/courses/${courseSlug}` },
+    alternates: { canonical: `${siteConfig.baseUrl}/courses/${categorySlug}/${courseSlug}` },
   };
 }
 
 const colorMap = {
-  pink: { icon: "text-neon-pink", bg: "bg-neon-pink/10", border: "border-neon-pink/30", glow: "shadow-[0_0_30px_rgba(236,72,153,0.12)]" },
-  purple: { icon: "text-neon-purple", bg: "bg-neon-purple/10", border: "border-neon-purple/30", glow: "shadow-[0_0_30px_rgba(168,85,247,0.12)]" },
-  blue: { icon: "text-neon-blue", bg: "bg-neon-blue/10", border: "border-neon-blue/30", glow: "shadow-[0_0_30px_rgba(59,130,246,0.12)]" },
-  cyan: { icon: "text-neon-cyan", bg: "bg-neon-cyan/10", border: "border-neon-cyan/30", glow: "shadow-[0_0_30px_rgba(34,211,238,0.12)]" },
+  pink:   { icon: "text-neon-pink",   bg: "bg-neon-pink/10",   border: "border-neon-pink/30",   glow: "shadow-[0_0_30px_rgba(236,72,153,0.12)]"  },
+  purple: { icon: "text-neon-purple", bg: "bg-neon-purple/10", border: "border-neon-purple/30", glow: "shadow-[0_0_30px_rgba(168,85,247,0.12)]"  },
+  blue:   { icon: "text-neon-blue",   bg: "bg-neon-blue/10",   border: "border-neon-blue/30",   glow: "shadow-[0_0_30px_rgba(59,130,246,0.12)]"  },
+  cyan:   { icon: "text-neon-cyan",   bg: "bg-neon-cyan/10",   border: "border-neon-cyan/30",   glow: "shadow-[0_0_30px_rgba(34,211,238,0.12)]"  },
 };
 
 export default async function CourseOverviewPage({ params }: CoursePageProps) {
-  const { courseSlug } = await params;
-  const course = getCourseBySlug(courseSlug);
-
+  const { categorySlug, courseSlug } = await params;
+  const course = getCourseBySlug(categorySlug, courseSlug);
   if (!course) notFound();
 
   const colors = colorMap[course.color as keyof typeof colorMap] ?? colorMap.cyan;
+  const prereqs = resolvePrerequisites(course.prerequisites);
   const lessonCount = course.lessons.length;
   const quizCount = course.lessons.filter((l) => l.isQuiz).length;
 
@@ -51,15 +56,21 @@ export default async function CourseOverviewPage({ params }: CoursePageProps) {
     <div className="min-h-screen py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
         {/* Breadcrumb */}
-        <Link href="/courses">
-          <Button variant="ghost" className="mb-8 text-neon-purple hover:text-neon-purple/80 group">
-            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            All Courses
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2 mb-8 text-sm">
+          <Link href="/courses">
+            <Button variant="ghost" size="sm" className="text-neon-purple hover:text-neon-purple/80 group px-2">
+              <ArrowLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
+              Courses
+            </Button>
+          </Link>
+          <span className="text-muted-foreground/40">/</span>
+          <Link href={`/courses/${categorySlug}`} className="text-muted-foreground hover:text-foreground transition-colors">
+            {categorySlug}
+          </Link>
+        </div>
 
         {/* Course hero */}
-        <div className={`glass rounded-2xl border p-8 mb-10 ${colors.border} ${colors.glow}`}>
+        <div className={`glass rounded-2xl border p-8 mb-8 ${colors.border} ${colors.glow}`}>
           <div className="flex flex-col md:flex-row gap-6 items-start">
             <div className={`p-4 rounded-2xl ${colors.bg} shrink-0 ${colors.icon}`}>
               <DynamicIcon name={course.icon} className="w-12 h-12" />
@@ -91,7 +102,11 @@ export default async function CourseOverviewPage({ params }: CoursePageProps) {
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <CourseCtaButton courseSlug={courseSlug} lessons={course.lessons} />
+                <CourseCtaButton
+                  courseSlug={courseSlug}
+                  categorySlug={categorySlug}
+                  lessons={course.lessons}
+                />
                 <CourseProgressActions />
               </div>
             </div>
@@ -99,34 +114,23 @@ export default async function CourseOverviewPage({ params }: CoursePageProps) {
         </div>
 
         {/* Prerequisites */}
-        {course.prerequisites.length > 0 && (
-          <div className="glass rounded-xl border border-white/5 p-5 mb-8">
-            <div className="flex items-center gap-2 mb-3">
-              <Layers className="w-4 h-4 text-neon-purple" />
-              <span className="text-sm font-semibold">Prerequisites</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {course.prerequisites.map((pre) => (
-                <Link
-                  key={pre}
-                  href={`/courses/${pre}`}
-                  className="text-sm px-3 py-1 rounded-full bg-neon-purple/10 text-neon-purple hover:bg-neon-purple/20 transition-colors"
-                >
-                  {pre}
-                </Link>
-              ))}
-            </div>
+        {prereqs.length > 0 && (
+          <div className="mb-8">
+            <Prerequisites prerequisites={prereqs} />
           </div>
         )}
 
-        {/* Lesson list — skill tree style */}
+        {/* Curriculum */}
         <div className="glass rounded-2xl border border-white/5 p-6">
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-neon-cyan" />
             Course Curriculum
           </h2>
-
-          <CourseCurriculum courseSlug={courseSlug} lessons={course.lessons} />
+          <CourseCurriculum
+            courseSlug={courseSlug}
+            categorySlug={categorySlug}
+            lessons={course.lessons}
+          />
         </div>
       </div>
     </div>

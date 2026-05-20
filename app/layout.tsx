@@ -107,8 +107,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const posts = getPostsForSearch();
-  const courses = getAllCourses().map(({ slug, title, description, icon, color, lessons }) => ({
-    slug, title, description, icon, color,
+  const courses = getAllCourses().map(({ slug, categorySlug, title, description, icon, color, lessons }) => ({
+    slug, categorySlug, title, description, icon, color,
     lessons: lessons.map(({ slug: lSlug, title: lTitle, excerpt, isQuiz }) => ({
       slug: lSlug, title: lTitle, excerpt, isQuiz,
     })),

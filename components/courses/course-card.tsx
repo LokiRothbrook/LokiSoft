@@ -86,13 +86,13 @@ function CourseProgressBar({
   );
 }
 
-function ContinueButton({ courseSlug, color }: { courseSlug: string; color: string }) {
+function ContinueButton({ categorySlug, courseSlug, color }: { categorySlug: string; courseSlug: string; color: string }) {
   const { lastVisited, completionCount } = useCourseProgress(courseSlug);
   const classes = colorClasses[color as keyof typeof colorClasses] ?? colorClasses.cyan;
 
   const href = lastVisited
-    ? `/courses/${courseSlug}/lessons/${lastVisited}`
-    : `/courses/${courseSlug}`;
+    ? `/courses/${categorySlug}/${courseSlug}/lessons/${lastVisited}`
+    : `/courses/${categorySlug}/${courseSlug}`;
 
   const label = completionCount > 0 ? "Continue" : "Start";
 
@@ -125,7 +125,7 @@ export function CourseCard({ course, index = 0 }: CourseCardProps) {
       className={`relative glass rounded-2xl border p-6 flex flex-col gap-4 transition-all duration-300 cursor-pointer ${classes.border} ${classes.glow}`}
     >
       {/* Stretched link — makes the whole card navigate to the course overview */}
-      <Link href={`/courses/${course.slug}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={`View ${course.title} overview`} />
+      <Link href={`/courses/${course.categorySlug}/${course.slug}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={`View ${course.title} overview`} />
 
       {/* Header */}
       <div className="flex items-start gap-4">
@@ -162,12 +162,12 @@ export function CourseCard({ course, index = 0 }: CourseCardProps) {
       {/* CTAs */}
       <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/5">
         <Link
-          href={`/courses/${course.slug}`}
+          href={`/courses/${course.categorySlug}/${course.slug}`}
           className="relative z-10 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-neon-purple hover:bg-neon-purple/80 transition-colors"
         >
           Overview
         </Link>
-        <ContinueButton courseSlug={course.slug} color={course.color} />
+        <ContinueButton categorySlug={course.categorySlug} courseSlug={course.slug} color={course.color} />
       </div>
     </motion.div>
   );

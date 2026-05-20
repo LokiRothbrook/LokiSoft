@@ -13,7 +13,6 @@ import rehypeStringify from "rehype-stringify";
 
 const coursesDirectory = path.join(process.cwd(), "courses");
 
-// Reuse the same sanitize schema as blog posts
 const sanitizeSchema: typeof defaultSchema = {
   ...defaultSchema,
   attributes: {
@@ -64,14 +63,27 @@ const sanitizeSchema: typeof defaultSchema = {
   },
 };
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface CategoryMeta {
+  slug: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  body: string;
+}
+
 export interface CourseMeta {
   slug: string;
+  categorySlug: string;
   title: string;
   description: string;
   icon: string;
   color: string;
   difficulty: number;
   estimatedHours: number;
+  /** Each entry is "categorySlug/courseSlug" */
   prerequisites: string[];
   body: string;
 }
@@ -95,6 +107,12 @@ export interface Course extends CourseMeta {
   lessons: LessonMeta[];
 }
 
+export interface Category extends CategoryMeta {
+  courses: Course[];
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
 function calculateReadingTime(content: string): number {
   const words = content.trim().split(/\s+/).length;
   return Math.ceil(words / 200);
@@ -109,16 +127,32 @@ function isQuizFile(filename: string): boolean {
   return filename.toLowerCase().includes("quiz");
 }
 
-function parseCourseInfo(slug: string): CourseMeta | null {
-  const infoPath = path.join(coursesDirectory, slug, "course-info.md");
+// ─── Parsers ─────────────────────────────────────────────────────────────────
+
+function parseCategoryInfo(categorySlug: string): CategoryMeta | null {
+  const infoPath = path.join(coursesDirectory, categorySlug, "category-info.md");
   if (!fs.existsSync(infoPath)) return null;
 
-  const fileContents = fs.readFileSync(infoPath, "utf8");
-  const { data, content } = matter(fileContents);
-
+  const { data, content } = matter(fs.readFileSync(infoPath, "utf8"));
   return {
-    slug,
-    title: String(data.title || slug),
+    slug: categorySlug,
+    title: String(data.title || categorySlug),
+    description: String(data.description || ""),
+    icon: String(data.icon || "Folder"),
+    color: String(data.color || "cyan"),
+    body: content,
+  };
+}
+
+function parseCourseInfo(categorySlug: string, courseSlug: string): CourseMeta | null {
+  const infoPath = path.join(coursesDirectory, categorySlug, courseSlug, "course-info.md");
+  if (!fs.existsSync(infoPath)) return null;
+
+  const { data, content } = matter(fs.readFileSync(infoPath, "utf8"));
+  return {
+    slug: courseSlug,
+    categorySlug,
+    title: String(data.title || courseSlug),
     description: String(data.description || ""),
     icon: String(data.icon || "BookOpen"),
     color: String(data.color || "cyan"),
@@ -131,8 +165,8 @@ function parseCourseInfo(slug: string): CourseMeta | null {
   };
 }
 
-function getLessonsForCourse(courseSlug: string): LessonMeta[] {
-  const lessonsDir = path.join(coursesDirectory, courseSlug, "lessons");
+function getLessonsForCourse(categorySlug: string, courseSlug: string): LessonMeta[] {
+  const lessonsDir = path.join(coursesDirectory, categorySlug, courseSlug, "lessons");
   if (!fs.existsSync(lessonsDir)) return [];
 
   const files = fs.readdirSync(lessonsDir).filter((f) => f.endsWith(".md"));
@@ -141,8 +175,7 @@ function getLessonsForCourse(courseSlug: string): LessonMeta[] {
     .map((filename) => {
       const slug = filename.replace(/\.md$/, "");
       const fullPath = path.join(lessonsDir, filename);
-      const fileContents = fs.readFileSync(fullPath, "utf8");
-      const { data, content } = matter(fileContents);
+      const { data, content } = matter(fs.readFileSync(fullPath, "utf8"));
 
       return {
         slug,
@@ -157,42 +190,83 @@ function getLessonsForCourse(courseSlug: string): LessonMeta[] {
     .sort((a, b) => a.lessonNumber - b.lessonNumber);
 }
 
-let _coursesCache: Course[] | undefined;
+// ─── Cache ────────────────────────────────────────────────────────────────────
 
-export function getAllCourses(): Course[] {
-  if (_coursesCache) return _coursesCache;
+let _categoriesCache: Category[] | undefined;
 
+// ─── Public API ───────────────────────────────────────────────────────────────
+
+export function getAllCategories(): Category[] {
+  if (_categoriesCache) return _categoriesCache;
   if (!fs.existsSync(coursesDirectory)) {
-    _coursesCache = [];
-    return _coursesCache;
+    _categoriesCache = [];
+    return _categoriesCache;
   }
 
   const entries = fs.readdirSync(coursesDirectory, { withFileTypes: true });
-  const courseDirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
 
-  _coursesCache = courseDirs
-    .map((slug) => {
-      const meta = parseCourseInfo(slug);
-      if (!meta) return null;
-      return { ...meta, lessons: getLessonsForCourse(slug) };
+  _categoriesCache = entries
+    .filter((e) => e.isDirectory())
+    .map((e) => {
+      const categoryMeta = parseCategoryInfo(e.name);
+      if (!categoryMeta) return null;
+
+      const courseEntries = fs.readdirSync(
+        path.join(coursesDirectory, e.name),
+        { withFileTypes: true }
+      );
+
+      const courses: Course[] = courseEntries
+        .filter((ce) => ce.isDirectory())
+        .map((ce) => {
+          const meta = parseCourseInfo(e.name, ce.name);
+          if (!meta) return null;
+          return { ...meta, lessons: getLessonsForCourse(e.name, ce.name) };
+        })
+        .filter((c): c is Course => c !== null);
+
+      return { ...categoryMeta, courses };
+    })
+    .filter((c): c is Category => c !== null);
+
+  return _categoriesCache;
+}
+
+export function getAllCourses(): Course[] {
+  return getAllCategories().flatMap((cat) => cat.courses);
+}
+
+export function getCategoryBySlug(categorySlug: string): Category | null {
+  return getAllCategories().find((c) => c.slug === categorySlug) ?? null;
+}
+
+export function getCourseBySlug(categorySlug: string, courseSlug: string): Course | null {
+  const category = getCategoryBySlug(categorySlug);
+  return category?.courses.find((c) => c.slug === courseSlug) ?? null;
+}
+
+/** Resolve prerequisite strings ("categorySlug/courseSlug") to Course objects. */
+export function resolvePrerequisites(prerequisites: string[]): Course[] {
+  return prerequisites
+    .map((pre) => {
+      const [catSlug, courseSlug] = pre.split("/");
+      if (!catSlug || !courseSlug) return null;
+      return getCourseBySlug(catSlug, courseSlug);
     })
     .filter((c): c is Course => c !== null);
-
-  return _coursesCache;
 }
 
-export function getCourseBySlug(slug: string): Course | null {
-  const meta = parseCourseInfo(slug);
-  if (!meta) return null;
-  return { ...meta, lessons: getLessonsForCourse(slug) };
-}
-
-export function getLessonBySlug(courseSlug: string, lessonSlug: string): Lesson | null {
-  const lessonPath = path.join(coursesDirectory, courseSlug, "lessons", `${lessonSlug}.md`);
+export function getLessonBySlug(
+  categorySlug: string,
+  courseSlug: string,
+  lessonSlug: string
+): Lesson | null {
+  const lessonPath = path.join(
+    coursesDirectory, categorySlug, courseSlug, "lessons", `${lessonSlug}.md`
+  );
   if (!fs.existsSync(lessonPath)) return null;
 
-  const fileContents = fs.readFileSync(lessonPath, "utf8");
-  const { data, content } = matter(fileContents);
+  const { data, content } = matter(fs.readFileSync(lessonPath, "utf8"));
   const filename = `${lessonSlug}.md`;
 
   return {
@@ -207,22 +281,23 @@ export function getLessonBySlug(courseSlug: string, lessonSlug: string): Lesson 
   };
 }
 
-// In-memory cache for lesson HTML
 const lessonHtmlCache = new Map<string, { html: string; mtime: number }>();
 
-export async function getLessonWithHtml(courseSlug: string, lessonSlug: string): Promise<Lesson | null> {
-  const lesson = getLessonBySlug(courseSlug, lessonSlug);
+export async function getLessonWithHtml(
+  categorySlug: string,
+  courseSlug: string,
+  lessonSlug: string
+): Promise<Lesson | null> {
+  const lesson = getLessonBySlug(categorySlug, courseSlug, lessonSlug);
   if (!lesson) return null;
 
-  const lessonPath = path.join(coursesDirectory, courseSlug, "lessons", `${lessonSlug}.md`);
-  const cacheKey = `${courseSlug}/${lessonSlug}`;
+  const lessonPath = path.join(
+    coursesDirectory, categorySlug, courseSlug, "lessons", `${lessonSlug}.md`
+  );
+  const cacheKey = `${categorySlug}/${courseSlug}/${lessonSlug}`;
 
   let mtime = 0;
-  try {
-    mtime = fs.statSync(lessonPath).mtimeMs;
-  } catch {
-    // ignore
-  }
+  try { mtime = fs.statSync(lessonPath).mtimeMs; } catch { /* ignore */ }
 
   const cached = lessonHtmlCache.get(cacheKey);
   if (cached && cached.mtime === mtime) {
@@ -242,25 +317,18 @@ export async function getLessonWithHtml(courseSlug: string, lessonSlug: string):
 
   const html = processedContent.toString();
   lessonHtmlCache.set(cacheKey, { html, mtime });
-
   return { ...lesson, contentHtml: html };
 }
 
 export function getAdjacentLessons(
+  categorySlug: string,
   courseSlug: string,
   lessonSlug: string
 ): { prev: LessonMeta | null; next: LessonMeta | null } {
-  const lessons = getLessonsForCourse(courseSlug);
+  const lessons = getLessonsForCourse(categorySlug, courseSlug);
   const idx = lessons.findIndex((l) => l.slug === lessonSlug);
-
   return {
     prev: idx > 0 ? lessons[idx - 1] : null,
     next: idx < lessons.length - 1 ? lessons[idx + 1] : null,
   };
-}
-
-export function getCourseNavItems(): { slug: string; title: string; description: string; icon: string; color: string }[] {
-  return getAllCourses().map(({ slug, title, description, icon, color }) => ({
-    slug, title, description, icon, color,
-  }));
 }

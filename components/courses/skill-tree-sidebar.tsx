@@ -27,6 +27,7 @@ const SIDEBAR_COLLAPSED_KEY = "lesson-sidebar-collapsed";
 type Tab = "tree" | "toc";
 
 interface SkillTreeSidebarProps {
+  categorySlug: string;
   courseSlug: string;
   courseTitle: string;
   lessons: LessonMeta[];
@@ -34,6 +35,7 @@ interface SkillTreeSidebarProps {
 
 function LessonNode({
   lesson,
+  categorySlug,
   courseSlug,
   isCompleted,
   isCurrent,
@@ -41,6 +43,7 @@ function LessonNode({
   onClick,
 }: {
   lesson: LessonMeta;
+  categorySlug: string;
   courseSlug: string;
   isCompleted: boolean;
   isCurrent: boolean;
@@ -59,7 +62,7 @@ function LessonNode({
     <div className="flex gap-3">
       <div className="flex flex-col items-center shrink-0">
         <Link
-          href={`/courses/${courseSlug}/lessons/${lesson.slug}`}
+          href={`/courses/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
           onClick={onClick}
           className={cn(
             "relative flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-300 hover:scale-110",
@@ -87,7 +90,7 @@ function LessonNode({
 
       <div className="flex-1 min-w-0 pb-4">
         <Link
-          href={`/courses/${courseSlug}/lessons/${lesson.slug}`}
+          href={`/courses/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
           onClick={onClick}
           className={cn(
             "group flex flex-col gap-0.5 rounded-lg px-2 py-1 transition-all hover:bg-white/5",
@@ -112,11 +115,13 @@ function LessonNode({
 
 function CollapsedRail({
   lessons,
+  categorySlug,
   courseSlug,
   currentLessonSlug,
   onToggle,
 }: {
   lessons: LessonMeta[];
+  categorySlug: string;
   courseSlug: string;
   currentLessonSlug: string | null;
   onToggle: () => void;
@@ -144,7 +149,7 @@ function CollapsedRail({
           return (
             <Link
               key={lesson.slug}
-              href={`/courses/${courseSlug}/lessons/${lesson.slug}`}
+              href={`/courses/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
               title={lesson.title}
               className={cn(
                 "relative flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all hover:scale-110 shrink-0",
@@ -197,6 +202,7 @@ function CollapsedRail({
 }
 
 function SidebarContent({
+  categorySlug,
   courseSlug,
   courseTitle,
   lessons,
@@ -205,6 +211,7 @@ function SidebarContent({
   onNavigate,
   onCollapseToggle,
 }: {
+  categorySlug: string;
   courseSlug: string;
   courseTitle: string;
   lessons: LessonMeta[];
@@ -245,7 +252,7 @@ function SidebarContent({
       <div className="shrink-0 p-4 border-b border-white/5">
         <div className="flex items-center justify-between mb-3">
           <Link
-            href={`/courses/${courseSlug}`}
+            href={`/courses/${categorySlug}/${courseSlug}`}
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-neon-cyan transition-colors group"
           >
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
@@ -329,6 +336,7 @@ function SidebarContent({
               <LessonNode
                 key={lesson.slug}
                 lesson={lesson}
+                categorySlug={categorySlug}
                 courseSlug={courseSlug}
                 isCompleted={isCompleted(lesson.slug)}
                 isCurrent={lesson.slug === currentLessonSlug}
@@ -383,7 +391,7 @@ function SidebarContent({
   );
 }
 
-export function SkillTreeSidebar({ courseSlug, courseTitle, lessons }: SkillTreeSidebarProps) {
+export function SkillTreeSidebar({ categorySlug, courseSlug, courseTitle, lessons }: SkillTreeSidebarProps) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -421,12 +429,14 @@ export function SkillTreeSidebar({ courseSlug, courseTitle, lessons }: SkillTree
         {isCollapsed ? (
           <CollapsedRail
             lessons={lessons}
+            categorySlug={categorySlug}
             courseSlug={courseSlug}
             currentLessonSlug={currentLessonSlug}
             onToggle={toggleCollapse}
           />
         ) : (
           <SidebarContent
+            categorySlug={categorySlug}
             courseSlug={courseSlug}
             courseTitle={courseTitle}
             lessons={lessons}
@@ -475,6 +485,7 @@ export function SkillTreeSidebar({ courseSlug, courseTitle, lessons }: SkillTree
               </div>
               <div className="flex-1 min-h-0 overflow-hidden">
                 <SidebarContent
+                  categorySlug={categorySlug}
                   courseSlug={courseSlug}
                   courseTitle={courseTitle}
                   lessons={lessons}
