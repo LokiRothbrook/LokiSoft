@@ -4,10 +4,9 @@ const nextConfig: NextConfig = {
   // Image optimization configuration
   images: {
     remotePatterns: [
-      // Allow images from common CDNs and sources
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "res.cloudinary.com",
       },
       {
         protocol: "https",
@@ -70,8 +69,7 @@ const nextConfig: NextConfig = {
               // Fonts: allow self and data URIs
               "font-src 'self' data:",
               // Images: RESTRICTED to specific trusted domains only
-              // Self, data URIs for inline images, Unsplash for blog images, jsDelivr for icons
-              "img-src 'self' data: blob: https://images.unsplash.com https://cdn.jsdelivr.net https://*.githubusercontent.com",
+              "img-src 'self' data: blob: https://res.cloudinary.com https://cdn.jsdelivr.net https://*.githubusercontent.com",
               // Connect: allow self, Giscus API, and Turnstile verification
               "connect-src 'self' https://giscus.app https://challenges.cloudflare.com",
               // Frames: allow Giscus for comments and Turnstile for CAPTCHA

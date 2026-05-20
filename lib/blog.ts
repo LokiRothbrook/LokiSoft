@@ -11,6 +11,8 @@ import rehypeSlug from "rehype-slug";
 import rehypeKatex from "rehype-katex";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
+import { visit } from "unist-util-visit";
+import type { Root } from "mdast";
 
 // Custom sanitization schema that extends the default GitHub schema
 // SECURITY: This schema is carefully designed to allow only necessary attributes
@@ -93,6 +95,22 @@ const sanitizeSchema: typeof defaultSchema = {
     src: ["http", "https"],
   },
 };
+
+// Remark plugin: resolves "cloudinary:path/to/image.ext" in inline markdown images
+// to full Cloudinary URLs using NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME.
+// Changing image hosts in future only requires updating lib/cloudinary.ts.
+function remarkCloudinaryImages() {
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  return (tree: Root) => {
+    if (!cloudName) return;
+    visit(tree, "image", (node) => {
+      if (node.url.startsWith("cloudinary:")) {
+        const publicId = node.url.slice("cloudinary:".length);
+        node.url = `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}`;
+      }
+    });
+  };
+}
 
 const postsDirectory = path.join(process.cwd(), "posts");
 
@@ -266,6 +284,7 @@ export async function getPostWithHtml(slug: string): Promise<Post | null> {
   const processedContent = await remark()
     .use(remarkGfm)
     .use(remarkMath)
+    .use(remarkCloudinaryImages)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
     .use(rehypeSlug)

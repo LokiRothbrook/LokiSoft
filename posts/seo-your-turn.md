@@ -6,7 +6,7 @@ excerpt: A complete guide to maintaining excellent SEO. Learn what tasks you nee
 categories: Documentation, SEO, Guide
 difficulty: 2
 featured: true
-coverImage: /features-reference-cover.svg
+coverImage: cloudinary:covers/features-reference-cover.svg
 ---
 
 # SEO Maintenance Guide

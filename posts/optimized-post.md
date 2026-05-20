@@ -6,7 +6,7 @@ excerpt: A comprehensive template demonstrating all the sections you need for cr
 categories: Documentation, Tutorial, Template
 difficulty: 2
 featured: true
-coverImage: /features-reference-cover.svg
+coverImage: cloudinary:covers/features-reference-cover.svg
 ---
 
 # The Ultimate Blog Post Template

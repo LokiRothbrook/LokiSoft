@@ -6,7 +6,7 @@ excerpt: Learn how to create beautiful, feature-rich blog posts using Markdown. 
 categories: Documentation, Tutorial, Getting Started
 difficulty: 1
 featured: false
-coverImage: /writing-guide-cover.svg
+coverImage: cloudinary:covers/writing-guide-cover.svg
 ---
 
 # Your Quick Start Guide to Writing Posts

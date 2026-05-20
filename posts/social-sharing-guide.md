@@ -6,7 +6,7 @@ excerpt: Learn how social sharing works on our site and how to make your blog po
 categories: Documentation, Tutorial, Social Media
 difficulty: 1
 featured: false
-coverImage: /features-reference-cover.svg
+coverImage: cloudinary:covers/features-reference-cover.svg
 ---
 
 # Social Sharing Guide

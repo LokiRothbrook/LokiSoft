@@ -121,7 +121,9 @@ function CollapsedRail({
   currentLessonSlug: string | null;
   onToggle: () => void;
 }) {
-  const { isCompleted } = useCourseProgress(courseSlug);
+  const { isCompleted, completionCount } = useCourseProgress(courseSlug);
+  const totalLessons = lessons.length;
+  const progressPercent = totalLessons > 0 ? Math.round((completionCount / totalLessons) * 100) : 0;
 
   return (
     <div className="flex flex-col h-full">
@@ -134,6 +136,7 @@ function CollapsedRail({
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
+
       <div className="flex-1 overflow-y-auto min-h-0 flex flex-col items-center gap-1.5 py-3 px-1">
         {lessons.map((lesson) => {
           const completed = isCompleted(lesson.slug);
@@ -168,6 +171,27 @@ function CollapsedRail({
           );
         })}
       </div>
+
+      {/* Progress bar */}
+      <div className="shrink-0 px-2 py-3 border-t border-white/5 space-y-1.5">
+        <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+          <motion.div
+            className={cn(
+              "h-full rounded-full",
+              progressPercent === 100 ? "bg-green-400" : "bg-gradient-to-r from-neon-cyan to-neon-purple"
+            )}
+            initial={{ width: 0 }}
+            animate={{ width: `${progressPercent}%` }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          />
+        </div>
+        <p className={cn(
+          "text-[10px] font-medium text-center tabular-nums",
+          progressPercent === 100 ? "text-green-400" : "text-muted-foreground"
+        )}>
+          {progressPercent}%
+        </p>
+      </div>
     </div>
   );
 }
@@ -176,17 +200,20 @@ function SidebarContent({
   courseSlug,
   courseTitle,
   lessons,
+  activeTab,
+  onTabChange,
   onNavigate,
   onCollapseToggle,
 }: {
   courseSlug: string;
   courseTitle: string;
   lessons: LessonMeta[];
+  activeTab: Tab;
+  onTabChange: (tab: Tab) => void;
   onNavigate?: () => void;
   onCollapseToggle?: () => void;
 }) {
   const pathname = usePathname();
-  const [activeTab, setActiveTab] = useState<Tab>("tree");
   const { isCompleted, completionCount, exportProgress, importProgress } =
     useCourseProgress(courseSlug);
   const importRef = useRef<HTMLInputElement>(null);
@@ -265,10 +292,10 @@ function SidebarContent({
           </div>
         </div>
 
-        {/* Tabs — hidden on 1400px+ because ToC lives in the right column there */}
-        <div className="min-[1400px]:hidden flex rounded-lg bg-white/5 p-0.5 gap-0.5">
+        {/* Tabs */}
+        <div className="flex rounded-lg bg-white/5 p-0.5 gap-0.5">
           <button
-            onClick={() => setActiveTab("tree")}
+            onClick={() => onTabChange("tree")}
             className={cn(
               "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all",
               activeTab === "tree"
@@ -280,7 +307,7 @@ function SidebarContent({
             Course
           </button>
           <button
-            onClick={() => setActiveTab("toc")}
+            onClick={() => onTabChange("toc")}
             className={cn(
               "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all",
               activeTab === "toc"
@@ -296,8 +323,7 @@ function SidebarContent({
 
       {/* Tab content — scrollable */}
       <div className="flex-1 overflow-y-auto min-h-0">
-        {/* Tree: always visible on 1400px+ (ToC tab is hidden there), toggled by tab below */}
-        <div className={showTree ? "block" : "hidden min-[1400px]:block"}>
+        <div className={showTree ? "block" : "hidden"}>
           <div className="p-4 space-y-0">
             {lessons.map((lesson, idx) => (
               <LessonNode
@@ -313,17 +339,17 @@ function SidebarContent({
           </div>
         </div>
 
-        {/* ToC: only below 1400px when the toc tab is active */}
-        <div className={!showTree ? "min-[1400px]:hidden" : "hidden"}>
-          <TableOfContents embedded />
+        {/* ToC: mounted lazily so the DOM scan runs after the article is in the DOM. */}
+        <div className={!showTree ? "block" : "hidden"}>
+          {!showTree && <TableOfContents embedded />}
         </div>
       </div>
 
-      {/* Footer: export / import — always visible on 1400px+, only on tree tab below */}
+      {/* Footer: export / import — only visible on tree tab */}
       <div
         className={cn(
           "shrink-0 p-4 border-t border-white/5 space-y-2",
-          !showTree ? "hidden min-[1400px]:block" : "block"
+          !showTree ? "hidden" : "block"
         )}
       >
         {importError && <p className="text-xs text-red-400">{importError}</p>}
@@ -361,6 +387,7 @@ export function SkillTreeSidebar({ courseSlug, courseTitle, lessons }: SkillTree
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("tree");
 
   useEffect(() => {
     const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
@@ -403,6 +430,8 @@ export function SkillTreeSidebar({ courseSlug, courseTitle, lessons }: SkillTree
             courseSlug={courseSlug}
             courseTitle={courseTitle}
             lessons={lessons}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
             onCollapseToggle={toggleCollapse}
           />
         )}
@@ -449,6 +478,8 @@ export function SkillTreeSidebar({ courseSlug, courseTitle, lessons }: SkillTree
                   courseSlug={courseSlug}
                   courseTitle={courseTitle}
                   lessons={lessons}
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
                   onNavigate={() => setIsMobileOpen(false)}
                 />
               </div>
