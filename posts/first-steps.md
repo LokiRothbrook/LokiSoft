@@ -7,7 +7,7 @@ categories: Documentation, Tutorial, Getting Started
 difficulty: 3
 announcement: true
 featured: true
-coverImage: /clone-website-cover.svg
+coverImage: cloudinary:covers/clone-website-cover.svg
 ---
 
 # No Really, We Mean It - Take This Website!

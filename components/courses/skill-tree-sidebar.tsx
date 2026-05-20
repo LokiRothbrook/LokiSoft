@@ -10,6 +10,7 @@ import {
   HelpCircle,
   BookOpen,
   ChevronLeft,
+  ChevronRight,
   Download,
   Upload,
   Menu,
@@ -18,7 +19,10 @@ import {
 } from "lucide-react";
 import { useCourseProgress } from "@/hooks/use-course-progress";
 import { TableOfContents } from "@/components/blog/table-of-contents";
+import { cn } from "@/lib/utils";
 import type { LessonMeta } from "@/lib/courses";
+
+const SIDEBAR_COLLAPSED_KEY = "lesson-sidebar-collapsed";
 
 type Tab = "tree" | "toc";
 
@@ -57,9 +61,12 @@ function LessonNode({
         <Link
           href={`/courses/${courseSlug}/lessons/${lesson.slug}`}
           onClick={onClick}
-          className={`relative flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-300 hover:scale-110 ${nodeColor} ${
-            isCurrent ? "shadow-[0_0_12px_rgba(34,211,238,0.6)]" : ""
-          } ${isCompleted ? "shadow-[0_0_8px_rgba(74,222,128,0.4)]" : ""}`}
+          className={cn(
+            "relative flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-300 hover:scale-110",
+            nodeColor,
+            isCurrent && "shadow-[0_0_12px_rgba(34,211,238,0.6)]",
+            isCompleted && "shadow-[0_0_8px_rgba(74,222,128,0.4)]"
+          )}
           title={lesson.title}
         >
           {isCompleted ? (
@@ -82,9 +89,10 @@ function LessonNode({
         <Link
           href={`/courses/${courseSlug}/lessons/${lesson.slug}`}
           onClick={onClick}
-          className={`group flex flex-col gap-0.5 rounded-lg px-2 py-1 transition-all hover:bg-white/5 ${
+          className={cn(
+            "group flex flex-col gap-0.5 rounded-lg px-2 py-1 transition-all hover:bg-white/5",
             isCurrent ? "text-neon-cyan" : isCompleted ? "text-green-400" : "text-muted-foreground hover:text-foreground"
-          }`}
+          )}
         >
           <span className="text-sm font-medium leading-tight line-clamp-2">{lesson.title}</span>
           <div className="flex items-center gap-2">
@@ -102,19 +110,110 @@ function LessonNode({
   );
 }
 
+function CollapsedRail({
+  lessons,
+  courseSlug,
+  currentLessonSlug,
+  onToggle,
+}: {
+  lessons: LessonMeta[];
+  courseSlug: string;
+  currentLessonSlug: string | null;
+  onToggle: () => void;
+}) {
+  const { isCompleted, completionCount } = useCourseProgress(courseSlug);
+  const totalLessons = lessons.length;
+  const progressPercent = totalLessons > 0 ? Math.round((completionCount / totalLessons) * 100) : 0;
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="shrink-0 py-3 border-b border-white/5 flex justify-center">
+        <button
+          onClick={onToggle}
+          className="p-2 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-neon-cyan transition-colors"
+          title="Expand sidebar"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 flex flex-col items-center gap-1.5 py-3 px-1">
+        {lessons.map((lesson) => {
+          const completed = isCompleted(lesson.slug);
+          const current = lesson.slug === currentLessonSlug;
+          return (
+            <Link
+              key={lesson.slug}
+              href={`/courses/${courseSlug}/lessons/${lesson.slug}`}
+              title={lesson.title}
+              className={cn(
+                "relative flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all hover:scale-110 shrink-0",
+                completed
+                  ? "border-green-400 bg-green-400/20 text-green-400"
+                  : current
+                  ? "border-neon-cyan bg-neon-cyan/20 text-neon-cyan"
+                  : "border-neon-purple/50 bg-neon-purple/10 text-neon-purple/70",
+                current && "shadow-[0_0_12px_rgba(34,211,238,0.6)]",
+                completed && "shadow-[0_0_8px_rgba(74,222,128,0.4)]"
+              )}
+            >
+              {completed ? (
+                <CheckCircle2 className="w-3.5 h-3.5" />
+              ) : lesson.isQuiz ? (
+                <HelpCircle className="w-3.5 h-3.5" />
+              ) : (
+                <span className="text-xs font-bold">{lesson.lessonNumber}</span>
+              )}
+              {current && (
+                <span className="absolute inset-0 rounded-full border-2 border-neon-cyan animate-ping opacity-40" />
+              )}
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Progress bar */}
+      <div className="shrink-0 px-2 py-3 border-t border-white/5 space-y-1.5">
+        <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+          <motion.div
+            className={cn(
+              "h-full rounded-full",
+              progressPercent === 100 ? "bg-green-400" : "bg-gradient-to-r from-neon-cyan to-neon-purple"
+            )}
+            initial={{ width: 0 }}
+            animate={{ width: `${progressPercent}%` }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          />
+        </div>
+        <p className={cn(
+          "text-[10px] font-medium text-center tabular-nums",
+          progressPercent === 100 ? "text-green-400" : "text-muted-foreground"
+        )}>
+          {progressPercent}%
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function SidebarContent({
   courseSlug,
   courseTitle,
   lessons,
+  activeTab,
+  onTabChange,
   onNavigate,
+  onCollapseToggle,
 }: {
   courseSlug: string;
   courseTitle: string;
   lessons: LessonMeta[];
+  activeTab: Tab;
+  onTabChange: (tab: Tab) => void;
   onNavigate?: () => void;
+  onCollapseToggle?: () => void;
 }) {
   const pathname = usePathname();
-  const [activeTab, setActiveTab] = useState<Tab>("tree");
   const { isCompleted, completionCount, exportProgress, importProgress } =
     useCourseProgress(courseSlug);
   const importRef = useRef<HTMLInputElement>(null);
@@ -138,17 +237,31 @@ function SidebarContent({
     }
   };
 
+  const showTree = activeTab === "tree";
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="shrink-0 p-4 border-b border-white/5">
-        <Link
-          href={`/courses/${courseSlug}`}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-neon-cyan transition-colors mb-3 group"
-        >
-          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-          Course overview
-        </Link>
+        <div className="flex items-center justify-between mb-3">
+          <Link
+            href={`/courses/${courseSlug}`}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-neon-cyan transition-colors group"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+            Course overview
+          </Link>
+          {onCollapseToggle && (
+            <button
+              onClick={onCollapseToggle}
+              className="p-1.5 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-neon-cyan transition-colors"
+              title="Collapse sidebar"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
         <div className="flex items-center gap-2 mb-3">
           <BookOpen className="w-4 h-4 text-neon-cyan shrink-0" />
           <span className="text-sm font-semibold text-foreground line-clamp-2 leading-tight">
@@ -166,11 +279,12 @@ function SidebarContent({
           </div>
           <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
             <motion.div
-              className={`h-full rounded-full transition-colors ${
+              className={cn(
+                "h-full rounded-full transition-colors",
                 progressPercent === 100
                   ? "bg-green-400"
                   : "bg-gradient-to-r from-neon-cyan to-neon-purple"
-              }`}
+              )}
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 0.5, ease: "easeOut" }}
@@ -181,23 +295,25 @@ function SidebarContent({
         {/* Tabs */}
         <div className="flex rounded-lg bg-white/5 p-0.5 gap-0.5">
           <button
-            onClick={() => setActiveTab("tree")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+            onClick={() => onTabChange("tree")}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all",
               activeTab === "tree"
                 ? "bg-neon-cyan/20 text-neon-cyan shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+            )}
           >
             <Map className="w-3.5 h-3.5" />
             Course
           </button>
           <button
-            onClick={() => setActiveTab("toc")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+            onClick={() => onTabChange("toc")}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all",
               activeTab === "toc"
                 ? "bg-neon-pink/20 text-neon-pink shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+            )}
           >
             <List className="w-3.5 h-3.5" />
             Contents
@@ -206,8 +322,8 @@ function SidebarContent({
       </div>
 
       {/* Tab content — scrollable */}
-      <div className="flex-1 overflow-y-auto min-h-0">
-        {activeTab === "tree" ? (
+      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0">
+        <div className={showTree ? "block" : "hidden"}>
           <div className="p-4 space-y-0">
             {lessons.map((lesson, idx) => (
               <LessonNode
@@ -221,42 +337,48 @@ function SidebarContent({
               />
             ))}
           </div>
-        ) : (
-          <TableOfContents embedded />
-        )}
+        </div>
+
+        {/* ToC: mounted lazily so the DOM scan runs after the article is in the DOM. */}
+        <div className={!showTree ? "block" : "hidden"}>
+          {!showTree && <TableOfContents embedded />}
+        </div>
       </div>
 
-      {/* Footer: export / import (only visible on tree tab) */}
-      {activeTab === "tree" && (
-        <div className="shrink-0 p-4 border-t border-white/5 space-y-2">
-          {importError && <p className="text-xs text-red-400">{importError}</p>}
-          <div className="flex gap-2">
-            <button
-              onClick={exportProgress}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-neon-cyan hover:bg-neon-cyan/10 border border-white/5 hover:border-neon-cyan/30 transition-all"
-              title="Export your progress as a JSON file"
-            >
-              <Download className="w-3.5 h-3.5" />
-              Export
-            </button>
-            <button
-              onClick={() => importRef.current?.click()}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-neon-purple hover:bg-neon-purple/10 border border-white/5 hover:border-neon-purple/30 transition-all"
-              title="Import progress from a JSON file"
-            >
-              <Upload className="w-3.5 h-3.5" />
-              Import
-            </button>
-            <input
-              ref={importRef}
-              type="file"
-              accept=".json"
-              className="hidden"
-              onChange={handleImport}
-            />
-          </div>
+      {/* Footer: export / import — only visible on tree tab */}
+      <div
+        className={cn(
+          "shrink-0 p-4 border-t border-white/5 space-y-2",
+          !showTree ? "hidden" : "block"
+        )}
+      >
+        {importError && <p className="text-xs text-red-400">{importError}</p>}
+        <div className="flex gap-2">
+          <button
+            onClick={exportProgress}
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-neon-cyan hover:bg-neon-cyan/10 border border-white/5 hover:border-neon-cyan/30 transition-all"
+            title="Export your progress as a JSON file"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Export
+          </button>
+          <button
+            onClick={() => importRef.current?.click()}
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-neon-purple hover:bg-neon-purple/10 border border-white/5 hover:border-neon-purple/30 transition-all"
+            title="Import progress from a JSON file"
+          >
+            <Upload className="w-3.5 h-3.5" />
+            Import
+          </button>
+          <input
+            ref={importRef}
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={handleImport}
+          />
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -264,21 +386,55 @@ function SidebarContent({
 export function SkillTreeSidebar({ courseSlug, courseTitle, lessons }: SkillTreeSidebarProps) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("tree");
+
+  useEffect(() => {
+    const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+    if (stored === "true") setIsCollapsed(true);
+  }, []);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMobileOpen(false);
   }, [pathname]);
 
+  const currentLessonSlug = pathname.split("/lessons/")[1] ?? null;
+
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(next));
+      return next;
+    });
+  };
+
   return (
     <>
       {/* Desktop sidebar — sticky, full viewport height minus navbar */}
-      <aside className="hidden lg:flex w-72 xl:w-80 shrink-0 sticky top-16 h-[calc(100vh-4rem)] flex-col glass border-r border-white/5 overflow-hidden">
-        <SidebarContent
-          courseSlug={courseSlug}
-          courseTitle={courseTitle}
-          lessons={lessons}
-        />
+      <aside
+        className={cn(
+          "hidden lg:flex shrink-0 sticky top-16 h-[calc(100vh-4rem)] flex-col glass border-r border-white/5 overflow-hidden transition-[width] duration-300",
+          isCollapsed ? "w-14" : "w-72 xl:w-80"
+        )}
+      >
+        {isCollapsed ? (
+          <CollapsedRail
+            lessons={lessons}
+            courseSlug={courseSlug}
+            currentLessonSlug={currentLessonSlug}
+            onToggle={toggleCollapse}
+          />
+        ) : (
+          <SidebarContent
+            courseSlug={courseSlug}
+            courseTitle={courseTitle}
+            lessons={lessons}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            onCollapseToggle={toggleCollapse}
+          />
+        )}
       </aside>
 
       {/* Mobile toggle */}
@@ -322,6 +478,8 @@ export function SkillTreeSidebar({ courseSlug, courseTitle, lessons }: SkillTree
                   courseSlug={courseSlug}
                   courseTitle={courseTitle}
                   lessons={lessons}
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
                   onNavigate={() => setIsMobileOpen(false)}
                 />
               </div>

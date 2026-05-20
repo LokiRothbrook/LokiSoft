@@ -184,7 +184,7 @@ export function TableOfContents({ embedded = false }: TableOfContentsProps) {
     return (
       <div
         ref={tocScrollRef}
-        className="h-full overflow-y-auto"
+        className="h-full overflow-y-auto overscroll-contain"
       >
         <nav className="space-y-0.5 p-2">{renderItems()}</nav>
       </div>
@@ -198,7 +198,7 @@ export function TableOfContents({ embedded = false }: TableOfContentsProps) {
         <div className="sticky top-24">
           <div
             ref={tocScrollRef}
-            className="glass rounded-xl p-4 max-h-[calc(100vh-8rem)] overflow-y-auto border border-white/5"
+            className="glass rounded-xl p-4 max-h-[calc(100vh-8rem)] overflow-y-auto overscroll-contain border border-white/5"
           >
             <h3 className="text-sm font-semibold mb-4 flex items-center gap-2 gradient-text">
               <List className="w-4 h-4 text-neon-pink" />
@@ -239,7 +239,7 @@ export function TableOfContents({ embedded = false }: TableOfContentsProps) {
                 animate={{ x: 0 }}
                 exit={{ x: "100%" }}
                 transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="fixed right-0 top-0 bottom-0 z-50 w-80 max-w-[90vw] glass-strong border-l border-white/10 p-6 overflow-y-auto"
+                className="fixed right-0 top-0 bottom-0 z-50 w-80 max-w-[90vw] glass-strong border-l border-white/10 p-6 overflow-y-auto overscroll-contain"
               >
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold flex items-center gap-2 gradient-text">

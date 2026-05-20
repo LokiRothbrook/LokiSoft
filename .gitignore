@@ -50,3 +50,6 @@ CLAUDE.md
 
 # Notes
 notes/
+
+# Local Cloudinary staging folder — never synced, persists across branch switches
+/cloudinary/

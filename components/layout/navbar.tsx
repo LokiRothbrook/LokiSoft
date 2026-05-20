@@ -89,8 +89,8 @@ function DropdownItem({
         <DynamicIcon name={icon} className="w-5 h-5" />
       </div>
       <div className="flex-1">
-        <p className={`font-medium text-sm transition-colors ${classes.text}`}>{name}</p>
-        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{description}</p>
+        <p className={`font-medium text-sm transition-colors line-clamp-2 ${classes.text}`}>{name}</p>
+        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{description}</p>
       </div>
       <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-all mt-1" />
     </div>
@@ -195,9 +195,9 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-96 glass-strong rounded-xl shadow-xl overflow-hidden"
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-auto min-w-[26.5rem] max-w-[40rem] whitespace-normal glass-strong rounded-xl shadow-xl overflow-hidden"
                   >
-                    <div className="max-h-[75vh] overflow-y-auto p-2 text-neon-blue backdrop-blur-sm">
+                    <div className="max-h-[75vh] overflow-y-auto overscroll-contain p-2 text-neon-blue backdrop-blur-sm">
                       {/* All Services/Products Link */}
                       <Link href={link.href}>
                         <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-pink/10 to-neon-purple/10 hover:from-neon-pink/20 hover:to-neon-purple/20 transition-all mb-2">
@@ -331,7 +331,7 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden glass-strong border-t border-border/50 max-h-[calc(100vh-4rem)] overflow-y-auto"
+            className="lg:hidden glass-strong border-t border-border/50 max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain"
           >
             <div className="container mx-auto px-4 py-4 space-y-2 text-neon-purple">
               {/* Home — mobile only (logo covers this on desktop) */}

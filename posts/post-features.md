@@ -6,7 +6,7 @@ excerpt: A comprehensive reference guide showcasing all the features available i
 categories: Documentation, Reference, Tutorial
 difficulty: 2
 featured: false
-coverImage: /features-reference-cover.svg
+coverImage: cloudinary:covers/features-reference-cover.svg
 ---
 
 # Complete Feature Reference
@@ -143,7 +143,7 @@ Example images:
 
 ![LokiSoft Logo](/lokisoft-logo.svg "Company Logo")
 
-![Tutorial Screenshot](/tutorial-screenshot.svg "Code Example")
+![Tutorial Screenshot](cloudinary:screenshots/tutorial-screenshot.svg "Code Example")
 
 > *"A picture is worth a thousand words, but a word fitly spoken is like apples of gold in a setting of silver."*
 > — Proverbs 25:11 (ESV)

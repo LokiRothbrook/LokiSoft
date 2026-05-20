@@ -7,9 +7,19 @@ import { Button } from "@/components/ui/button";
 import { SupportButton } from "@/components/ui/support-button";
 import { TableOfContents, BlogContent, Comments, RelatedPosts, DifficultyStars, categoryColors } from "@/components/blog";
 import { siteConfig } from "@/lib/data/site";
+import { resolveImageUrl } from "@/lib/cloudinary";
 
 // ISR: Revalidate every hour
 export const revalidate = 3600;
+
+// Resolve a cover image src (may be "cloudinary:...", absolute URL, or local path)
+// to an absolute URL suitable for OG/JSON-LD metadata.
+function toAbsoluteImageUrl(src: string | undefined): string {
+  if (!src) return `${siteConfig.baseUrl}${siteConfig.branding.logo}`;
+  const resolved = resolveImageUrl(src);
+  if (resolved.startsWith("http://") || resolved.startsWith("https://")) return resolved;
+  return `${siteConfig.baseUrl}${resolved}`;
+}
 
 // Generate Article JSON-LD schema for blog posts
 function generateArticleSchema(post: Post, slug: string) {
@@ -18,7 +28,7 @@ function generateArticleSchema(post: Post, slug: string) {
     "@type": "Article",
     headline: post.title,
     description: post.excerpt,
-    image: post.coverImage ? `${siteConfig.baseUrl}${post.coverImage}` : `${siteConfig.baseUrl}${siteConfig.branding.logo}`,
+    image: toAbsoluteImageUrl(post.coverImage),
     datePublished: post.date,
     dateModified: post.date,
     author: {
@@ -100,8 +110,7 @@ export async function generateMetadata({
   }
 
   const postUrl = `${siteConfig.baseUrl}/blog/${slug}`;
-  // TODO: Create /public/og-image.png (1200x630px) for optimal social sharing fallback
-  const ogImage = post.coverImage || siteConfig.branding.logo;
+  const ogImage = toAbsoluteImageUrl(post.coverImage);
 
   return {
     title: post.title,
@@ -167,7 +176,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         }}
       />
       <div className="min-h-screen py-12">
-        <div className="w-full max-w-full px-4 sm:px-6 md:px-8 lg:pl-24 lg:pr-12 xl:pl-32 xl:pr-16">
+        <div className="w-full max-w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           {/* Back Button */}
         <Link href="/blog">
           <Button variant="ghost" className="mb-8 text-neon-purple hover:text-neon-purple/80 group">
@@ -179,8 +188,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         {/* Main layout with TOC */}
         <div className="flex gap-6 lg:gap-8 xl:gap-12">
           {/* Article container - centers article content on large screens */}
-          <div className="flex-1 min-w-0 min-[1366px]:flex min-[1366px]:justify-center">
-            <article className="w-full min-[1366px]:max-w-[56rem]">
+          <div className="flex-1 min-w-0">
+            <article className="w-full">
             {/* Header */}
             <header className="mb-12 text-center">
               {/* Badges */}

@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { resolveImageUrl } from "@/lib/cloudinary";
 
 const PLACEHOLDER_IMAGE = "/images/blog-placeholder.svg";
 
-// Default allowed domains for external images
-// Additional domains can be added via ALLOWED_IMAGE_DOMAINS env var
 const DEFAULT_ALLOWED_DOMAINS = [
-  "images.unsplash.com",
+  "res.cloudinary.com",
   "cdn.jsdelivr.net",
   "reactjs.org",
   "nextjs.org",
@@ -25,17 +24,14 @@ function isAllowedExternalUrl(url: string): boolean {
     const parsed = new URL(url);
     const hostname = parsed.hostname;
 
-    // Only allow HTTPS for external images (security)
     if (parsed.protocol !== "https:") {
       return false;
     }
 
-    // Check default allowed domains
     if (DEFAULT_ALLOWED_DOMAINS.includes(hostname)) {
       return true;
     }
 
-    // Check if it matches the site URL
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
     if (siteUrl) {
       try {
@@ -48,7 +44,6 @@ function isAllowedExternalUrl(url: string): boolean {
       }
     }
 
-    // Check GitHub user content (for avatars, etc.)
     if (hostname.endsWith(".githubusercontent.com")) {
       return true;
     }
@@ -64,17 +59,21 @@ function normalizeImagePath(path: string | undefined): string {
     return PLACEHOLDER_IMAGE;
   }
 
+  // Resolve cloudinary: shorthand (used in post frontmatter)
+  if (path.startsWith("cloudinary:")) {
+    const resolved = resolveImageUrl(path);
+    return resolved || PLACEHOLDER_IMAGE;
+  }
+
   // If it's an external URL, validate the domain
   if (path.startsWith("http://") || path.startsWith("https://")) {
     if (isAllowedExternalUrl(path)) {
       return path;
     }
-    // Blocked domain - use placeholder
     console.warn(`External image domain not allowed: ${path}`);
     return PLACEHOLDER_IMAGE;
   }
 
-  // Ensure local paths start with /
   if (!path.startsWith("/")) {
     return `/${path}`;
   }
@@ -86,12 +85,16 @@ export function CoverImage({ src, alt, className = "" }: CoverImageProps) {
   const normalizedSrc = normalizeImagePath(src);
   const [errorForSrc, setErrorForSrc] = useState<string | null>(null);
 
-  // Derive imageSrc based on whether we had an error for the current src
   const imageSrc = errorForSrc === src ? PLACEHOLDER_IMAGE : normalizedSrc;
 
   const handleError = () => {
     setErrorForSrc(src ?? null);
   };
+
+  // Skip Vercel's optimizer for SVGs and Cloudinary images (Cloudinary handles its own optimization)
+  const shouldSkipOptimization =
+    imageSrc.endsWith(".svg") ||
+    imageSrc.startsWith("https://res.cloudinary.com");
 
   return (
     <Image
@@ -101,7 +104,7 @@ export function CoverImage({ src, alt, className = "" }: CoverImageProps) {
       className={`object-cover ${className}`}
       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
       onError={handleError}
-      unoptimized={imageSrc.endsWith(".svg")}
+      unoptimized={shouldSkipOptimization}
     />
   );
 }

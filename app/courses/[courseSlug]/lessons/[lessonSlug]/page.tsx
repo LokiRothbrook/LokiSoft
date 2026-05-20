@@ -5,6 +5,8 @@ import { siteConfig } from "@/lib/data/site";
 import { SkillTreeSidebar } from "@/components/courses/skill-tree-sidebar";
 import { LessonContent } from "@/components/courses/lesson-content";
 
+export const dynamicParams = true;
+
 interface LessonPageProps {
   params: Promise<{ courseSlug: string; lessonSlug: string }>;
 }
@@ -59,17 +61,15 @@ export default async function LessonPage({ params }: LessonPageProps) {
         lessons={course.lessons}
       />
 
-      {/* Main content + ToC */}
-      <div className="flex-1 min-w-0">
-        <div className="px-4 sm:px-6 md:px-8 py-10">
-          <LessonContent
-            lesson={lesson}
-            courseSlug={courseSlug}
-            courseTitle={course.title}
-            prev={prev}
-            next={next}
-          />
-        </div>
+      {/* Main content */}
+      <div className="flex-1 min-w-0 px-4 sm:px-6 md:px-8 py-10">
+        <LessonContent
+          lesson={lesson}
+          courseSlug={courseSlug}
+          courseTitle={course.title}
+          prev={prev}
+          next={next}
+        />
       </div>
     </div>
   );
