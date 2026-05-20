@@ -137,7 +137,7 @@ function CollapsedRail({
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto min-h-0 flex flex-col items-center gap-1.5 py-3 px-1">
+      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 flex flex-col items-center gap-1.5 py-3 px-1">
         {lessons.map((lesson) => {
           const completed = isCompleted(lesson.slug);
           const current = lesson.slug === currentLessonSlug;
@@ -322,7 +322,7 @@ function SidebarContent({
       </div>
 
       {/* Tab content — scrollable */}
-      <div className="flex-1 overflow-y-auto min-h-0">
+      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0">
         <div className={showTree ? "block" : "hidden"}>
           <div className="p-4 space-y-0">
             {lessons.map((lesson, idx) => (

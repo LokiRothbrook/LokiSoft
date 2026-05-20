@@ -176,7 +176,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         }}
       />
       <div className="min-h-screen py-12">
-        <div className="w-full max-w-full px-4 sm:px-6 md:px-8 lg:pl-24 lg:pr-12 xl:pl-32 xl:pr-16">
+        <div className="w-full max-w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           {/* Back Button */}
         <Link href="/blog">
           <Button variant="ghost" className="mb-8 text-neon-purple hover:text-neon-purple/80 group">
@@ -188,8 +188,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         {/* Main layout with TOC */}
         <div className="flex gap-6 lg:gap-8 xl:gap-12">
           {/* Article container - centers article content on large screens */}
-          <div className="flex-1 min-w-0 min-[1366px]:flex min-[1366px]:justify-center">
-            <article className="w-full min-[1366px]:max-w-[56rem]">
+          <div className="flex-1 min-w-0">
+            <article className="w-full">
             {/* Header */}
             <header className="mb-12 text-center">
               {/* Badges */}
