@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { ParticleBackground } from "@/components/ui/particle-background";
@@ -143,6 +144,7 @@ export default function RootLayout({
         <Navbar posts={posts} courses={courses} />
         <main className="flex-1 pt-16 overflow-x-clip">{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
