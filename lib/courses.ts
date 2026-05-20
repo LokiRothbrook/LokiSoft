@@ -1,3 +1,4 @@
+import { cache } from "react";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
@@ -192,22 +193,16 @@ function getLessonsForCourse(categorySlug: string, courseSlug: string): LessonMe
     .sort((a, b) => a.lessonNumber - b.lessonNumber);
 }
 
-// ─── Cache ────────────────────────────────────────────────────────────────────
-
-let _categoriesCache: Category[] | undefined;
-
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-export function getAllCategories(): Category[] {
-  if (_categoriesCache) return _categoriesCache;
-  if (!fs.existsSync(coursesDirectory)) {
-    _categoriesCache = [];
-    return _categoriesCache;
-  }
+// cache() deduplicates filesystem reads within a single server render pass —
+// request-scoped, so file changes are visible on the next page refresh in dev.
+export const getAllCategories = cache((): Category[] => {
+  if (!fs.existsSync(coursesDirectory)) return [];
 
   const entries = fs.readdirSync(coursesDirectory, { withFileTypes: true });
 
-  _categoriesCache = entries
+  return entries
     .filter((e) => e.isDirectory())
     .map((e) => {
       const categoryMeta = parseCategoryInfo(e.name);
@@ -231,9 +226,7 @@ export function getAllCategories(): Category[] {
       return { ...categoryMeta, courses };
     })
     .filter((c): c is Category => c !== null);
-
-  return _categoriesCache;
-}
+});
 
 export function getAllCourses(): Course[] {
   return getAllCategories().flatMap((cat) => cat.courses);

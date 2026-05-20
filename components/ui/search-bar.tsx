@@ -217,7 +217,6 @@ export function SearchBar({ posts = [], courses = [] }: SearchBarProps) {
   // Use searchResults directly as results
   const results = searchResults;
 
-  // Reset selected index when query changes - intentional derived state reset
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedIndex(0);

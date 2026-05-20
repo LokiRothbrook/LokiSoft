@@ -129,12 +129,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css"
-          integrity="sha384-37HxnHzKDeErp3qc4riQ1jVbWFLnF79MMh6cK0z9tFDI1EeF8qQHMJv7IilANpCh"
-          crossOrigin="anonymous"
-        />
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"

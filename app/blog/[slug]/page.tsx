@@ -162,6 +162,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <>
+      {/* KaTeX styles — only loaded on pages that render math */}
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css"
+        integrity="sha384-37HxnHzKDeErp3qc4riQ1jVbWFLnF79MMh6cK0z9tFDI1EeF8qQHMJv7IilANpCh"
+        crossOrigin="anonymous"
+        precedence="default"
+      />
       {/* JSON-LD Structured Data for Article */}
       <script
         type="application/ld+json"

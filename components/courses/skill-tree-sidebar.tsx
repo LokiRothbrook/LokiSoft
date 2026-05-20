@@ -399,6 +399,7 @@ export function SkillTreeSidebar({ categorySlug, courseSlug, courseTitle, lesson
 
   useEffect(() => {
     const stored = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored === "true") setIsCollapsed(true);
   }, []);
 

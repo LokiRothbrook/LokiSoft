@@ -2,12 +2,14 @@ import { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/blog";
 import { getAllServices } from "@/lib/data/services";
 import { getAllProducts } from "@/lib/data/products";
+import { getAllCategories } from "@/lib/courses";
 import { siteConfig } from "@/lib/data/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getAllPosts();
   const services = getAllServices();
   const products = getAllProducts();
+  const categories = getAllCategories();
   const baseUrl = siteConfig.baseUrl;
 
   // Static pages
@@ -92,5 +94,37 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...blogPages, ...servicePages, ...productPages];
+  // Academy pages (category, course, and lesson URLs)
+  const academyPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/academy`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    },
+    ...categories.flatMap((cat) => [
+      {
+        url: `${baseUrl}/academy/${cat.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      },
+      ...cat.courses.flatMap((course) => [
+        {
+          url: `${baseUrl}/academy/${cat.slug}/${course.slug}`,
+          lastModified: new Date(),
+          changeFrequency: "weekly" as const,
+          priority: 0.7,
+        },
+        ...course.lessons.map((lesson) => ({
+          url: `${baseUrl}/academy/${cat.slug}/${course.slug}/lessons/${lesson.slug}`,
+          lastModified: new Date(),
+          changeFrequency: "monthly" as const,
+          priority: 0.6,
+        })),
+      ]),
+    ]),
+  ];
+
+  return [...staticPages, ...blogPages, ...servicePages, ...productPages, ...academyPages];
 }

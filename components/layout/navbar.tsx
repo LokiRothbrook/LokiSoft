@@ -141,12 +141,10 @@ export function Navbar({ posts = [], categories = [] }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close menu on route change - intentional navigation pattern
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMobileMenuOpen(false);
     setOpenDropdown(null);
-    /* eslint-enable react-hooks/set-state-in-effect */
   }, [pathname]);
 
   const handleMouseEnter = (label: string) => {
