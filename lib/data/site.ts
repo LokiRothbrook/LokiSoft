@@ -106,7 +106,7 @@ export const siteConfig: SiteConfig = {
       "custom software",
       "home-lab",
       "tech",
-      "programing",
+      "programming",
       "web design"
     ],
     ogImage: "/og-image.svg",

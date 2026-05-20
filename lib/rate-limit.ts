@@ -97,17 +97,15 @@ export interface RateLimitResult {
 }
 
 /**
- * Check if a request should be rate limited
- * Uses both IP and session-based tracking for defense in depth
+ * Check if a request should be rate limited.
+ * Session is checked first so a session-denied request doesn't burn IP quota.
  */
 export function checkRateLimit(
   ip: string | null,
   sessionId: string | null
 ): RateLimitResult {
-  // Cleanup expired entries periodically
   cleanupExpiredEntries();
 
-  // Default result for when we can't identify the client
   if (!ip && !sessionId) {
     return {
       allowed: true,
@@ -118,6 +116,19 @@ export function checkRateLimit(
 
   let ipResult = { allowed: true, remaining: MAX_REQUESTS_PER_IP, resetIn: RATE_LIMIT_WINDOW_MS };
   let sessionResult = { allowed: true, remaining: MAX_REQUESTS_PER_SESSION, resetIn: RATE_LIMIT_WINDOW_MS };
+
+  // Check session first — if it fails, IP quota is not consumed
+  if (sessionId) {
+    sessionResult = checkLimit(sessionStore, sessionId, MAX_REQUESTS_PER_SESSION);
+    if (!sessionResult.allowed) {
+      return {
+        allowed: false,
+        reason: "session",
+        remaining: { ip: ipResult.remaining, session: 0 },
+        resetIn: sessionResult.resetIn,
+      };
+    }
+  }
 
   // Check IP limit
   if (ip) {
@@ -132,35 +143,9 @@ export function checkRateLimit(
     }
   }
 
-  // Check session limit
-  if (sessionId) {
-    sessionResult = checkLimit(sessionStore, sessionId, MAX_REQUESTS_PER_SESSION);
-    if (!sessionResult.allowed) {
-      return {
-        allowed: false,
-        reason: "session",
-        remaining: { ip: ipResult.remaining, session: 0 },
-        resetIn: sessionResult.resetIn,
-      };
-    }
-  }
-
   return {
     allowed: true,
     remaining: { ip: ipResult.remaining, session: sessionResult.remaining },
     resetIn: Math.min(ipResult.resetIn, sessionResult.resetIn),
-  };
-}
-
-/**
- * Get current rate limit status without incrementing counters
- */
-export function getRateLimitStatus(
-  ip: string | null,
-  sessionId: string | null
-): { ip: RateLimitEntry | null; session: RateLimitEntry | null } {
-  return {
-    ip: ip ? ipStore.get(ip) || null : null,
-    session: sessionId ? sessionStore.get(sessionId) || null : null,
   };
 }

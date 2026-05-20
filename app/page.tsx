@@ -14,6 +14,19 @@ import { DynamicIcon } from "@/components/ui/dynamic-icon";
 import { siteConfig, getPageTitle } from "@/lib/data/site";
 import { homepageConfig } from "@/lib/data/homepage";
 
+const colorClasses: Record<string, string> = {
+  pink: "bg-neon-pink/10 text-neon-pink",
+  purple: "bg-neon-purple/10 text-neon-purple",
+  blue: "bg-neon-blue/10 text-neon-blue",
+  cyan: "bg-neon-cyan/10 text-neon-cyan",
+};
+
+const statusClasses: Record<string, string> = {
+  available: "bg-green-500/20 text-green-400",
+  "coming-soon": "bg-neon-purple/20 text-neon-purple",
+  beta: "bg-neon-cyan/20 text-neon-cyan",
+};
+
 export const metadata: Metadata = {
   title: getPageTitle(),
 };
@@ -44,7 +57,7 @@ export default function HomePage() {
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Link href="/courses">
+            <Link href="/academy">
               <Button size="lg" className="w-full bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group py-6 text-lg">
                 View Courses
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -116,19 +129,14 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {courses.map((course) => {
-              const colorClasses = {
-                pink: { icon: "bg-neon-pink/10 text-neon-pink", glow: "pink" as const },
-                purple: { icon: "bg-neon-purple/10 text-neon-purple", glow: "purple" as const },
-                blue: { icon: "bg-neon-blue/10 text-neon-blue", glow: "blue" as const },
-                cyan: { icon: "bg-neon-cyan/10 text-neon-cyan", glow: "cyan" as const },
-              };
-              const c = colorClasses[course.color as keyof typeof colorClasses] ?? colorClasses.cyan;
+              const iconClass = colorClasses[course.color] ?? colorClasses.cyan;
+              const glow = (course.color as "pink" | "purple" | "blue" | "cyan") ?? "cyan";
 
               return (
-                <Link key={course.slug} href={`/courses/${course.slug}`}>
-                  <GlassCard className="h-full group cursor-pointer" glow={c.glow}>
+                <Link key={course.slug} href={`/academy/${course.categorySlug}/${course.slug}`}>
+                  <GlassCard className="h-full group cursor-pointer" glow={glow}>
                     <div className="flex items-center justify-between mb-4">
-                      <div className={`p-3 rounded-xl ${c.icon}`}>
+                      <div className={`p-3 rounded-xl ${iconClass}`}>
                         <DynamicIcon name={course.icon} className="w-6 h-6" />
                       </div>
                       <span className="text-xs px-2 py-1 rounded-full bg-neon-cyan/15 text-neon-cyan font-medium">
@@ -162,7 +170,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-8 text-center">
-            <Link href="/courses">
+            <Link href="/academy">
               <Button size="lg" className="bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group">
                 View All Courses
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -181,28 +189,19 @@ export default function HomePage() {
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {homepageConfig.about.cards.map((card) => {
-              const colorClasses = {
-                pink: "bg-neon-pink/10 text-neon-pink",
-                purple: "bg-neon-purple/10 text-neon-purple",
-                blue: "bg-neon-blue/10 text-neon-blue",
-                cyan: "bg-neon-cyan/10 text-neon-cyan",
-              };
-
-              return (
-                <GlassCard key={card.title} glow={card.color}>
-                  <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-xl ${colorClasses[card.color]}`}>
-                      <DynamicIcon name={card.icon} className="w-8 h-8" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
-                      <p className="text-muted-foreground">{card.description}</p>
-                    </div>
+            {homepageConfig.about.cards.map((card) => (
+              <GlassCard key={card.title} glow={card.color}>
+                <div className="flex items-start gap-4">
+                  <div className={`p-3 rounded-xl ${colorClasses[card.color]}`}>
+                    <DynamicIcon name={card.icon} className="w-8 h-8" />
                   </div>
-                </GlassCard>
-              );
-            })}
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
+                    <p className="text-muted-foreground">{card.description}</p>
+                  </div>
+                </div>
+              </GlassCard>
+            ))}
           </div>
 
           <div className="mt-8 text-center">
@@ -225,15 +224,7 @@ export default function HomePage() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {services.map((service) => {
-              const colorClasses = {
-                pink: "bg-neon-pink/10 text-neon-pink",
-                purple: "bg-neon-purple/10 text-neon-purple",
-                blue: "bg-neon-blue/10 text-neon-blue",
-                cyan: "bg-neon-cyan/10 text-neon-cyan",
-              };
-
-              return (
+            {services.map((service) => (
                 <Link key={service.slug} href={`/services/${service.slug}`}>
                   <GlassCard className="h-full group cursor-pointer" glow={service.color}>
                     <div className={`p-3 rounded-xl ${colorClasses[service.color]} w-fit mb-4`}>
@@ -249,8 +240,7 @@ export default function HomePage() {
                     </div>
                   </GlassCard>
                 </Link>
-              );
-            })}
+            ))}
           </div>
 
           <div className="mt-8 text-center">
@@ -273,45 +263,29 @@ export default function HomePage() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {products.map((product) => {
-              const colorClasses = {
-                pink: "bg-neon-pink/10 text-neon-pink",
-                purple: "bg-neon-purple/10 text-neon-purple",
-                blue: "bg-neon-blue/10 text-neon-blue",
-                cyan: "bg-neon-cyan/10 text-neon-cyan",
-              };
-              const statusClasses = {
-                available: "bg-green-500/20 text-green-400",
-                "coming-soon": "bg-neon-purple/20 text-neon-purple",
-                beta: "bg-neon-cyan/20 text-neon-cyan",
-              };
-
-              return (
-                <Link key={product.slug} href={`/products/${product.slug}`}>
-                  <GlassCard className="h-full group cursor-pointer" glow={product.color}>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className={`p-3 rounded-xl ${colorClasses[product.color]}`}>
-                        <DynamicIcon name={product.icon} className="w-6 h-6" />
-                      </div>
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full ${statusClasses[product.status]}`}
-                      >
-                        {product.status === "coming-soon" ? "Coming Soon" : product.status}
-                      </span>
+            {products.map((product) => (
+              <Link key={product.slug} href={`/products/${product.slug}`}>
+                <GlassCard className="h-full group cursor-pointer" glow={product.color}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`p-3 rounded-xl ${colorClasses[product.color]}`}>
+                      <DynamicIcon name={product.icon} className="w-6 h-6" />
                     </div>
-                    <h3 className="text-lg font-semibold mb-1 group-hover:text-neon-pink transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-sm text-neon-cyan mb-2">{product.tagline}</p>
-                    <p className="text-sm text-muted-foreground">{product.shortDescription}</p>
-                    <div className="mt-4 flex items-center text-sm text-muted-foreground group-hover:text-neon-pink transition-colors">
-                      Learn more
-                      <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </GlassCard>
-                </Link>
-              );
-            })}
+                    <span className={`text-xs px-2 py-1 rounded-full ${statusClasses[product.status]}`}>
+                      {product.status === "coming-soon" ? "Coming Soon" : product.status}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-1 group-hover:text-neon-pink transition-colors">
+                    {product.name}
+                  </h3>
+                  <p className="text-sm text-neon-cyan mb-2">{product.tagline}</p>
+                  <p className="text-sm text-muted-foreground">{product.shortDescription}</p>
+                  <div className="mt-4 flex items-center text-sm text-muted-foreground group-hover:text-neon-pink transition-colors">
+                    Learn more
+                    <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </GlassCard>
+              </Link>
+            ))}
           </div>
 
           <div className="mt-8 text-center">

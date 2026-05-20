@@ -86,15 +86,16 @@ function CourseProgressBar({
   );
 }
 
-function ContinueButton({ courseSlug, color }: { courseSlug: string; color: string }) {
-  const { lastVisited, completionCount } = useCourseProgress(courseSlug);
+function ContinueButton({ categorySlug, courseSlug, color, lessons }: { categorySlug: string; courseSlug: string; color: string; lessons: { slug: string }[] }) {
+  const { isCompleted, completionCount } = useCourseProgress(courseSlug);
   const classes = colorClasses[color as keyof typeof colorClasses] ?? colorClasses.cyan;
 
-  const href = lastVisited
-    ? `/courses/${courseSlug}/lessons/${lastVisited}`
-    : `/courses/${courseSlug}`;
+  const nextLesson = lessons.find((l) => !isCompleted(l.slug));
+  const href = nextLesson
+    ? `/academy/${categorySlug}/${courseSlug}/lessons/${nextLesson.slug}`
+    : `/academy/${categorySlug}/${courseSlug}/lessons/${lessons[0]?.slug ?? ""}`;
 
-  const label = completionCount > 0 ? "Continue" : "Start";
+  const label = completionCount === 0 ? "Start" : nextLesson ? "Continue" : "Review";
 
   return (
     <Link
@@ -122,52 +123,55 @@ export function CourseCard({ course, index = 0 }: CourseCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, duration: 0.4 }}
-      className={`relative glass rounded-2xl border p-6 flex flex-col gap-4 transition-all duration-300 cursor-pointer ${classes.border} ${classes.glow}`}
+      className={`relative glass rounded-2xl border p-6 flex flex-col transition-all duration-300 cursor-pointer ${classes.border} ${classes.glow}`}
     >
       {/* Stretched link — makes the whole card navigate to the course overview */}
-      <Link href={`/courses/${course.slug}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={`View ${course.title} overview`} />
+      <Link href={`/academy/${course.categorySlug}/${course.slug}`} className="absolute inset-0 z-0 rounded-2xl" aria-label={`View ${course.title} overview`} />
 
       {/* Header */}
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-4 flex-1">
         <div className={`p-3 rounded-xl bg-muted/50 shrink-0 ${classes.icon}`}>
           <DynamicIcon name={course.icon} className="w-7 h-7" />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-semibold text-foreground leading-tight">{course.title}</h3>
-          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{course.description}</p>
+          <p className="text-sm text-muted-foreground mt-1 line-clamp-3">{course.description}</p>
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-        <div className="flex items-center gap-1.5">
-          <BookOpen className="w-3.5 h-3.5" />
-          <span>{lessonCount} lessons</span>
-          {quizCount > 0 && <span className="text-muted-foreground/50">· {quizCount} quizzes</span>}
-        </div>
-        {course.estimatedHours > 0 && (
+      {/* Bottom-pinned content */}
+      <div className="mt-auto flex flex-col gap-4">
+        {/* Stats row */}
+        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5" />
-            <span>~{course.estimatedHours}h total</span>
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>{lessonCount} lessons</span>
+            {quizCount > 0 && <span className="text-muted-foreground/50">· {quizCount} quizzes</span>}
           </div>
-        )}
-        <div className="ml-auto">
-          <DifficultyStars difficulty={course.difficulty} size="sm" showName />
+          {course.estimatedHours > 0 && (
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" />
+              <span>~{course.estimatedHours}h total</span>
+            </div>
+          )}
+          <div className="ml-auto">
+            <DifficultyStars difficulty={course.difficulty} size="sm" showName />
+          </div>
         </div>
-      </div>
 
-      {/* Progress bar */}
-      <CourseProgressBar courseSlug={course.slug} totalLessons={lessonCount} color={course.color} />
+        {/* Progress bar */}
+        <CourseProgressBar courseSlug={course.slug} totalLessons={lessonCount} color={course.color} />
 
-      {/* CTAs */}
-      <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/5">
-        <Link
-          href={`/courses/${course.slug}`}
-          className="relative z-10 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-neon-purple hover:bg-neon-purple/80 transition-colors"
-        >
-          Overview
-        </Link>
-        <ContinueButton courseSlug={course.slug} color={course.color} />
+        {/* CTAs */}
+        <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/5">
+          <Link
+            href={`/academy/${course.categorySlug}/${course.slug}`}
+            className="relative z-10 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-neon-purple hover:bg-neon-purple/80 transition-colors"
+          >
+            Overview
+          </Link>
+          <ContinueButton categorySlug={course.categorySlug} courseSlug={course.slug} color={course.color} lessons={course.lessons} />
+        </div>
       </div>
     </motion.div>
   );

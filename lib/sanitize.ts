@@ -24,15 +24,6 @@ export function escapeHtml(text: string): string {
 }
 
 /**
- * Strip all HTML tags from a string
- * Use this when you want plain text only
- */
-export function stripHtml(text: string): string {
-  if (typeof text !== "string") return "";
-  return text.replace(/<[^>]*>/g, "");
-}
-
-/**
  * Sanitize a string for safe use in text contexts
  * - Trims whitespace
  * - Removes null bytes and control characters (except newlines and tabs)
@@ -119,20 +110,6 @@ export function sanitizeTextField(text: string, maxLength: number = 5000): strin
     .trim()
     // Limit length
     .slice(0, maxLength);
-}
-
-/**
- * Sanitize a URL parameter/slug
- * - Only allows alphanumeric, hyphens, underscores
- */
-export function sanitizeSlug(slug: string): string {
-  if (typeof slug !== "string") return "";
-
-  return slug
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9-_]/g, "")
-    .slice(0, 200);
 }
 
 /**

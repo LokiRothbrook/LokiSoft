@@ -8,6 +8,11 @@ import { services } from "@/lib/data/services";
 import { products } from "@/lib/data/products";
 import { siteConfig } from "@/lib/data/site";
 
+interface FooterCategoryLink {
+  slug: string;
+  title: string;
+}
+
 // Custom X (Twitter) icon
 function XIcon({ className }: { className?: string }) {
   return (
@@ -60,14 +65,14 @@ const footerLinks = {
   ],
 };
 
-export function Footer() {
+export function Footer({ categories = [] }: { categories?: FooterCategoryLink[] }) {
   return (
     <footer className="relative mt-auto border-t border-border/30 bg-background/50 backdrop-blur-sm">
       {/* Gradient line at top */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-pink/50 to-transparent" />
 
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <NeonLogo size="lg" href="/" />
@@ -129,6 +134,32 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+            </ul>
+          </div>
+
+          {/* Courses / Academy */}
+          <div>
+            <h3 className="font-semibold text-sm uppercase tracking-wider text-neon-cyan mb-4">
+              <Link href="/academy" className="hover:text-neon-pink transition-colors">Academy</Link>
+            </h3>
+            <ul className="space-y-2">
+              {categories.map((cat) => (
+                <li key={cat.slug}>
+                  <Link
+                    href={`/academy/${cat.slug}`}
+                    className="text-sm text-muted-foreground hover:text-neon-pink transition-colors"
+                  >
+                    {cat.title}
+                  </Link>
+                </li>
+              ))}
+              {categories.length === 0 && (
+                <li>
+                  <Link href="/academy" className="text-sm text-muted-foreground hover:text-neon-pink transition-colors">
+                    Browse Courses
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 

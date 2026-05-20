@@ -374,17 +374,14 @@ export interface PaginatedResult<T> {
   pagination: PaginationInfo;
 }
 
-export type PostFilterType = "all" | "featured" | "announcements" | "category";
 export type SortOption = "newest" | "oldest" | "reading_time_asc" | "reading_time_desc";
 export type CategoryMatchMode = "and" | "or";
 
 export interface PostFilters {
-  filterType?: PostFilterType;
-  category?: string; // Legacy single category support
-  categories?: string[]; // New multi-category support
-  categoryMatchMode?: CategoryMatchMode; // AND or OR logic for multi-category
-  featured?: boolean; // Filter to include only featured posts
-  announcement?: boolean; // Filter to include only announcement posts
+  categories?: string[];
+  categoryMatchMode?: CategoryMatchMode;
+  featured?: boolean;
+  announcement?: boolean;
   query?: string;
   difficulty?: number | null; // 1-5 or null for any
   sort?: SortOption;
@@ -400,20 +397,11 @@ export function getPaginatedPosts(
 ): PaginatedResult<Post> {
   let posts = getAllPosts();
 
-  // Apply featured filter (new approach - can be combined with other filters)
   if (filters.featured === true) {
     posts = posts.filter((post) => post.featured);
   }
 
-  // Apply announcement filter (new approach - can be combined with other filters)
   if (filters.announcement === true) {
-    posts = posts.filter((post) => post.announcement);
-  }
-
-  // Legacy filterType support (for backwards compatibility)
-  if (filters.filterType === "featured" && filters.featured !== true) {
-    posts = posts.filter((post) => post.featured);
-  } else if (filters.filterType === "announcements" && filters.announcement !== true) {
     posts = posts.filter((post) => post.announcement);
   }
 
@@ -434,12 +422,6 @@ export function getPaginatedPosts(
         post.categories.some((c) => categorySet.has(c.toLowerCase()))
       );
     }
-  } else if (filters.category) {
-    // Legacy single category filter
-    const categoryLower = filters.category.toLowerCase();
-    posts = posts.filter((post) =>
-      post.categories.some((c) => c.toLowerCase() === categoryLower)
-    );
   }
 
   // Apply difficulty filter

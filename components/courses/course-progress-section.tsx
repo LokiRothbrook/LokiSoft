@@ -25,6 +25,7 @@ import {
 import type { LessonMeta } from "@/lib/courses";
 
 interface CourseProgressSectionProps {
+  categorySlug: string;
   courseSlug: string;
   lessons: LessonMeta[];
 }
@@ -90,7 +91,7 @@ export function CourseProgressActions() {
 
 // ─── Smart CTA button ────────────────────────────────────────────────────────
 
-export function CourseCtaButton({ courseSlug, lessons }: CourseProgressSectionProps) {
+export function CourseCtaButton({ categorySlug, courseSlug, lessons }: CourseProgressSectionProps) {
   const { isCompleted, completionCount } = useCourseProgress(courseSlug);
 
   const total = lessons.length;
@@ -101,7 +102,7 @@ export function CourseCtaButton({ courseSlug, lessons }: CourseProgressSectionPr
 
   if (allDone) {
     return (
-      <Link href={`/courses/${courseSlug}/lessons/${lessons[0].slug}`}>
+      <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
         <Button className="bg-green-500 hover:bg-green-400 text-black font-semibold group">
           <Trophy className="w-4 h-4 mr-2" />
           Review Course
@@ -113,7 +114,7 @@ export function CourseCtaButton({ courseSlug, lessons }: CourseProgressSectionPr
 
   if (!nextLesson || completionCount === 0) {
     return (
-      <Link href={`/courses/${courseSlug}/lessons/${lessons[0].slug}`}>
+      <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
         <Button className="bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group">
           <PlayCircle className="w-4 h-4 mr-2" />
           Start Course
@@ -125,7 +126,7 @@ export function CourseCtaButton({ courseSlug, lessons }: CourseProgressSectionPr
 
   if (nextLesson.isQuiz) {
     return (
-      <Link href={`/courses/${courseSlug}/lessons/${nextLesson.slug}`}>
+      <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${nextLesson.slug}`}>
         <Button className="bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group">
           <HelpCircle className="w-4 h-4 mr-2" />
           Start Quiz
@@ -136,7 +137,7 @@ export function CourseCtaButton({ courseSlug, lessons }: CourseProgressSectionPr
   }
 
   return (
-    <Link href={`/courses/${courseSlug}/lessons/${nextLesson.slug}`}>
+    <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${nextLesson.slug}`}>
       <Button className="bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group">
         <RotateCcw className="w-4 h-4 mr-2" />
         Resume Course
@@ -148,7 +149,7 @@ export function CourseCtaButton({ courseSlug, lessons }: CourseProgressSectionPr
 
 // ─── Progress-aware curriculum ────────────────────────────────────────────────
 
-export function CourseCurriculum({ courseSlug, lessons }: CourseProgressSectionProps) {
+export function CourseCurriculum({ categorySlug, courseSlug, lessons }: CourseProgressSectionProps) {
   const { isCompleted, completionCount, getQuizScore } = useCourseProgress(courseSlug);
 
   const total = lessons.length;
@@ -220,7 +221,7 @@ export function CourseCurriculum({ courseSlug, lessons }: CourseProgressSectionP
               {/* Row content */}
               <div className="flex-1 pb-6">
                 <Link
-                  href={`/courses/${courseSlug}/lessons/${lesson.slug}`}
+                  href={`/academy/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
                   className={`group flex items-start justify-between gap-4 rounded-xl p-3 transition-colors ${
                     isNext ? "bg-neon-cyan/5 hover:bg-neon-cyan/10" : "hover:bg-white/5"
                   }`}
@@ -290,14 +291,14 @@ export function CourseCurriculum({ courseSlug, lessons }: CourseProgressSectionP
       {/* Bottom CTA */}
       {lessons.length > 0 && (
         <div className="mt-4 pt-4 border-t border-white/5 flex justify-center">
-          <BottomCtaButton courseSlug={courseSlug} lessons={lessons} />
+          <BottomCtaButton categorySlug={categorySlug} courseSlug={courseSlug} lessons={lessons} />
         </div>
       )}
     </>
   );
 }
 
-function BottomCtaButton({ courseSlug, lessons }: CourseProgressSectionProps) {
+function BottomCtaButton({ categorySlug, courseSlug, lessons }: CourseProgressSectionProps) {
   const { isCompleted, completionCount } = useCourseProgress(courseSlug);
 
   const total = lessons.length;
@@ -306,7 +307,7 @@ function BottomCtaButton({ courseSlug, lessons }: CourseProgressSectionProps) {
 
   if (allDone) {
     return (
-      <Link href={`/courses/${courseSlug}/lessons/${lessons[0].slug}`}>
+      <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
         <Button variant="outline" className="border-green-400/40 text-green-400 hover:bg-green-400/10 group">
           <Trophy className="w-4 h-4 mr-2" />
           Course Complete — Review from Start
@@ -318,7 +319,7 @@ function BottomCtaButton({ courseSlug, lessons }: CourseProgressSectionProps) {
 
   if (!nextLesson || completionCount === 0) {
     return (
-      <Link href={`/courses/${courseSlug}/lessons/${lessons[0].slug}`}>
+      <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
         <Button variant="outline" className="border-neon-cyan/40 text-neon-cyan hover:bg-neon-cyan/10 group">
           <PlayCircle className="w-4 h-4 mr-2" />
           Begin with Lesson 1
@@ -329,7 +330,7 @@ function BottomCtaButton({ courseSlug, lessons }: CourseProgressSectionProps) {
   }
 
   return (
-    <Link href={`/courses/${courseSlug}/lessons/${nextLesson.slug}`}>
+    <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${nextLesson.slug}`}>
       <Button variant="outline" className="border-neon-cyan/40 text-neon-cyan hover:bg-neon-cyan/10 group">
         {nextLesson.isQuiz ? (
           <><HelpCircle className="w-4 h-4 mr-2" />Continue to Quiz</>

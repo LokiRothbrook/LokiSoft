@@ -17,13 +17,14 @@ import type { Lesson, LessonMeta } from "@/lib/courses";
 
 interface LessonContentProps {
   lesson: Lesson;
+  categorySlug: string;
   courseSlug: string;
   courseTitle: string;
   prev: LessonMeta | null;
   next: LessonMeta | null;
 }
 
-export function LessonContent({ lesson, courseSlug, courseTitle, prev, next }: LessonContentProps) {
+export function LessonContent({ lesson, categorySlug, courseSlug, courseTitle, prev, next }: LessonContentProps) {
   const { isCompleted, markComplete, markIncomplete, saveQuizScore, setLastVisited, getQuizScore } =
     useCourseProgress(courseSlug);
 
@@ -108,9 +109,9 @@ export function LessonContent({ lesson, courseSlug, courseTitle, prev, next }: L
     <article className="w-full">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8 flex-wrap">
-        <Link href="/courses" className="hover:text-neon-cyan transition-colors">Courses</Link>
+        <Link href="/academy" className="hover:text-neon-cyan transition-colors">Courses</Link>
         <span>/</span>
-        <Link href={`/courses/${courseSlug}`} className="hover:text-neon-cyan transition-colors line-clamp-1 max-w-[200px]">
+        <Link href={`/academy/${categorySlug}/${courseSlug}`} className="hover:text-neon-cyan transition-colors line-clamp-1 max-w-[200px]">
           {courseTitle}
         </Link>
         <span>/</span>
@@ -244,7 +245,7 @@ export function LessonContent({ lesson, courseSlug, courseTitle, prev, next }: L
       {/* Prev / Next navigation */}
       <div className="flex gap-4 justify-between items-center border-t border-white/5 pt-8 mb-8">
         {prev ? (
-          <Link href={`/courses/${courseSlug}/lessons/${prev.slug}`} className="flex-1 max-w-xs">
+          <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${prev.slug}`} className="flex-1 max-w-xs">
             <div className="group flex items-center gap-3 p-4 rounded-xl glass border border-white/5 hover:border-neon-purple/40 transition-all">
               <ArrowLeft className="w-5 h-5 text-muted-foreground group-hover:text-neon-purple group-hover:-translate-x-0.5 transition-all shrink-0" />
               <div className="min-w-0">
@@ -260,7 +261,7 @@ export function LessonContent({ lesson, courseSlug, courseTitle, prev, next }: L
         )}
 
         {next ? (
-          <Link href={`/courses/${courseSlug}/lessons/${next.slug}`} className="flex-1 max-w-xs ml-auto">
+          <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${next.slug}`} className="flex-1 max-w-xs ml-auto">
             <div className="group flex items-center gap-3 p-4 rounded-xl glass border border-white/5 hover:border-neon-cyan/40 transition-all">
               <div className="flex-1 min-w-0 text-right">
                 <p className="text-xs text-muted-foreground mb-0.5">Next</p>
@@ -275,7 +276,7 @@ export function LessonContent({ lesson, courseSlug, courseTitle, prev, next }: L
           <div className="flex items-center gap-3 p-4 rounded-xl glass border border-green-400/20 flex-1 max-w-xs ml-auto">
             <div className="flex-1 text-right">
               <p className="text-xs text-muted-foreground mb-0.5">You&apos;re at the end!</p>
-              <Link href={`/courses/${courseSlug}`} className="text-sm font-medium text-green-400 hover:text-green-300 transition-colors">
+              <Link href={`/academy/${categorySlug}/${courseSlug}`} className="text-sm font-medium text-green-400 hover:text-green-300 transition-colors">
                 Back to course overview
               </Link>
             </div>
