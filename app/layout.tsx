@@ -7,6 +7,7 @@ import { ParticleBackground } from "@/components/ui/particle-background";
 import { getPostsForSearch } from "@/lib/blog";
 import { getAllCategories } from "@/lib/courses";
 import { siteConfig, getPageTitle, getFullUrl } from "@/lib/data/site";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.baseUrl),
@@ -146,6 +147,7 @@ export default function RootLayout({
       <body
         className="font-sans antialiased min-h-screen flex flex-col"
       >
+        <ScrollToTop />
         <ParticleBackground />
         <Navbar posts={posts} categories={navCategories} />
         <main className="flex-1 pt-16 overflow-x-clip">{children}</main>
