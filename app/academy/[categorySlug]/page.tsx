@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   return {
     title: `${category.title} Courses`,
     description: category.description,
-    alternates: { canonical: `${siteConfig.baseUrl}/courses/${categorySlug}` },
+    alternates: { canonical: `${siteConfig.baseUrl}/academy/${categorySlug}` },
   };
 }
 
@@ -45,7 +45,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   return (
     <div className="min-h-screen py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-        <Link href="/courses">
+        <Link href="/academy">
           <Button variant="ghost" className="mb-8 text-neon-purple hover:text-neon-purple/80 group">
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             All Tracks

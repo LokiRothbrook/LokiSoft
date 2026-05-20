@@ -6,6 +6,7 @@ color: "cyan"
 difficulty: 1
 estimatedHours: 3
 prerequisites: []
+order: 1
 ---
 
 Before you write a single line of code, you need the right tools. This course walks you through everything a professional developer has on their machine — and why each tool matters.

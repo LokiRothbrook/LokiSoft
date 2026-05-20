@@ -21,7 +21,7 @@ function PrerequisiteItem({ course }: { course: Course }) {
 
   return (
     <Link
-      href={`/courses/${course.categorySlug}/${course.slug}`}
+      href={`/academy/${course.categorySlug}/${course.slug}`}
       className="flex items-center gap-3 p-3 rounded-xl glass border border-white/5 hover:border-white/10 transition-all group"
     >
       <div className={`shrink-0 ${iconColor}`}>

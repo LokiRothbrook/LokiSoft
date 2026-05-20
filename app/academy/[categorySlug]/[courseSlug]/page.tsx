@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: CoursePageProps): Promise<Met
   return {
     title: course.title,
     description: course.description,
-    alternates: { canonical: `${siteConfig.baseUrl}/courses/${categorySlug}/${courseSlug}` },
+    alternates: { canonical: `${siteConfig.baseUrl}/academy/${categorySlug}/${courseSlug}` },
   };
 }
 
@@ -57,14 +57,14 @@ export default async function CourseOverviewPage({ params }: CoursePageProps) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-8 text-sm">
-          <Link href="/courses">
+          <Link href="/academy">
             <Button variant="ghost" size="sm" className="text-neon-purple hover:text-neon-purple/80 group px-2">
               <ArrowLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
               Courses
             </Button>
           </Link>
           <span className="text-muted-foreground/40">/</span>
-          <Link href={`/courses/${categorySlug}`} className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link href={`/academy/${categorySlug}`} className="text-muted-foreground hover:text-foreground transition-colors">
             {categorySlug}
           </Link>
         </div>

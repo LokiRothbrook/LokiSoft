@@ -62,7 +62,7 @@ function LessonNode({
     <div className="flex gap-3">
       <div className="flex flex-col items-center shrink-0">
         <Link
-          href={`/courses/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
+          href={`/academy/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
           onClick={onClick}
           className={cn(
             "relative flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-300 hover:scale-110",
@@ -90,7 +90,7 @@ function LessonNode({
 
       <div className="flex-1 min-w-0 pb-4">
         <Link
-          href={`/courses/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
+          href={`/academy/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
           onClick={onClick}
           className={cn(
             "group flex flex-col gap-0.5 rounded-lg px-2 py-1 transition-all hover:bg-white/5",
@@ -149,7 +149,7 @@ function CollapsedRail({
           return (
             <Link
               key={lesson.slug}
-              href={`/courses/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
+              href={`/academy/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
               title={lesson.title}
               className={cn(
                 "relative flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all hover:scale-110 shrink-0",
@@ -252,7 +252,7 @@ function SidebarContent({
       <div className="shrink-0 p-4 border-b border-white/5">
         <div className="flex items-center justify-between mb-3">
           <Link
-            href={`/courses/${categorySlug}/${courseSlug}`}
+            href={`/academy/${categorySlug}/${courseSlug}`}
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-neon-cyan transition-colors group"
           >
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
@@ -331,7 +331,7 @@ function SidebarContent({
       {/* Tab content — scrollable */}
       <div className="flex-1 overflow-y-auto overscroll-contain min-h-0">
         <div className={showTree ? "block" : "hidden"}>
-          <div className="p-4 space-y-0">
+          <div className="p-4 pb-16 space-y-0">
             {lessons.map((lesson, idx) => (
               <LessonNode
                 key={lesson.slug}

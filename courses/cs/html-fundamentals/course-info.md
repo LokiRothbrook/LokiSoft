@@ -6,6 +6,7 @@ color: "pink"
 difficulty: 1
 estimatedHours: 8
 prerequisites: ["cs/dev-environment"]
+order: 3
 ---
 
 Every webpage on the internet is built on HTML. Before you can style, script, or deploy anything, you need to understand how browsers read and display markup.

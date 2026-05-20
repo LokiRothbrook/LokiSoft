@@ -77,8 +77,9 @@ export function TableOfContents({ embedded = false }: TableOfContentsProps) {
     return () => observer.disconnect();
   }, [headings]);
 
-  // Auto-scroll the active TOC item into view (desktop sidebar only).
-  // Skipped while the user is manually scrolling the sidebar.
+  // Auto-scroll the active TOC item into view.
+  // Uses scrollIntoView so it works whether the scroller is the TOC div itself
+  // (standalone mode) or an ancestor container (embedded mode).
   useEffect(() => {
     if (!activeId || isUserScrollingTocRef.current || isClickScrollingRef.current) return;
     const container = tocScrollRef.current;
@@ -89,16 +90,7 @@ export function TableOfContents({ embedded = false }: TableOfContentsProps) {
     ) as HTMLElement | null;
     if (!activeItem) return;
 
-    const containerRect = container.getBoundingClientRect();
-    const itemRect = activeItem.getBoundingClientRect();
-    const relTop = itemRect.top - containerRect.top;
-    const relBottom = itemRect.bottom - containerRect.top;
-
-    if (relTop < 0) {
-      container.scrollBy({ top: relTop - 8, behavior: "smooth" });
-    } else if (relBottom > container.clientHeight) {
-      container.scrollBy({ top: relBottom - container.clientHeight + 8, behavior: "smooth" });
-    }
+    activeItem.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [activeId]);
 
   // Detect the user manually scrolling the TOC sidebar via wheel or touch.
@@ -179,13 +171,10 @@ export function TableOfContents({ embedded = false }: TableOfContentsProps) {
       </button>
     ));
 
-  // Embedded mode: just the scrollable list, no wrapper or mobile button
+  // Embedded mode: plain block — the parent sidebar container is the scroller.
   if (embedded) {
     return (
-      <div
-        ref={tocScrollRef}
-        className="h-full overflow-y-auto overscroll-contain"
-      >
+      <div ref={tocScrollRef} className="pb-16">
         <nav className="space-y-0.5 p-2">{renderItems()}</nav>
       </div>
     );

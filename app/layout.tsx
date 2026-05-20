@@ -5,7 +5,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { ParticleBackground } from "@/components/ui/particle-background";
 import { getPostsForSearch } from "@/lib/blog";
-import { getAllCourses } from "@/lib/courses";
+import { getAllCategories } from "@/lib/courses";
 import { siteConfig, getPageTitle, getFullUrl } from "@/lib/data/site";
 
 export const metadata: Metadata = {
@@ -107,12 +107,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const posts = getPostsForSearch();
-  const courses = getAllCourses().map(({ slug, categorySlug, title, description, icon, color, lessons }) => ({
-    slug, categorySlug, title, description, icon, color,
-    lessons: lessons.map(({ slug: lSlug, title: lTitle, excerpt, isQuiz }) => ({
-      slug: lSlug, title: lTitle, excerpt, isQuiz,
+  const allCategories = getAllCategories();
+  const navCategories = allCategories.map((cat) => ({
+    slug: cat.slug,
+    title: cat.title,
+    description: cat.description,
+    icon: cat.icon,
+    color: cat.color,
+    courses: cat.courses.map((c) => ({
+      slug: c.slug,
+      categorySlug: c.categorySlug,
+      title: c.title,
+      description: c.description,
+      icon: c.icon,
+      color: c.color,
+      lessons: c.lessons.map((l) => ({ slug: l.slug, title: l.title, excerpt: l.excerpt, isQuiz: l.isQuiz })),
     })),
   }));
+  const footerCategories = allCategories.map((c) => ({ slug: c.slug, title: c.title }));
 
   return (
     <html lang="en">
@@ -141,9 +153,9 @@ export default function RootLayout({
         className="font-sans antialiased min-h-screen flex flex-col"
       >
         <ParticleBackground />
-        <Navbar posts={posts} courses={courses} />
+        <Navbar posts={posts} categories={navCategories} />
         <main className="flex-1 pt-16 overflow-x-clip">{children}</main>
-        <Footer />
+        <Footer categories={footerCategories} />
         <Analytics />
       </body>
     </html>

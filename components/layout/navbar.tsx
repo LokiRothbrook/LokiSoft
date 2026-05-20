@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronUp, Menu, X, ArrowRight } from "lucide-react";
+import { ChevronUp, ChevronRight, Menu, X, ArrowRight } from "lucide-react";
 import { NeonLogo } from "@/components/ui/neon-logo";
 import { SearchBar } from "@/components/ui/search-bar";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,25 @@ import { products } from "@/lib/data/products";
 import { demos, portfolio } from "@/lib/data/showcase";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
 
+interface NavCourse {
+  slug: string;
+  categorySlug: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  lessons?: { slug: string; title: string; excerpt: string; isQuiz: boolean }[];
+}
+
+interface NavCategory {
+  slug: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  courses: NavCourse[];
+}
+
 interface NavbarProps {
   posts?: {
     slug: string;
@@ -20,20 +39,12 @@ interface NavbarProps {
     excerpt?: string;
     categories?: string[];
   }[];
-  courses?: {
-    slug: string;
-    categorySlug: string;
-    title: string;
-    description: string;
-    icon: string;
-    color: string;
-    lessons?: { slug: string; title: string; excerpt: string; isQuiz: boolean }[];
-  }[];
+  categories?: NavCategory[];
 }
 
 const navLinks = [
   { label: "Blog", href: "/blog" },
-  { label: "Courses", href: "/courses", hasDropdown: true },
+  { label: "Academy", href: "/academy", hasDropdown: true },
   { label: "Services", href: "/services", hasDropdown: true },
   { label: "Products", href: "/products", hasDropdown: true },
   { label: "About", href: "/about" },
@@ -112,9 +123,13 @@ function DropdownItem({
   );
 }
 
-export function Navbar({ posts = [], courses = [] }: NavbarProps) {
+export function Navbar({ posts = [], categories = [] }: NavbarProps) {
+  // Flatten categories → courses for the search bar
+  const courses = categories.flatMap((cat) => cat.courses);
   const [isScrolled, setIsScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [hoveredCategorySlug, setHoveredCategorySlug] = useState<string | null>(null);
+  const [openMobileCategory, setOpenMobileCategory] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -136,10 +151,14 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
 
   const handleMouseEnter = (label: string) => {
     setOpenDropdown(label);
+    if (label === "Academy" && categories.length > 0) {
+      setHoveredCategorySlug((prev) => prev ?? categories[0].slug);
+    }
   };
 
   const handleMouseLeave = () => {
     setOpenDropdown(null);
+    setHoveredCategorySlug(null);
   };
 
   return (
@@ -196,107 +215,158 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-auto min-w-[26.5rem] max-w-[40rem] whitespace-normal glass-strong rounded-xl shadow-xl overflow-hidden"
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-normal glass-strong rounded-xl shadow-xl overflow-hidden"
                   >
-                    <div className="max-h-[75vh] overflow-y-auto overscroll-contain p-2 text-neon-blue backdrop-blur-sm">
-                      {/* All Services/Products Link */}
-                      <Link href={link.href}>
-                        <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-pink/10 to-neon-purple/10 hover:from-neon-pink/20 hover:to-neon-purple/20 transition-all mb-2">
-                          <span className="font-medium text-sm">
-                            All {link.label}
-                          </span>
-                          <ArrowRight className="w-4 h-4 ml-auto group-hover:translate-x-1 transition-transform" />
-                        </div>
-                      </Link>
-
-                      <div className="h-px bg-border/50 my-2" />
-
-                      {/* Items */}
-                      {link.label === "Courses" &&
-                        (courses.length === 0 ? (
-                          <p className="px-3 py-4 text-sm text-muted-foreground text-center">
-                            Courses coming soon
-                          </p>
-                        ) : (
-                          courses.map((course) => (
-                            <DropdownItem
-                              key={course.slug}
-                              href={`/courses/${course.categorySlug}/${course.slug}`}
-                              icon={course.icon}
-                              name={course.title}
-                              description={course.description}
-                              color={course.color}
-                            />
-                          ))
-                        ))}
-
-                      {link.label === "Services" && (
-                        <>
-                          <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Services
-                          </p>
-                          {services.map((service) => (
-                            <DropdownItem
-                              key={service.slug}
-                              href={`/services/${service.slug}`}
-                              icon={service.icon}
-                              name={service.name}
-                              description={service.shortDescription}
-                              color={service.color}
-                            />
-                          ))}
-                          <div className="h-px bg-border/50 my-2" />
-                          <Link href="/showcase">
-                            <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-cyan/10 to-neon-blue/10 hover:from-neon-cyan/20 hover:to-neon-blue/20 transition-all mb-1">
-                              <span className="font-medium text-sm">All Showcase</span>
-                              <ArrowRight className="w-4 h-4 ml-auto group-hover:translate-x-1 transition-transform" />
+                    {/* ── Courses: two-panel cascading flyout ── */}
+                    {link.label === "Academy" && (
+                      <div className="flex flex-col">
+                        {/* All Courses button */}
+                        <div className="p-2 pb-0">
+                          <Link href="/academy">
+                            <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-pink/10 to-neon-purple/10 hover:from-neon-pink/20 hover:to-neon-purple/20 transition-all">
+                              <span className="font-medium text-sm text-neon-blue">All Courses</span>
+                              <ArrowRight className="w-4 h-4 ml-auto text-neon-blue group-hover:translate-x-1 transition-transform" />
                             </div>
                           </Link>
-                          <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Demo Templates
-                          </p>
-                          {demos.map((demo) => (
-                            <DropdownItem
-                              key={demo.slug}
-                              href={demo.liveUrl}
-                              icon={demo.icon}
-                              name={demo.name}
-                              description={demo.shortDescription}
-                              color={demo.color}
-                              external
-                            />
-                          ))}
                           <div className="h-px bg-border/50 my-2" />
-                          <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Portfolio
-                          </p>
-                          {portfolio.map((item) => (
+                        </div>
+                        {/* Category + course panels */}
+                        <div className="flex">
+                        {/* Left: category list */}
+                        <div className="w-52 border-r border-white/5 p-2 pt-0 flex flex-col gap-0.5">
+                          {categories.length === 0 ? (
+                            <p className="px-3 py-3 text-sm text-muted-foreground text-center">Coming soon</p>
+                          ) : (
+                            categories.map((cat) => {
+                              const isHovered = hoveredCategorySlug === cat.slug;
+                              return (
+                                <Link key={cat.slug} href={`/academy/${cat.slug}`}>
+                                  <div
+                                    onMouseEnter={() => setHoveredCategorySlug(cat.slug)}
+                                    className={`group flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-colors ${isHovered ? "bg-muted/50" : "hover:bg-muted/30"}`}
+                                  >
+                                    <DynamicIcon name={cat.icon} className="w-4 h-4 text-neon-cyan shrink-0" />
+                                    <span className="flex-1 text-sm font-medium text-foreground group-hover:text-neon-cyan transition-colors">
+                                      {cat.title}
+                                    </span>
+                                    <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform ${isHovered ? "translate-x-0.5 text-neon-cyan" : ""}`} />
+                                  </div>
+                                </Link>
+                              );
+                            })
+                          )}
+                        </div>
+
+                        {/* Right: courses for hovered category */}
+                        <div className="w-64 p-2">
+                          {(() => {
+                            const cat = categories.find((c) => c.slug === hoveredCategorySlug);
+                            if (!cat) return (
+                              <div className="flex items-center justify-center h-full min-h-[8rem] text-sm text-muted-foreground/50">
+                                Hover a track to see courses
+                              </div>
+                            );
+                            return (
+                              <>
+                                <p className="px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                  {cat.title}
+                                </p>
+                                {cat.courses.map((course) => (
+                                  <DropdownItem
+                                    key={course.slug}
+                                    href={`/academy/${course.categorySlug}/${course.slug}`}
+                                    icon={course.icon}
+                                    name={course.title}
+                                    description={course.description}
+                                    color={course.color}
+                                  />
+                                ))}
+                              </>
+                            );
+                          })()}
+                        </div>
+                        </div>{/* end flex panels */}
+                      </div>
+                    )}
+
+                    {/* ── Services / Products: single scrollable panel ── */}
+                    {link.label !== "Academy" && (
+                      <div className="max-h-[75vh] overflow-y-auto overscroll-contain p-2 min-w-[26.5rem] max-w-[40rem] text-neon-blue backdrop-blur-sm">
+                        <Link href={link.href}>
+                          <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-pink/10 to-neon-purple/10 hover:from-neon-pink/20 hover:to-neon-purple/20 transition-all mb-2">
+                            <span className="font-medium text-sm">All {link.label}</span>
+                            <ArrowRight className="w-4 h-4 ml-auto group-hover:translate-x-1 transition-transform" />
+                          </div>
+                        </Link>
+                        <div className="h-px bg-border/50 my-2" />
+
+                        {link.label === "Services" && (
+                          <>
+                            <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Services
+                            </p>
+                            {services.map((service) => (
+                              <DropdownItem
+                                key={service.slug}
+                                href={`/services/${service.slug}`}
+                                icon={service.icon}
+                                name={service.name}
+                                description={service.shortDescription}
+                                color={service.color}
+                              />
+                            ))}
+                            <div className="h-px bg-border/50 my-2" />
+                            <Link href="/showcase">
+                              <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-cyan/10 to-neon-blue/10 hover:from-neon-cyan/20 hover:to-neon-blue/20 transition-all mb-1">
+                                <span className="font-medium text-sm">All Showcase</span>
+                                <ArrowRight className="w-4 h-4 ml-auto group-hover:translate-x-1 transition-transform" />
+                              </div>
+                            </Link>
+                            <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Demo Templates
+                            </p>
+                            {demos.map((demo) => (
+                              <DropdownItem
+                                key={demo.slug}
+                                href={demo.liveUrl}
+                                icon={demo.icon}
+                                name={demo.name}
+                                description={demo.shortDescription}
+                                color={demo.color}
+                                external
+                              />
+                            ))}
+                            <div className="h-px bg-border/50 my-2" />
+                            <p className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Portfolio
+                            </p>
+                            {portfolio.map((item) => (
+                              <DropdownItem
+                                key={item.slug}
+                                href={item.liveUrl}
+                                icon={item.icon}
+                                name={item.name}
+                                description={item.shortDescription}
+                                color={item.color}
+                                external
+                              />
+                            ))}
+                          </>
+                        )}
+
+                        {link.label === "Products" &&
+                          products.map((product) => (
                             <DropdownItem
-                              key={item.slug}
-                              href={item.liveUrl}
-                              icon={item.icon}
-                              name={item.name}
-                              description={item.shortDescription}
-                              color={item.color}
-                              external
+                              key={product.slug}
+                              href={`/products/${product.slug}`}
+                              icon={product.icon}
+                              name={product.name}
+                              description={product.shortDescription}
+                              color={product.color}
                             />
                           ))}
-                        </>
-                      )}
-
-                      {link.label === "Products" &&
-                        products.map((product) => (
-                          <DropdownItem
-                            key={product.slug}
-                            href={`/products/${product.slug}`}
-                            icon={product.icon}
-                            name={product.name}
-                            description={product.shortDescription}
-                            color={product.color}
-                          />
-                        ))}
-
-                    </div>
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -349,7 +419,8 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
               </Link>
 
               {navLinks.map((link) => (
-                <div key={link.label}>
+                <React.Fragment key={link.label}>
+                <div>
                   {link.hasDropdown ? (
                     <button
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all ${
@@ -390,44 +461,68 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
                         className="pl-4 overflow-hidden"
                       >
                         {/* All X Link */}
-                        <Link
-                          href={link.href}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
+                        <Link href={link.href} onClick={() => setIsMobileMenuOpen(false)}>
                           <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-pink/10 to-neon-purple/10 hover:from-neon-pink/20 hover:to-neon-purple/20 transition-all mb-2">
-                            <span className="font-medium text-sm text-neon-blue">
-                              All {link.label}
-                            </span>
+                            <span className="font-medium text-sm text-neon-blue">{link.label === "Academy" ? "All Courses" : `All ${link.label}`}</span>
                             <ArrowRight className="w-4 h-4 ml-auto text-neon-blue group-hover:translate-x-1 transition-transform" />
                           </div>
                         </Link>
-
                         <div className="h-px bg-border/50 my-2" />
 
-                        {link.label === "Courses" &&
-                          (courses.length === 0 ? (
-                            <p className="px-3 py-4 text-sm text-muted-foreground text-center">
-                              Courses coming soon
-                            </p>
+                        {/* Academy → category accordions */}
+                        {link.label === "Academy" &&
+                          (categories.length === 0 ? (
+                            <p className="px-3 py-4 text-sm text-muted-foreground text-center">Courses coming soon</p>
                           ) : (
-                            courses.map((course) => (
-                              <DropdownItem
-                                key={course.slug}
-                                href={`/courses/${course.categorySlug}/${course.slug}`}
-                                icon={course.icon}
-                                name={course.title}
-                                description={course.description}
-                                color={course.color}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                              />
+                            categories.map((cat) => (
+                              <div key={cat.slug}>
+                                <button
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/30 transition-colors text-left"
+                                  onClick={() => setOpenMobileCategory(openMobileCategory === cat.slug ? null : cat.slug)}
+                                >
+                                  <DynamicIcon name={cat.icon} className="w-4 h-4 text-neon-cyan shrink-0" />
+                                  <span className="flex-1 text-sm font-medium">{cat.title}</span>
+                                  <ChevronUp className={`w-4 h-4 text-muted-foreground transition-transform ${openMobileCategory === cat.slug ? "rotate-180" : ""}`} />
+                                </button>
+                                <AnimatePresence>
+                                  {openMobileCategory === cat.slug && (
+                                    <motion.div
+                                      initial={{ opacity: 0, height: 0 }}
+                                      animate={{ opacity: 1, height: "auto" }}
+                                      exit={{ opacity: 0, height: 0 }}
+                                      className="pl-4 overflow-hidden"
+                                    >
+                                      <Link
+                                        href={`/academy/${cat.slug}`}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                      >
+                                        <div className="group flex items-center gap-2 p-2.5 rounded-lg bg-gradient-to-r from-neon-cyan/10 to-neon-blue/10 hover:from-neon-cyan/15 hover:to-neon-blue/15 transition-all my-1">
+                                          <span className="text-xs font-semibold text-neon-cyan">All {cat.title} Courses</span>
+                                          <ArrowRight className="w-3 h-3 ml-auto text-neon-cyan group-hover:translate-x-0.5 transition-transform" />
+                                        </div>
+                                      </Link>
+                                      {cat.courses.map((course) => (
+                                        <DropdownItem
+                                          key={course.slug}
+                                          href={`/academy/${course.categorySlug}/${course.slug}`}
+                                          icon={course.icon}
+                                          name={course.title}
+                                          description={course.description}
+                                          color={course.color}
+                                          onClick={() => setIsMobileMenuOpen(false)}
+                                        />
+                                      ))}
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
                             ))
                           ))}
 
+                        {/* Services → list services only (Showcase is its own item) */}
                         {link.label === "Services" && (
                           <>
-                            <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                              Services
-                            </p>
+                            <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Services</p>
                             {services.map((service) => (
                               <DropdownItem
                                 key={service.slug}
@@ -437,44 +532,6 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
                                 description={service.shortDescription}
                                 color={service.color}
                                 onClick={() => setIsMobileMenuOpen(false)}
-                              />
-                            ))}
-                            <div className="h-px bg-border/50 my-2" />
-                            <Link href="/showcase" onClick={() => setIsMobileMenuOpen(false)}>
-                              <div className="group flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-neon-cyan/10 to-neon-blue/10 hover:from-neon-cyan/20 hover:to-neon-blue/20 transition-all mb-1">
-                                <span className="font-medium text-sm text-neon-blue">All Showcase</span>
-                                <ArrowRight className="w-4 h-4 ml-auto text-neon-blue group-hover:translate-x-1 transition-transform" />
-                              </div>
-                            </Link>
-                            <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                              Demo Templates
-                            </p>
-                            {demos.map((demo) => (
-                              <DropdownItem
-                                key={demo.slug}
-                                href={demo.liveUrl}
-                                icon={demo.icon}
-                                name={demo.name}
-                                description={demo.shortDescription}
-                                color={demo.color}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                external
-                              />
-                            ))}
-                            <div className="h-px bg-border/50 my-2" />
-                            <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                              Portfolio
-                            </p>
-                            {portfolio.map((item) => (
-                              <DropdownItem
-                                key={item.slug}
-                                href={item.liveUrl}
-                                icon={item.icon}
-                                name={item.name}
-                                description={item.shortDescription}
-                                color={item.color}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                external
                               />
                             ))}
                           </>
@@ -492,11 +549,26 @@ export function Navbar({ posts = [], courses = [] }: NavbarProps) {
                               onClick={() => setIsMobileMenuOpen(false)}
                             />
                           ))}
-
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
+
+                {/* Mobile Showcase — own item after Services */}
+                {link.label === "Services" && (
+                  <Link
+                    href="/showcase"
+                    className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      pathname === "/showcase"
+                        ? "text-neon-pink bg-neon-pink/10"
+                        : "text-neon-purple hover:bg-muted/50"
+                    }`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Showcase
+                  </Link>
+                )}
+                </React.Fragment>
               ))}
 
               {/* Mobile Contact Button */}

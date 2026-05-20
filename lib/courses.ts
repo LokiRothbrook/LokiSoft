@@ -85,6 +85,7 @@ export interface CourseMeta {
   estimatedHours: number;
   /** Each entry is "categorySlug/courseSlug" */
   prerequisites: string[];
+  order: number;
   body: string;
 }
 
@@ -161,6 +162,7 @@ function parseCourseInfo(categorySlug: string, courseSlug: string): CourseMeta |
     prerequisites: Array.isArray(data.prerequisites)
       ? data.prerequisites.map(String)
       : [],
+    order: Number(data.order) || 999,
     body: content,
   };
 }
@@ -223,7 +225,8 @@ export function getAllCategories(): Category[] {
           if (!meta) return null;
           return { ...meta, lessons: getLessonsForCourse(e.name, ce.name) };
         })
-        .filter((c): c is Course => c !== null);
+        .filter((c): c is Course => c !== null)
+        .sort((a, b) => a.order - b.order);
 
       return { ...categoryMeta, courses };
     })

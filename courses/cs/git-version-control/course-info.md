@@ -6,6 +6,7 @@ color: "purple"
 difficulty: 1
 estimatedHours: 4
 prerequisites: ["cs/dev-environment"]
+order: 2
 ---
 
 Version control is how developers save their work, collaborate without overwriting each other, and roll back mistakes. Git is the industry standard — and GitHub is where the world's code lives.

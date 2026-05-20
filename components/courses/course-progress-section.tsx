@@ -102,7 +102,7 @@ export function CourseCtaButton({ categorySlug, courseSlug, lessons }: CoursePro
 
   if (allDone) {
     return (
-      <Link href={`/courses/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
+      <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
         <Button className="bg-green-500 hover:bg-green-400 text-black font-semibold group">
           <Trophy className="w-4 h-4 mr-2" />
           Review Course
@@ -114,7 +114,7 @@ export function CourseCtaButton({ categorySlug, courseSlug, lessons }: CoursePro
 
   if (!nextLesson || completionCount === 0) {
     return (
-      <Link href={`/courses/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
+      <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
         <Button className="bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group">
           <PlayCircle className="w-4 h-4 mr-2" />
           Start Course
@@ -126,7 +126,7 @@ export function CourseCtaButton({ categorySlug, courseSlug, lessons }: CoursePro
 
   if (nextLesson.isQuiz) {
     return (
-      <Link href={`/courses/${categorySlug}/${courseSlug}/lessons/${nextLesson.slug}`}>
+      <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${nextLesson.slug}`}>
         <Button className="bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group">
           <HelpCircle className="w-4 h-4 mr-2" />
           Start Quiz
@@ -137,7 +137,7 @@ export function CourseCtaButton({ categorySlug, courseSlug, lessons }: CoursePro
   }
 
   return (
-    <Link href={`/courses/${categorySlug}/${courseSlug}/lessons/${nextLesson.slug}`}>
+    <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${nextLesson.slug}`}>
       <Button className="bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group">
         <RotateCcw className="w-4 h-4 mr-2" />
         Resume Course
@@ -221,7 +221,7 @@ export function CourseCurriculum({ categorySlug, courseSlug, lessons }: CoursePr
               {/* Row content */}
               <div className="flex-1 pb-6">
                 <Link
-                  href={`/courses/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
+                  href={`/academy/${categorySlug}/${courseSlug}/lessons/${lesson.slug}`}
                   className={`group flex items-start justify-between gap-4 rounded-xl p-3 transition-colors ${
                     isNext ? "bg-neon-cyan/5 hover:bg-neon-cyan/10" : "hover:bg-white/5"
                   }`}
@@ -307,7 +307,7 @@ function BottomCtaButton({ categorySlug, courseSlug, lessons }: CourseProgressSe
 
   if (allDone) {
     return (
-      <Link href={`/courses/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
+      <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
         <Button variant="outline" className="border-green-400/40 text-green-400 hover:bg-green-400/10 group">
           <Trophy className="w-4 h-4 mr-2" />
           Course Complete — Review from Start
@@ -319,7 +319,7 @@ function BottomCtaButton({ categorySlug, courseSlug, lessons }: CourseProgressSe
 
   if (!nextLesson || completionCount === 0) {
     return (
-      <Link href={`/courses/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
+      <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${lessons[0].slug}`}>
         <Button variant="outline" className="border-neon-cyan/40 text-neon-cyan hover:bg-neon-cyan/10 group">
           <PlayCircle className="w-4 h-4 mr-2" />
           Begin with Lesson 1
@@ -330,7 +330,7 @@ function BottomCtaButton({ categorySlug, courseSlug, lessons }: CourseProgressSe
   }
 
   return (
-    <Link href={`/courses/${categorySlug}/${courseSlug}/lessons/${nextLesson.slug}`}>
+    <Link href={`/academy/${categorySlug}/${courseSlug}/lessons/${nextLesson.slug}`}>
       <Button variant="outline" className="border-neon-cyan/40 text-neon-cyan hover:bg-neon-cyan/10 group">
         {nextLesson.isQuiz ? (
           <><HelpCircle className="w-4 h-4 mr-2" />Continue to Quiz</>

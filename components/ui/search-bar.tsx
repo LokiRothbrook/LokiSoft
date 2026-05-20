@@ -42,6 +42,7 @@ interface SearchBarProps {
   }[];
   courses?: {
     slug: string;
+    categorySlug: string;
     title: string;
     description: string;
     lessons?: { slug: string; title: string; excerpt: string; isQuiz: boolean }[];
@@ -51,7 +52,7 @@ interface SearchBarProps {
 const staticPages: SearchResult[] = [
   { type: "page", title: "Home", url: "/", description: "Return to the homepage" },
   { type: "page", title: "Blog", url: "/blog", description: "Read our latest articles" },
-  { type: "page", title: "Courses", url: "/courses", description: "Free web development courses" },
+  { type: "page", title: "Academy", url: "/academy", description: "Free web development courses" },
   { type: "page", title: "Services", url: "/services", description: "Explore our services" },
   { type: "page", title: "Products", url: "/products", description: "Discover our products" },
   { type: "page", title: "About", url: "/about", description: "Learn about LokiSoft" },
@@ -125,14 +126,14 @@ export function SearchBar({ posts = [], courses = [] }: SearchBarProps) {
         type: "course",
         title: course.title,
         description: course.description,
-        url: `/courses/${course.slug}`,
+        url: `/academy/${course.categorySlug}/${course.slug}`,
       });
       course.lessons?.forEach((lesson) => {
         results.push({
           type: "lesson",
           title: lesson.title,
           description: lesson.excerpt,
-          url: `/courses/${course.slug}/lessons/${lesson.slug}`,
+          url: `/academy/${course.categorySlug}/${course.slug}/lessons/${lesson.slug}`,
           category: lesson.isQuiz ? "Quiz" : course.title,
         });
       });

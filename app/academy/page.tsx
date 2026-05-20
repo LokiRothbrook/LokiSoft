@@ -2,12 +2,13 @@ import { Metadata } from "next";
 import { GraduationCap, Sparkles } from "lucide-react";
 import { getAllCategories } from "@/lib/courses";
 import { CategoryCard } from "@/components/courses/category-card";
+import { ContinueLearningSection } from "@/components/courses/continue-learning";
 import { siteConfig } from "@/lib/data/site";
 
 export const metadata: Metadata = {
-  title: "Courses",
+  title: "Academy",
   description: "Free, high-quality courses on web development. From fundamentals to full-stack applications.",
-  alternates: { canonical: `${siteConfig.baseUrl}/courses` },
+  alternates: { canonical: `${siteConfig.baseUrl}/academy` },
 };
 
 export default function CoursesPage() {
@@ -31,6 +32,9 @@ export default function CoursesPage() {
             concept, building real things along the way. No fluff. No paywalls.
           </p>
         </div>
+
+        {/* Continue Learning banner — client component, only renders when courses are in progress */}
+        <ContinueLearningSection categories={categories} />
 
         {/* Categories */}
         {categories.length === 0 ? (

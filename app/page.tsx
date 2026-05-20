@@ -44,7 +44,7 @@ export default function HomePage() {
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Link href="/courses">
+            <Link href="/academy">
               <Button size="lg" className="w-full bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group py-6 text-lg">
                 View Courses
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -125,7 +125,7 @@ export default function HomePage() {
               const c = colorClasses[course.color as keyof typeof colorClasses] ?? colorClasses.cyan;
 
               return (
-                <Link key={course.slug} href={`/courses/${course.slug}`}>
+                <Link key={course.slug} href={`/academy/${course.categorySlug}/${course.slug}`}>
                   <GlassCard className="h-full group cursor-pointer" glow={c.glow}>
                     <div className="flex items-center justify-between mb-4">
                       <div className={`p-3 rounded-xl ${c.icon}`}>
@@ -162,7 +162,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-8 text-center">
-            <Link href="/courses">
+            <Link href="/academy">
               <Button size="lg" className="bg-neon-cyan hover:bg-neon-cyan/80 text-black font-semibold group">
                 View All Courses
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
