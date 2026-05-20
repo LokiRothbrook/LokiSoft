@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#ec4899"/>
+      <stop offset="50%"  stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softglow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Site background colour -->
+  <rect width="512" height="512" rx="100" fill="#0d0b14"/>
+
+  <!-- Outer hex — thick gradient stroke -->
+  <g filter="url(#glow)">
+    <polygon
+      points="256,60 416,158 416,354 256,452 96,354 96,158"
+      fill="rgba(168,85,247,0.06)"
+      stroke="url(#grad)"
+      stroke-width="22"
+      stroke-linejoin="round"/>
+  </g>
+
+  <!-- Inner hex — thin purple dashed ring -->
+  <g filter="url(#softglow)">
+    <polygon
+      points="256,148 336,196 336,316 256,364 176,316 176,196"
+      fill="none"
+      stroke="#a855f7"
+      stroke-width="6"
+      stroke-linejoin="round"
+      stroke-dasharray="28 14"
+      opacity="0.55"/>
+  </g>
+
+  <!-- Circuit nodes at three alternating outer vertices -->
+  <g filter="url(#glow)">
+    <circle cx="256" cy="60"  r="13" fill="#ec4899"/>
+    <circle cx="416" cy="354" r="13" fill="#a855f7"/>
+    <circle cx="96"  cy="354" r="13" fill="#22d3ee"/>
+  </g>
+
+  <!-- Central neon ring (donut) -->
+  <g filter="url(#glow)">
+    <circle cx="256" cy="256" r="38" fill="none" stroke="url(#grad)" stroke-width="18"/>
+    <circle cx="256" cy="256" r="12" fill="#22d3ee"/>
+  </g>
+</svg>
