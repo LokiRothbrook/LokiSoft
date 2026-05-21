@@ -54,7 +54,7 @@ export function QuizGroup({ children, title }: QuizGroupProps) {
 
   return (
     <QuizContext.Provider value={{ totalQuestions, answeredQuestions, correctAnswers, registerQuestion, recordAnswer }}>
-      <div className="my-8 rounded-xl border-2 border-neon-cyan/40 bg-neon-cyan/5 p-6 max-w-[80%]">
+      <div className="my-8 rounded-xl border-2 border-neon-cyan/40 bg-neon-cyan/5 p-6 max-w-full lg:max-w-[80%]">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
