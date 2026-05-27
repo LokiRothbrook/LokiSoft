@@ -70,8 +70,8 @@ const nextConfig: NextConfig = {
               "font-src 'self' data:",
               // Images: RESTRICTED to specific trusted domains only
               "img-src 'self' data: blob: https://res.cloudinary.com https://cdn.jsdelivr.net https://*.githubusercontent.com",
-              // Connect: allow self, Giscus API, and Turnstile verification
-              "connect-src 'self' https://giscus.app https://challenges.cloudflare.com",
+              // Connect: allow self, Giscus API, Turnstile verification, and GitHub API (for release fetching from user's browser)
+              "connect-src 'self' https://giscus.app https://challenges.cloudflare.com https://api.github.com",
               // Frames: allow Giscus for comments and Turnstile for CAPTCHA
               "frame-src 'self' https://giscus.app https://challenges.cloudflare.com",
               // Frame ancestors: only self (prevents clickjacking)

@@ -16,6 +16,67 @@ export interface Product {
 
 export const products: Product[] = [
   {
+    slug: "lokiasam",
+    name: "LokiASAM",
+    tagline: "Manage your ARK: Survival Ascended servers like a pro",
+    shortDescription: "A free, open-source desktop manager for ARK: Survival Ascended dedicated servers on Windows and Linux",
+    description:
+      "LokiASAM is a full-featured desktop application for managing dedicated ARK: Survival Ascended servers. Built with Tauri, Next.js, and Rust — it runs natively on Windows and Linux with no browser required, no monthly subscription, and no cloud dependency. Create and manage multiple servers, install mods, automate backups, and monitor live logs all from one unified interface. Cluster support, Discord notifications, Proton-GE integration on Linux, and auto-updates are all built in.",
+    icon: "Server",
+    features: [
+      {
+        title: "Server Management",
+        description:
+          "Create, start, stop, restart, clone, and delete dedicated ASA servers with a clean, unified dashboard.",
+        icon: "Server",
+      },
+      {
+        title: "Mod Manager",
+        description:
+          "Install mods by ID, drag to reorder, toggle per-server, and browse CurseForge directly from the app.",
+        icon: "Package",
+      },
+      {
+        title: "RCON Console",
+        description:
+          "Live terminal with command history, saved presets, and broadcast support to reach all servers at once.",
+        icon: "Terminal",
+      },
+      {
+        title: "Scheduled Automation",
+        description:
+          "Cron-based schedules for backups, updates, restarts, and RCON broadcasts — set it and forget it.",
+        icon: "Clock",
+      },
+      {
+        title: "Backup & Restore",
+        description:
+          "Create, restore, and prune ZIP backups per server with configurable retention policies.",
+        icon: "HardDrive",
+      },
+      {
+        title: "SteamCMD Integration",
+        description:
+          "Automated SteamCMD install, update, and validation with a shared cache to speed up multi-server setups.",
+        icon: "Download",
+      },
+      {
+        title: "Cluster Support",
+        description:
+          "Group servers into clusters with a shared directory for seamless cross-server gameplay.",
+        icon: "Network",
+      },
+      {
+        title: "Notifications",
+        description:
+          "Discord webhooks, email (SMTP), and desktop notifications keep you informed of server events.",
+        icon: "Bell",
+      },
+    ],
+    status: "beta",
+    color: "pink",
+  },
+  {
     slug: "lokimoney",
     name: "LokiMoney",
     tagline: "Take control of your finances",
